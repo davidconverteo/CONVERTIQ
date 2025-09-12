@@ -118,6 +118,7 @@ export default function MMMPage() {
 }
 
 const CustomTreemapContent = ({ root, depth, x, y, width, height, index, payload, rank, name }: any) => {
+    if (!payload) return null;
     return (
       <g>
         <rect
@@ -148,7 +149,7 @@ const CustomTreemapContent = ({ root, depth, x, y, width, height, index, payload
           fill="#fff"
           fontSize={12}
         >
-          ({payload.value}%)
+          ({payload.size}%)
         </text>
       </g>
     );
