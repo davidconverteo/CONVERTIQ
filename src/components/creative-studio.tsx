@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -219,14 +220,14 @@ export default function CreativeStudio() {
                      <FormField
                         control={briefForm.control}
                         name="baseImageFile"
-                        render={({ field: { onChange, ...fieldProps } }) => (
+                        render={({ field: { onChange, value, ...fieldProps } }) => (
                             <FormItem>
                                 <FormLabel>Uploader votre image</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                        {...fieldProps} 
-                                        type="file" 
-                                        accept="image/*" 
+                                    <Input
+                                        {...fieldProps}
+                                        type="file"
+                                        accept="image/*"
                                         onChange={(e) => handleFileChange(e, 'baseImage', onChange)}
                                     />
                                 </FormControl>
@@ -243,14 +244,14 @@ export default function CreativeStudio() {
                         <FormField
                         control={briefForm.control}
                         name="inspirationFile"
-                        render={({ field: { onChange, ...fieldProps } }) => (
+                        render={({ field: { onChange, value, ...fieldProps } }) => (
                             <FormItem>
                             <FormLabel>Inspiration (Optionnel)</FormLabel>
                             <FormControl>
-                                <Input 
-                                    {...fieldProps} 
-                                    type="file" 
-                                    accept="image/*" 
+                                <Input
+                                    {...fieldProps}
+                                    type="file"
+                                    accept="image/*"
                                     onChange={(e) => handleFileChange(e, 'inspiration', onChange)}
                                 />
                             </FormControl>
@@ -263,15 +264,15 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="logoFile"
-                      render={({ field: { onChange, ...fieldProps } }) => (
+                      render={({ field: { onChange, value, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Logo (Optionnel)</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                                 {...fieldProps}
-                                type="file" 
-                                accept="image/*" 
-                                onChange={(e) => handleFileChange(e, 'logo', onChange)} 
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleFileChange(e, 'logo', onChange)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -281,14 +282,14 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="guidelinesFile"
-                      render={({ field: { onChange, ...fieldProps } }) => (
+                      render={({ field: { onChange, value, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Charte Graphique</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                                 {...fieldProps}
-                                type="file" 
-                                accept="image/*,application/pdf" 
+                                type="file"
+                                accept="image/*,application/pdf"
                                 onChange={(e) => handleFileChange(e, 'guidelines', onChange)}
                             />
                           </FormControl>
@@ -383,5 +384,3 @@ export default function CreativeStudio() {
     </div>
   );
 }
-
-    
