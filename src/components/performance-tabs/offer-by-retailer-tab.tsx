@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Treemap } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, Cell } from 'recharts';
 import { cn } from '@/lib/utils';
 import { retailerOptions as allRetailerOptions } from '@/services/filters-data';
 
@@ -31,36 +31,36 @@ const generatePotentialData = (retailer: string) => {
         return result * (max - min) + min;
     };
 
-    const products = [
-        'Yaourt Brassé Fraise 4x125g',
-        'Yaourt Brassé Vanille 4x125g',
-        'Grand Pot Nature Bio 450g',
-        'Skyr Nature 150g',
-        'Yaourt à la Grecque Miel 2x150g',
-        'Gourde Pomme 4x90g',
-        'Dessert Végétal Amande 2x100g'
+    const allProducts = [
+        'Yaourt Brassé Fraise 4x125g', 'Yaourt Brassé Vanille 4x125g', 'Grand Pot Nature Bio 450g', 'Skyr Nature 150g', 'Yaourt à la Grecque Miel 2x150g',
+        'Gourde Pomme 4x90g', 'Dessert Végétal Amande 2x100g', 'Yaourt Brassé Pêche 4x125g', 'Skyr sur lit de fruits 150g', 'Yaourt Végétal Coco 2x100g',
+        'Crème Dessert Chocolat 4x100g', 'Yaourt à boire Framboise 500ml', 'Fromage Blanc 500g', 'Petit Suisse Nature 6x60g', 'Kéfir de Lait Nature 1L',
+        'Yaourt Bio Citron 4x125g', 'Skyr Vanille 150g', 'Yaourt Grec Myrtille 2x150g', 'Gourde Poire 4x90g', 'Dessert Végétal Soja Nature 4x100g'
     ];
 
-    const potential = products
-        .map(p => ({
+    const potential = allProducts
+        .map((p, i) => ({
             name: p,
-            gain: seededRandom(15000, 35000, p),
-            listed: seededRandom(0, 1, p) > 0.4
+            gain: seededRandom(10000, 50000, p) / (1 + i * 0.2), // Diminishing returns
+            listed: seededRandom(0, 1, p) > 0.6
         }))
         .filter(p => !p.listed)
         .sort((a,b) => b.gain - a.gain)
-        .slice(0, 5);
+        .slice(0, 20);
 
     let cumulativeGain = 0;
+    const baseCA = 250000;
     const saturation = potential.map((p, index) => {
+        const previousCA = baseCA + cumulativeGain;
         cumulativeGain += p.gain;
         return {
-            name: p.name,
+            name: `${index + 1}. ${p.name}`,
             references: index + 1,
-            ca: cumulativeGain,
+            base: previousCA,
+            increment: p.gain,
+            total: previousCA + p.gain,
         };
     });
-    saturation.unshift({ name: 'Baseline', references: 0, ca: 25000 });
 
     const planogram = [
         { name: 'La Prairie Gourmande', size: seededRandom(15, 25, 'lpg') },
@@ -76,11 +76,12 @@ const generatePotentialData = (retailer: string) => {
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
       return (
         <div className="rounded-lg border bg-background p-2 shadow-sm">
-          <p className="font-bold text-foreground">{`${payload[0].payload.name}`}</p>
-          <p className="text-sm text-muted-foreground">{`CA Cumulé : ${payload[0].value.toLocaleString('fr-FR')}€`}</p>
-          <p className="text-sm text-muted-foreground">{`Après ${label} réf.`}</p>
+          <p className="font-bold text-foreground">{`${data.name}`}</p>
+          <p className="text-sm text-primary">{`Gain Incrémental : ${data.increment.toLocaleString('fr-FR')}€`}</p>
+          <p className="text-sm text-muted-foreground">{`CA Total : ${data.total.toLocaleString('fr-FR')}€`}</p>
         </div>
       );
     }
@@ -119,27 +120,29 @@ export default function OfferByRetailerTab({ filters }: OfferByRetailerTabProps)
                         <CardTitle>Potentiel de Référencement</CardTitle>
                         <CardDescription>Gain de CA potentiel en référençant ces produits.</CardDescription>
                     </CardHeader>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Référence Non Listée</TableHead>
-                                <TableHead className="text-right">Gain de CA Potentiel</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {potential.map((p) => (
-                                <TableRow 
-                                    key={p.name}
-                                    className={cn("transition-colors", highlightedProduct === p.name ? "bg-primary/10" : "")}
-                                    onMouseEnter={() => setHighlightedProduct(p.name)}
-                                    onMouseLeave={() => setHighlightedProduct(null)}
-                                >
-                                    <TableCell className="font-medium">{p.name}</TableCell>
-                                    <TableCell className="text-right font-bold text-green-600">{p.gain.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}</TableCell>
+                     <div className="h-[350px] overflow-auto">
+                        <Table>
+                            <TableHeader className="sticky top-0 bg-card">
+                                <TableRow>
+                                    <TableHead>Référence Non Listée</TableHead>
+                                    <TableHead className="text-right">Gain de CA Potentiel</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {potential.map((p, index) => (
+                                    <TableRow 
+                                        key={p.name}
+                                        className={cn("transition-colors", highlightedProduct === `${index + 1}. ${p.name}` ? "bg-primary/10" : "")}
+                                        onMouseEnter={() => setHighlightedProduct(`${index + 1}. ${p.name}`)}
+                                        onMouseLeave={() => setHighlightedProduct(null)}
+                                    >
+                                        <TableCell className="font-medium">{p.name}</TableCell>
+                                        <TableCell className="text-right font-bold text-green-600">{p.gain.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </Card>
                 <Card>
                     <CardHeader>
@@ -147,9 +150,10 @@ export default function OfferByRetailerTab({ filters }: OfferByRetailerTabProps)
                         <CardDescription>Impact du référencement de nouvelles références sur le CA.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <LineChart 
-                                data={saturation}
+                        <ResponsiveContainer width="100%" height={350}>
+                            <BarChart 
+                                data={saturation} 
+                                margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
                                 onMouseMove={(state) => {
                                     if (state.isTooltipActive && state.activePayload) {
                                         setHighlightedProduct(state.activePayload[0].payload.name);
@@ -158,11 +162,20 @@ export default function OfferByRetailerTab({ filters }: OfferByRetailerTabProps)
                                 onMouseLeave={() => setHighlightedProduct(null)}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis type="number" dataKey="references" name="Nombre de Références" domain={[0, 'dataMax']} />
+                                <XAxis dataKey="references" name="Nb. Réf." />
                                 <YAxis tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}/>
                                 <Tooltip content={<CustomTooltip />} />
-                                <Line type="monotone" dataKey="ca" strokeWidth={2} stroke="hsl(var(--primary))" dot={{ r: 4 }} activeDot={{ r: 8 }} />
-                            </LineChart>
+                                <Legend verticalAlign="top" payload={[{ value: 'CA existant', type: 'rect', color: 'hsl(var(--muted))' }, { value: 'Gain incrémental', type: 'rect', color: 'hsl(var(--primary))' }]} />
+                                <Bar dataKey="base" name="CA existant" stackId="a" fill="hsl(var(--muted))" />
+                                <Bar dataKey="increment" name="Gain incrémental" stackId="a" fill="hsl(var(--primary))">
+                                    {saturation.map((entry, index) => (
+                                        <Cell 
+                                            key={`cell-${index}`} 
+                                            className={cn(highlightedProduct === entry.name ? "opacity-100" : "opacity-75", "transition-opacity")}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
                 </Card>
@@ -220,3 +233,4 @@ const CustomizedTreemapContent = (props: any) => {
       </g>
     );
   };
+
