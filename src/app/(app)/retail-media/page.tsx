@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, MapPin, DollarSign, Eye, MousePointerClick, TrendingUp, CalendarDays, ChevronRight, Presentation } from "lucide-react";
+import { ShoppingCart, Filter, MapPin, DollarSign, Eye, MousePointerClick, TrendingUp, CalendarDays, ChevronRight, Presentation, Sparkles } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -17,32 +17,40 @@ import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 
 const campaignDataByCountry = {
   France: [
+    { id: 'RM-FR-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 5.8, sales_attributed: 350000, spend: 60345, details: { type: 'Sponsored Products', acos: '17.2%', clicks: 180000, ctr: '1.5%', cpc: '0.34€', recommendation: "Campagne 'always-on' très performante. Maintenir le budget et optimiser la liste de mots-clés négatifs tous les mois." }},
     { id: 'RM-FR-01', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-07-15'), end: new Date('2024-08-15'), retailer: 'Unlimitail', lever: 'Sponsored Products', objective: 'Visibilité', status: 'Terminée', roas: 5.1, sales_attributed: 45000, spend: 8824, details: { type: 'Sponsored Products', acos: '19.6%', clicks: 12500, ctr: '1.2%', cpc: '0.85€', recommendation: "Le ROAS est excellent. Augmenter le budget sur les mots-clés les plus performants pour maximiser la part de voix." }},
     { id: 'RM-FR-02', brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date('2024-08-01'), end: new Date('2024-08-31'), retailer: 'Amazon Ads', lever: 'Display On-site', objective: 'Notoriété', status: 'En cours', roas: 2.8, sales_attributed: 22000, spend: 7857, details: { type: 'Display On-site', impressions: 2500000, viewability: '75%', ctr: '0.45%', brand_uplift: '15%', recommendation: "La visibilité est bonne mais le CTR est faible. Tester de nouvelles créations visuelles pour améliorer l'engagement." }},
     { id: 'RM-FR-03', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-09-05'), end: new Date('2024-09-07'), retailer: 'Carrefour', lever: 'Animation Magasin', objective: 'Recrutement', status: 'Terminée', sales_uplift: 25, sales_attributed: 54000, spend: 5400, details: { type: 'Animation Magasin', stores_participating: 50, cost_per_visitor: '4.50€', sales_uplift_vs_control: '25%', recommendation: "Forte augmentation des ventes dans les magasins participants. Envisager un déploiement national pour le prochain trimestre." }},
     { id: 'RM-FR-04', brand: 'La Prairie Gourmande', product: 'Pack de 4 Fraise', start: new Date('2024-10-01'), end: new Date('2024-10-31'), retailer: 'Système U', lever: 'Coupons', objective: 'Fidélisation', status: 'Planifiée', roas: null, sales_attributed: null, spend: 25000, details: { type: 'Coupons', coupons_distributed: 500000, estimated_redemption: '5%', offer_value: '0.50€', recommendation: "Le ciblage sur les acheteurs existants devrait renforcer la fidélité. Suivre le taux de rédemption de près." }},
+    { id: 'RM-FR-05', brand: 'Gamme Végétale', product: 'Dessert Soja', start: new Date('2024-06-01'), end: new Date('2024-06-30'), retailer: 'Unlimitail', lever: 'Display Off-site', objective: 'Considération', status: 'Terminée', roas: 3.2, sales_attributed: 18000, spend: 5625, details: { type: 'Display Off-site', reach: 800000, offsite_sales_lift: '8%', recommendation: "Bonne performance pour une campagne de considération. Le retargeting a bien fonctionné." }},
+    { id: 'RM-FR-06', brand: 'Gamme Skyr', product: 'Skyr Fruits', start: new Date('2024-11-01'), end: new Date('2024-11-30'), retailer: 'Amazon Ads', lever: 'Sponsored Brands', objective: 'Notoriété', status: 'Planifiée', roas: null, sales_attributed: null, spend: 12000, details: { type: 'Sponsored Brands', recommendation: "Campagne de notoriété pour la nouvelle gamme Skyr Fruits. Objectif : 1M d'impressions." }},
   ],
   USA: [
+    { id: 'RM-US-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 6.5, sales_attributed: 850000, spend: 130769, details: { type: 'Sponsored Products', acos: '15.4%', clicks: 450000, ctr: '2.0%', cpc: '0.95$', recommendation: "Excellent ROAS pour une campagne 'always-on'. La part de voix est dominante sur les mots-clés principaux." }},
     { id: 'RM-US-01', brand: 'Gourdes Enfant', product: 'Gourde Fraise-Banane', start: new Date('2024-07-10'), end: new Date('2024-08-10'), retailer: 'Walmart Connect', lever: 'Sponsored Products', objective: 'Conversion', status: 'Terminée', roas: 6.2, sales_attributed: 120000, spend: 19355, details: { type: 'Sponsored Products', acos: '16.1%', clicks: 45000, ctr: '2.1%', cpc: '1.10$', recommendation: "Performance exceptionnelle. Le produit résonne bien avec la clientèle de Walmart. Le CPC reste maîtrisé." }},
     { id: 'RM-US-02', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-08-01'), end: new Date('2024-08-31'), retailer: 'Instacart Ads', lever: 'Audience Extension', objective: 'Recrutement', status: 'En cours', roas: 3.5, sales_attributed: 65000, spend: 18571, details: { type: 'Audience Extension', reach: 1200000, cpm: '8.50$', offsite_sales_lift: '12%', recommendation: "Bonne portée de la campagne. Mesurer l'impact sur la part de marché chez les nouveaux acheteurs à la fin de la campagne." }},
+    { id: 'RM-US-03', brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date('2024-09-01'), end: new Date('2024-09-30'), retailer: 'Kroger Precision Marketing', lever: 'Coupons', objective: 'Essai', status: 'Planifiée', roas: null, sales_attributed: null, spend: 40000, details: { type: 'Coupons', coupons_distributed: 800000, estimated_redemption: '6%', offer_value: '1.00$', recommendation: "Ciblage précis sur les acheteurs de yaourts concurrents. Le ROI dépendra fortement du taux de rédemption." }},
+    { id: 'RM-US-04', brand: 'Gamme Végétale', product: 'Dessert Amande', start: new Date('2024-06-15'), end: new Date('2024-07-15'), retailer: 'Amazon Ads', lever: 'Display On-site', objective: 'Considération', status: 'Terminée', roas: 3.1, sales_attributed: 48000, spend: 15484, details: { type: 'Display On-site', impressions: 4000000, viewability: '70%', ctr: '0.35%', brand_uplift: '10%', recommendation: "La campagne a bien fonctionné pour introduire le produit. Prochaine étape : campagne de conversion." }},
   ],
   Japan: [
-     { id: 'RM-JP-01', brand: 'Gamme Végétale', product: 'Dessert Soja Chocolat', start: new Date('2024-09-01'), end: new Date('2024-09-30'), retailer: 'Rakuten Ads', lever: 'Coupons', objective: 'Essai Produit', status: 'Planifiée', roas: null, sales_attributed: null, spend: 14000, details: { type: 'Coupons', coupons_distributed: 1000000, estimated_redemption: '8%', offer_value: '50 JPY', recommendation: "Levier clé pour pénétrer le marché japonais. L'offre agressive devrait stimuler l'essai." }}
+    { id: 'RM-JP-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 4.9, sales_attributed: 250000, spend: 51020, details: { type: 'Sponsored Products', acos: '20.4%', clicks: 300000, ctr: '1.0%', cpc: '20 JPY', recommendation: "La campagne maintient une bonne visibilité. L'ACoS est plus élevé qu'en EU/US, ce qui est normal pour le marché japonais. Continuer à optimiser." }},
+    { id: 'RM-JP-01', brand: 'Gamme Végétale', product: 'Dessert Soja Chocolat', start: new Date('2024-09-01'), end: new Date('2024-09-30'), retailer: 'Rakuten Ads', lever: 'Coupons', objective: 'Essai Produit', status: 'Planifiée', roas: null, sales_attributed: null, spend: 14000, details: { type: 'Coupons', coupons_distributed: 1000000, estimated_redemption: '8%', offer_value: '50 JPY', recommendation: "Levier clé pour pénétrer le marché japonais. L'offre agressive devrait stimuler l'essai." }},
+    { id: 'RM-JP-02', brand: 'Gourdes Enfant', product: 'Gourde Pomme', start: new Date('2024-07-20'), end: new Date('2024-08-20'), retailer: 'Yahoo! Shopping', lever: 'Sponsored Products', objective: 'Conversion', status: 'Terminée', roas: 4.5, sales_attributed: 85000, spend: 18889, details: { type: 'Sponsored Products', acos: '22.2%', clicks: 50000, ctr: '1.8%', cpc: '45 JPY', recommendation: "Bonne performance sur Yahoo. Le CPC est plus élevé que sur Amazon, mais le taux de conversion est bon." }},
   ]
 };
 
 const performanceByRetailer = {
-  France: [ { retailer: 'Unlimitail', ROI: 5.1, CPA: 0.71 }, { retailer: 'Amazon Ads', ROI: 2.8, CPA: 1.25 }, { retailer: 'Carrefour', ROI: 10, CPA: 0.8 }, { retailer: 'Système U', ROI: 4, CPA: 1.0 } ],
-  USA: [ { retailer: 'Walmart Connect', ROI: 6.2, CPA: 0.43 }, { retailer: 'Instacart Ads', ROI: 3.5, CPA: 0.98 } ],
-  Japan: [ { retailer: 'Rakuten Ads', ROI: 5.5, CPA: 0.5 } ]
+  France: [ { retailer: 'Unlimitail', ROI: 5.1, CPA: 0.71 }, { retailer: 'Amazon Ads', ROI: 5.8, CPA: 0.34 }, { retailer: 'Carrefour', ROI: 10, CPA: 0.8 }, { retailer: 'Système U', ROI: 4, CPA: 1.0 } ],
+  USA: [ { retailer: 'Walmart Connect', ROI: 6.2, CPA: 0.43 }, { retailer: 'Instacart Ads', ROI: 3.5, CPA: 0.98 }, { retailer: 'Kroger Precision Marketing', ROI: 4.8, CPA: 1.2 }, { retailer: 'Amazon Ads', ROI: 6.5, CPA: 0.95 } ],
+  Japan: [ { retailer: 'Rakuten Ads', ROI: 5.5, CPA: 0.5 }, { retailer: 'Amazon Ads', ROI: 4.9, CPA: 1.2 }, { retailer: 'Yahoo! Shopping', ROI: 4.5, CPA: 1.5 }]
 };
 
 const budgetAllocation = {
-    France: [{name: 'Sponsored Products', value: 8824}, {name: 'Display On-site', value: 7857}, {name: 'Animation Magasin', value: 5400}, {name: 'Coupons', value: 25000}],
-    USA: [{name: 'Sponsored Products', value: 19355}, {name: 'Audience Extension', value: 18571}],
-    Japan: [{name: 'Coupons', value: 14000}],
+    France: [{name: 'Sponsored Products', value: 69169}, {name: 'Display On-site', value: 7857}, {name: 'Animation Magasin', value: 5400}, {name: 'Coupons', value: 25000}, { name: 'Display Off-site', value: 5625 }, { name: 'Sponsored Brands', value: 12000 } ],
+    USA: [{name: 'Sponsored Products', value: 150124}, {name: 'Audience Extension', value: 18571}, {name: 'Coupons', value: 40000}, { name: 'Display On-site', value: 15484 }],
+    Japan: [{name: 'Sponsored Products', value: 69909}, {name: 'Coupons', value: 14000}],
 };
-const COLORS = ['#16a34a', '#0ea5e9', '#f97316', '#6366f1', '#f59e0b'];
+const COLORS = ['#16a34a', '#0ea5e9', '#f97316', '#6366f1', '#f59e0b', '#84cc16'];
 
 // --- Components ---
 
@@ -68,12 +76,13 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
         );
     };
 
-    const kpiHtml = {
-        'Sponsored Products': (d: any) => `${renderKpi('ACoS', d.acos)} ${renderKpi('Clics', d.clicks?.toLocaleString('fr-FR'))} ${renderKpi('CTR', d.ctr)} ${renderKpi('CPC Moyen', d.cpc)}`,
-        'Display On-site': (d: any) => `${renderKpi('Impressions', d.impressions?.toLocaleString('fr-FR'))} ${renderKpi('Visibilité', d.viewability)} ${renderKpi('CTR', d.ctr)} ${renderKpi('Brand Uplift', d.brand_uplift)}`,
-        'Audience Extension': (d: any) => `${renderKpi('Portée', d.reach?.toLocaleString('fr-FR'))} ${renderKpi('CPM', d.cpm)} ${renderKpi('Sales Lift Off-site', d.offsite_sales_lift)}`,
-        'Animation Magasin': (d: any) => `${renderKpi('Uplift Ventes', d.sales_uplift_vs_control, '%')} ${renderKpi('Visiteurs Engagés', d.visitors_engaged?.toLocaleString('fr-FR'))} ${renderKpi('Coût / Visiteur', d.cost_per_visitor)}`,
-        'Coupons': (d: any) => `${renderKpi('Taux de Rédemption', d.estimated_redemption || d.redemption_rate, '%')} ${renderKpi('Coupons Distribués', d.coupons_distributed?.toLocaleString('fr-FR'))} ${renderKpi('Valeur Offre', d.offer_value)}`
+    const kpiHtml: { [key: string]: (d: any) => string } = {
+        'Sponsored Products': (d: any) => [renderKpi('ACoS', d.acos), renderKpi('Clics', d.clicks?.toLocaleString('fr-FR')), renderKpi('CTR', d.ctr), renderKpi('CPC Moyen', d.cpc)].join(''),
+        'Display On-site': (d: any) => [renderKpi('Impressions', d.impressions?.toLocaleString('fr-FR')), renderKpi('Visibilité', d.viewability), renderKpi('CTR', d.ctr), renderKpi('Brand Uplift', d.brand_uplift)].join(''),
+        'Audience Extension': (d: any) => [renderKpi('Portée', d.reach?.toLocaleString('fr-FR')), renderKpi('CPM', d.cpm), renderKpi('ROAS', campaign.roas, 'x'), renderKpi('Sales Lift Off-site', d.offsite_sales_lift)].join(''),
+        'Animation Magasin': (d: any) => [renderKpi('Uplift Ventes', d.sales_uplift_vs_control, '%'), renderKpi('Visiteurs Engagés', d.visitors_engaged?.toLocaleString('fr-FR')), renderKpi('Coût / Visiteur', d.cost_per_visitor), renderKpi('Magasins Participants', d.stores_participating)].join(''),
+        'Coupons': (d: any) => [renderKpi('Taux de Rédemption', d.estimated_redemption || d.redemption_rate, '%'), renderKpi('Coupons Distribués', d.coupons_distributed?.toLocaleString('fr-FR')), renderKpi('Valeur Offre', d.offer_value)].join(''),
+        'Sponsored Brands': (d: any) => [renderKpi('Objectif Impressions', '1M'), renderKpi('Statut', 'Planifié')].join('')
     };
 
     return (
@@ -103,6 +112,7 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                 </div>
                  <Card className="bg-background">
                     <CardHeader className="flex-row items-center gap-2 space-y-0">
+                        <Sparkles className="h-5 w-5 text-accent" />
                         <CardTitle className="text-lg">Recommandation IA</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -196,13 +206,17 @@ const RetailPlanner = ({ campaigns }: { campaigns: any[] }) => {
 export default function RetailMediaPage() {
   const [country, setCountry] = useState<'France' | 'USA' | 'Japan'>('France');
   const [retailer, setRetailer] = useState('all');
+  const [brand, setBrand] = useState('all');
 
   const currentCampaigns = campaignDataByCountry[country]
-      .filter(c => retailer === 'all' || c.retailer === retailer);
+      .filter(c => retailer === 'all' || c.retailer === retailer)
+      .filter(c => brand === 'all' || c.brand === brand);
   
   const currentRetailerPerf = performanceByRetailer[country];
   const currentBudget = budgetAllocation[country];
+  
   const availableRetailers = ['all', ...Array.from(new Set(campaignDataByCountry[country].map(c => c.retailer)))];
+  const availableBrands = ['all', ...Array.from(new Set(campaignDataByCountry[country].map(c => c.brand)))];
 
   const aggregatedKpis = currentCampaigns.reduce((acc, campaign) => {
     if (campaign.status.toLowerCase() !== 'planifiée') {
@@ -221,11 +235,11 @@ export default function RetailMediaPage() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <CardTitle className="font-headline flex items-center gap-2"><MapPin /> Vue par Pays</CardTitle>
-                        <CardDescription>Sélectionnez un pays et une enseigne pour filtrer les données.</CardDescription>
+                        <CardDescription>Sélectionnez un pays, une enseigne et une marque pour filtrer les données.</CardDescription>
                     </div>
-                     <div className="flex items-center gap-2">
+                     <div className="flex items-center gap-2 flex-wrap">
                         <Filter className="h-5 w-5 text-muted-foreground" />
-                        <Select onValueChange={(val: 'France' | 'USA' | 'Japan') => { setCountry(val); setRetailer('all'); }} value={country}>
+                        <Select onValueChange={(val: 'France' | 'USA' | 'Japan') => { setCountry(val); setRetailer('all'); setBrand('all'); }} value={country}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Pays" />
                             </SelectTrigger>
@@ -241,6 +255,14 @@ export default function RetailMediaPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 {availableRetailers.map(r => <SelectItem key={r} value={r}>{r === 'all' ? 'Toutes les enseignes' : r}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <Select onValueChange={setBrand} value={brand}>
+                             <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Marque" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {availableBrands.map(b => <SelectItem key={b} value={b}>{b === 'all' ? 'Toutes les marques' : b}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -399,3 +421,5 @@ export default function RetailMediaPage() {
     </div>
   );
 }
+
+    
