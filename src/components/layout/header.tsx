@@ -15,7 +15,7 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/brand-media': { title: 'Brand Media', subtitle: "Analyse de la performance de vos campagnes." },
   '/retail-media': { title: 'Retail Media', subtitle: "Performance de vos activations e-commerce." },
   '/mmm': { title: 'Marketing Mix Modeling', subtitle: "Analysez la contribution de vos leviers." },
-  '/performances': { title: 'Performances Commerciales', subtitle: "Analysez vos ventes sur tous les canaux." },
+  '/performances': { title: 'Performances', subtitle: "Analysez vos ventes et données sur tous les canaux." },
   '/digital-shelf': { title: 'Digital Shelf', subtitle: "Monitorez votre présence en ligne." },
   '/donnees-consommateurs': { title: 'Données Consommateurs', subtitle: "Comprenez le profil de vos acheteurs." },
   '/settings': { title: 'Paramètres', subtitle: "Gérez les préférences de votre compte." },

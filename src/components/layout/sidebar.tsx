@@ -9,7 +9,7 @@ import {
   ShoppingCart,
   Sparkles,
   PieChart,
-  Tag,
+  TrendingUp,
   Store,
   Users,
   Settings,
@@ -24,7 +24,7 @@ const navItems = [
   { href: '/retail-media', icon: ShoppingCart, label: 'Retail Media' },
   { href: '/creative-studio', icon: Sparkles, label: 'Studio Créatif' },
   { href: '/mmm', icon: PieChart, label: 'MMM' },
-  { href: '/performances', icon: Tag, label: 'Performances Comm.' },
+  { href: '/performances', icon: TrendingUp, label: 'Performances' },
   { href: '/digital-shelf', icon: Store, label: 'Digital Shelf' },
   { href: '/donnees-consommateurs', icon: Users, label: 'Données Conso.' },
 ];
@@ -46,7 +46,7 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
             href={item.href}
             className={cn(
               'flex items-center gap-4 rounded-md px-4 py-2 text-sm font-medium transition-colors',
-              pathname === item.href
+              pathname.startsWith(item.href) && item.href !== '/dashboard' || pathname === item.href
                 ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                 : 'hover:bg-sidebar-accent/50'
             )}
