@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -79,14 +80,17 @@ export default function CreativeStudio() {
       const file = data.inspirationFile?.[0];
 
       if (file) {
+        toast({ title: "Analyse de l'inspiration...", description: "Génération d'un prompt amélioré." });
         const dataUri = await fileToDataUri(file);
         const promptResponse = await createPromptFromFileUpload({
           fileDataUri: dataUri,
           userPrompt: data.prompt,
         });
         finalPrompt = promptResponse.prompt;
+        briefForm.setValue('prompt', finalPrompt);
       }
 
+      toast({ title: "Génération en cours...", description: "Création de l'image de base, veuillez patienter." });
       const imageResponse = await generateMarketingImage({ prompt: finalPrompt });
       setBaseImage(imageResponse.imageUrl);
       toast({ title: "Image de base générée !", description: "Vous pouvez maintenant l'adapter aux différents canaux." });
@@ -178,7 +182,7 @@ export default function CreativeStudio() {
                  <div className="flex justify-center gap-4 min-h-[68px]">
                     {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
                     {previews.logo && <Image src={previews.logo} alt="Logo" width={60} height={60} className="object-contain rounded-md border p-1" />}
-                    {previews.guidelines && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                    {previews.guidelines && previews.guidelines.startsWith('data:image') && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isGenerating}>
@@ -260,3 +264,5 @@ export default function CreativeStudio() {
     </div>
   );
 }
+
+    

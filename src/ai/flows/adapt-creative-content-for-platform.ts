@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Adapts a creative image for a specific marketing platform.
@@ -104,3 +105,5 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
 export async function adaptCreativeContentForPlatform(input: AdaptCreativeContentForPlatformInput): Promise<AdaptCreativeContentForPlatformOutput> {
   return adaptCreativeContentForPlatformFlow(input);
 }
+
+    
