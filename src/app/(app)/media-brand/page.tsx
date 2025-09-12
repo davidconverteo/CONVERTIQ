@@ -19,38 +19,65 @@ import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 const campaignDataByCountry = {
   France: [
     { id: 'C001', brand: 'La Prairie Gourmande', product: 'Pack de 4 Fraise', start: new Date('2024-07-01'), end: new Date('2024-07-31'), lever: 'Social', channel: 'Meta', objective: 'Conversion', status: 'Terminée', roas: 4.2, ca_add: 85200, spend: 20286, reach: 750000, clicks: 15000 },
+    { id: 'C002', brand: 'Gamme Skyr', product: 'Skyr Nature 450g', start: new Date('2024-08-15'), end: new Date('2024-09-15'), lever: 'Radio', channel: 'NRJ', objective: 'Drive-to-store', status: 'En cours', roas: 2.5, ca_add: 75000, spend: 30000, reach: 3000000, clicks: 0 },
     { id: 'C003', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'TV', channel: 'TF1', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 450000, reach: 15000000, clicks: 0 },
-    { id: 'C011', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-05-10'), end: new Date('2024-06-10'), lever: 'Affichage', channel: 'JCDecaux', objective: 'Notoriété', status: 'Terminée', roas: 1.8, ca_add: 92000, spend: 51111, reach: 5000000, clicks: 0 },
-    { id: 'C012', brand: 'Gamme Skyr', product: 'Skyr Nature 450g', start: new Date('2024-08-15'), end: new Date('2024-09-15'), lever: 'Radio', channel: 'NRJ', objective: 'Drive-to-store', status: 'En cours', roas: 2.5, ca_add: 75000, spend: 30000, reach: 3000000, clicks: 0 },
-    { id: 'C013', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-10-01'), end: new Date('2024-10-31'), lever: 'Presse', channel: 'Le Figaro', objective: 'Considération', status: 'Planifiée', roas: null, ca_add: null, spend: 25000, reach: 1200000, clicks: 0 },
+    { id: 'C004', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-05-10'), end: new Date('2024-06-10'), lever: 'Affichage', channel: 'JCDecaux', objective: 'Notoriété', status: 'Terminée', roas: 1.8, ca_add: 92000, spend: 51111, reach: 5000000, clicks: 0 },
+    { id: 'C005', brand: 'Gamme Végétale', product: 'Dessert Soja', start: new Date('2024-10-01'), end: new Date('2024-10-31'), lever: 'Presse', channel: 'Le Figaro', objective: 'Considération', status: 'Planifiée', roas: null, ca_add: null, spend: 25000, reach: 1200000, clicks: 0 },
+    { id: 'C006', brand: 'La Prairie Gourmande', product: 'Toute la gamme', start: new Date('2024-02-01'), end: new Date('2024-02-28'), lever: 'Social', channel: 'Instagram', objective: 'Engagement', status: 'Terminée', roas: 3.5, ca_add: 63000, spend: 18000, reach: 900000, clicks: 22000 },
+    { id: 'C007', brand: 'Gamme Skyr', product: 'Gamme Skyr', start: new Date('2024-04-01'), end: new Date('2024-04-30'), lever: 'TV', channel: 'M6', objective: 'Notoriété', status: 'Terminée', roas: 3.1, ca_add: 310000, spend: 100000, reach: 8000000, clicks: 0 },
+    { id: 'C008', brand: 'Gamme Bio', product: 'Nouveau Yaourt Bio', start: new Date('2024-11-01'), end: new Date('2024-11-30'), lever: 'Digital', channel: 'Youtube', objective: 'Lancement', status: 'Planifiée', roas: null, ca_add: null, spend: 50000, reach: 2000000, clicks: 40000 },
+    { id: 'C009', brand: 'Gamme Végétale', product: 'Dessert Amande', start: new Date('2024-06-15'), end: new Date('2024-07-15'), lever: 'Affichage', channel: 'Metrobus', objective: 'Notoriété', status: 'Terminée', roas: 1.5, ca_add: 45000, spend: 30000, reach: 4000000, clicks: 0 },
+    { id: 'C010', brand: 'La Prairie Gourmande', product: 'Yaourt à boire', start: new Date('2024-08-01'), end: new Date('2024-08-31'), lever: 'Radio', channel: 'Fun Radio', objective: 'Promotion', status: 'En cours', roas: 2.8, ca_add: 56000, spend: 20000, reach: 2500000, clicks: 0 },
   ],
   USA: [
     { id: 'CUSA1', brand: 'La Prairie Gourmande', product: 'Grand Pot 450g', start: new Date('2024-07-15'), end: new Date('2024-08-15'), lever: 'Social', channel: 'TikTok', objective: 'Engagement', status: 'En cours', roas: 3.1, ca_add: 120500, spend: 38871, reach: 2800000, clicks: 25000 },
     { id: 'CUSA2', brand: 'Gamme Bio', product: 'Yaourt Bio Fraise', start: new Date('2024-08-01'), end: new Date('2024-08-31'), lever: 'Presse', channel: 'NY Times', objective: 'Considération', status: 'Terminée', roas: 1.5, ca_add: 45000, spend: 30000, reach: 1500000, clicks: 0 },
     { id: 'CUSA3', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-11-01'), end: new Date('2024-11-28'), lever: 'TV', channel: 'ABC', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 1200000, reach: 45000000, clicks: 0 },
+    { id: 'CUSA4', brand: 'Gamme Skyr', product: 'Skyr Protéine+', start: new Date('2024-05-01'), end: new Date('2024-05-31'), lever: 'Digital', channel: 'Hulu', objective: 'Conversion', status: 'Terminée', roas: 4.5, ca_add: 225000, spend: 50000, reach: 6000000, clicks: 90000 },
+    { id: 'CUSA5', brand: 'Gamme Végétale', product: 'Lait d\'Avoine', start: new Date('2024-09-10'), end: new Date('2024-10-10'), lever: 'Affichage', channel: 'Lamar', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 250000, reach: 12000000, clicks: 0 },
+    { id: 'CUSA6', brand: 'La Prairie Gourmande', product: 'Kids Pouches', start: new Date('2024-08-20'), end: new Date('2024-09-20'), lever: 'Social', channel: 'Pinterest', objective: 'Drive-to-store', status: 'En cours', roas: 3.8, ca_add: 95000, spend: 25000, reach: 4000000, clicks: 120000 },
+    { id: 'CUSA7', brand: 'Gamme Bio', product: 'Toute la gamme Bio', start: new Date('2024-01-15'), end: new Date('2024-02-15'), lever: 'Presse', channel: 'Whole Foods Mag', objective: 'Considération', status: 'Terminée', roas: 2.1, ca_add: 42000, spend: 20000, reach: 800000, clicks: 0 },
+    { id: 'CUSA8', brand: 'Gamme Skyr', product: 'Gamme Skyr', start: new Date('2024-10-01'), end: new Date('2024-10-31'), lever: 'Radio', channel: 'iHeartRadio', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 150000, reach: 25000000, clicks: 0 },
+    { id: 'CUSA9', brand: 'La Prairie Gourmande', product: 'Yaourt Grec', start: new Date('2024-03-01'), end: new Date('2024-03-31'), lever: 'TV', channel: 'NBC', objective: 'Notoriété', status: 'Terminée', roas: 3.9, ca_add: 975000, spend: 250000, reach: 35000000, clicks: 0 },
+    { id: 'CUSA10', brand: 'Gamme Végétale', product: 'Dessert Coco', start: new Date('2024-12-01'), end: new Date('2024-12-24'), lever: 'Social', channel: 'Facebook', objective: 'Promotion', status: 'Planifiée', roas: null, ca_add: null, spend: 75000, reach: 10000000, clicks: 150000 },
   ],
   Japan: [
      { id: 'CJAP1', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'TV', channel: 'Fuji TV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 660000, reach: 24000000, clicks: 0 },
      { id: 'CJAP2', brand: 'Gamme Végétale', product: 'Dessert Soja', start: new Date('2024-06-01'), end: new Date('2024-06-30'), lever: 'Social', channel: 'Line', objective: 'Essai', status: 'Terminée', roas: 3.8, ca_add: 55000, spend: 14474, reach: 5000000, clicks: 80000 },
+     { id: 'CJAP3', brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date('2024-07-01'), end: new Date('2024-07-31'), lever: 'Presse', channel: 'Nikkei', objective: 'Considération', status: 'Terminée', roas: 1.9, ca_add: 30000, spend: 15789, reach: 2000000, clicks: 0 },
+     { id: 'CJAP4', brand: 'La Prairie Gourmande', product: 'Pack de 4 Matcha', start: new Date('2024-10-01'), end: new Date('2024-10-31'), lever: 'Digital', channel: 'Yahoo! Japan', objective: 'Conversion', status: 'Planifiée', roas: null, ca_add: null, spend: 40000, reach: 15000000, clicks: 120000 },
+     { id: 'CJAP5', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-08-15'), end: new Date('2024-09-15'), lever: 'Affichage', channel: 'Tokyo Metro', objective: 'Notoriété', status: 'En cours', roas: 2.2, ca_add: 90000, spend: 40909, reach: 30000000, clicks: 0 },
+     { id: 'CJAP6', brand: 'Gamme Végétale', product: 'Lait d\'Avoine', start: new Date('2024-02-01'), end: new Date('2024-02-28'), lever: 'Social', channel: 'Instagram', objective: 'Engagement', status: 'Terminée', roas: 4.1, ca_add: 45000, spend: 10975, reach: 3000000, clicks: 60000 },
+     { id: 'CJAP7', brand: 'La Prairie Gourmande', product: 'Yaourt à boire Yuzu', start: new Date('2024-04-01'), end: new Date('2024-04-30'), lever: 'TV', channel: 'NTV', objective: 'Lancement', status: 'Terminée', roas: 3.5, ca_add: 350000, spend: 100000, reach: 20000000, clicks: 0 },
+     { id: 'CJAP8', brand: 'Gamme Skyr', product: 'Gamme Skyr', start: new Date('2024-11-05'), end: new Date('2024-12-05'), lever: 'Digital', channel: 'AbemaTV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 60000, reach: 8000000, clicks: 0 },
+     { id: 'CJAP9', brand: 'Gamme Bio', product: 'Yaourt Bio Nature', start: new Date('2024-01-10'), end: new Date('2024-02-10'), lever: 'Presse', channel: 'Asahi Shimbun', objective: 'Considération', status: 'Terminée', roas: 1.8, ca_add: 25000, spend: 13888, reach: 5000000, clicks: 0 },
+     { id: 'CJAP10', brand: 'La Prairie Gourmande', product: 'Gamme complète', start: new Date('2025-01-01'), end: new Date('2025-01-31'), lever: 'TV', channel: 'TV Asahi', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 750000, reach: 25000000, clicks: 0 },
   ]
 };
 
+
 const performanceByPlatform = {
   France: [
-    { platform: 'Meta', ROI: 4.2, CPA: 1.35 }, { platform: 'TF1', ROI: 3.8, CPA: 2.5 }, { platform: 'JCDecaux', ROI: 1.8, CPA: 5.0 }, { platform: 'NRJ', ROI: 2.5, CPA: 3.1 }, { platform: 'Le Figaro', ROI: 1.2, CPA: 6.2 }
+    { platform: 'Meta', ROI: 4.2, CPA: 1.35 }, { platform: 'TF1', ROI: 3.8, CPA: 2.5 }, { platform: 'JCDecaux', ROI: 1.8, CPA: 5.0 }, { platform: 'NRJ', ROI: 2.5, CPA: 3.1 }, { platform: 'Le Figaro', ROI: 1.2, CPA: 6.2 }, { platform: 'M6', ROI: 3.1, CPA: 3.0 }, { platform: 'Youtube', ROI: 4.0, CPA: 1.2 }
   ],
   USA: [
-    { platform: 'TikTok', ROI: 3.1, CPA: 0.95 }, { platform: 'NY Times', ROI: 1.5, CPA: 4.0 }, { platform: 'ABC', ROI: 4.5, CPA: 2.8 }
+    { platform: 'TikTok', ROI: 3.1, CPA: 0.95 }, { platform: 'NY Times', ROI: 1.5, CPA: 4.0 }, { platform: 'ABC', ROI: 4.5, CPA: 2.8 }, { platform: 'Hulu', ROI: 4.5, CPA: 2.0 }, { platform: 'Pinterest', ROI: 3.8, CPA: 1.5 }, { platform: 'iHeartRadio', ROI: 2.2, CPA: 4.5 }
   ],
   Japan: [
-     { platform: 'Fuji TV', ROI: 4.0, CPA: 2.8 }, { platform: 'Line', ROI: 3.8, CPA: 1.2 }
+     { platform: 'Fuji TV', ROI: 4.0, CPA: 2.8 }, { platform: 'Line', ROI: 3.8, CPA: 1.2 }, { platform: 'Nikkei', ROI: 1.9, CPA: 5.5 }, { platform: 'Yahoo! Japan', ROI: 3.5, CPA: 1.8 }, { platform: 'Tokyo Metro', ROI: 2.2, CPA: 4.0 }
   ]
 };
 
 const budgetAllocation = {
-    France: [{name: 'Social', value: 20286}, {name: 'TV', value: 450000}, {name: 'Affichage', value: 51111}, {name: 'Radio', value: 30000}, {name: 'Presse', value: 25000}],
-    USA: [{name: 'Social', value: 38871}, {name: 'Presse', value: 30000}, {name: 'TV', value: 1200000}],
-    Japan: [{name: 'TV', value: 660000}, {name: 'Social', value: 14474}],
+    France: [
+      {name: 'Social', value: 38286}, {name: 'TV', value: 550000}, {name: 'Affichage', value: 81111}, {name: 'Radio', value: 50000}, {name: 'Presse', value: 25000}, {name: 'Digital', value: 50000}
+    ],
+    USA: [
+      {name: 'Social', value: 138871}, {name: 'Presse', value: 50000}, {name: 'TV', value: 1450000}, {name: 'Digital', value: 50000}, {name: 'Affichage', value: 250000}, {name: 'Radio', value: 150000}
+    ],
+    Japan: [
+      {name: 'TV', value: 1510000}, {name: 'Social', value: 25449}, {name: 'Presse', value: 29677}, {name: 'Digital', value: 100000}, {name: 'Affichage', value: 40909}
+    ],
 }
 const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280', '#06B6D4', '#8B5CF6'];
 
@@ -346,17 +373,30 @@ export default function MediaBrandPage() {
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
-                                <Pie data={currentBudget} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                                <Pie data={currentBudget} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
                                     {currentBudget.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip formatter={(value: number, name: string) => [`${value.toLocaleString('fr-FR')}€`, name]}/>
+                                <Tooltip formatter={(value: number, name: string) => [`€${value.toLocaleString('fr-FR')}`, name]}/>
+                                <Legend />
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
                 </Card>
             </div>
+             <Card>
+                <CardHeader className="flex-row items-center gap-2 space-y-0">
+                    <Sparkles className="h-5 w-5 text-accent" />
+                    <CardTitle className="text-lg">Synthèse et Recommandation IA</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                        En {country}, le ROAS global de {globalRoi.toFixed(2)} est solide, principalement tiré par les campagnes digitales ({performanceByPlatform[country].find(p => p.platform.toLowerCase().includes('meta'))?.ROI || 4}x). La TV maintient une forte contribution à la notoriété malgré un ROAS plus faible. 
+                        <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget Affichage, dont le ROAS est faible, vers le Social Media pour maximiser la conversion à court terme. Lancez une analyse post-campagne pour la TV afin de quantifier son impact sur les ventes indirectes.
+                    </p>
+                </CardContent>
+            </Card>
         </TabsContent>
 
         <TabsContent value="campaigns" className="mt-6">
