@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -6,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { Sparkles, ArrowRight, ArrowLeft, TrendingUp, TrendingDown, Users, Repeat, HandCoins } from 'lucide-react';
+import { Sparkles, TrendingUp, TrendingDown, Users, Repeat, HandCoins } from 'lucide-react';
 import { retailerOptions, brandOptions } from '@/services/filters-data';
 
 type Filters = {
@@ -14,11 +15,43 @@ type Filters = {
     brand: string;
 };
 
-const generateData = (filters: Filters) => {
+// --- Data Generation ---
+
+const generateKpisData = (filters: Filters) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
     const seed = hashCode(JSON.stringify(filters));
     const random = (min: number, max: number, salt: string) => {
-        let t = seed + hashCode(salt) + 0x6D2B79F5;
+        let t = seed + hashCode(salt);
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
+        return result * (max-min) + min;
+    };
+
+    const salesTree = {
+        ca: { value: random(4500000, 5000000, 'ca'), trend: random(8, 10, 'ca_t')},
+        acheteurs: { value: random(2700000, 2900000, 'ach'), trend: random(1, 2, 'ach_t') },
+        depense: { value: 0, trend: random(3, 4, 'dep_t')},
+        frequence: { value: random(4.5, 5, 'freq'), trend: random(0.1, 0.5, 'freq_t')},
+        panier: { value: 0, trend: random(1, 1.5, 'panier_t')}
+    };
+    salesTree.depense.value = salesTree.ca.value / salesTree.acheteurs.value;
+    salesTree.panier.value = salesTree.depense.value / salesTree.frequence.value;
+
+    const kpis = [
+        { title: "Taux de Pénétration", value: `${random(15,16, 'pen').toFixed(1)}%`, change: `-${random(0.1, 0.3, 'pen_t').toFixed(1)}pt`, icon: Users },
+        { title: "Fréquence d'Achat", value: salesTree.frequence.value.toFixed(1), change: `+${salesTree.frequence.trend.toFixed(1)}pt`, icon: Repeat },
+        { title: "Dépense par Acte", value: `${salesTree.panier.value.toFixed(2)}€`, change: `+${salesTree.panier.trend.toFixed(1)}pt`, icon: HandCoins },
+    ];
+    
+    return { salesTree, kpis };
+};
+
+const generateDynamicsData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const random = (min: number, max: number, salt: string) => {
+        let t = seed + hashCode(salt);
         t = Math.imul(t ^ t >>> 15, t | 1);
         t ^= t + Math.imul(t ^ t >>> 7, t | 61);
         const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
@@ -51,8 +84,10 @@ const generateData = (filters: Filters) => {
 };
 
 
+// --- Components ---
+
 const DynamicsTab = ({ filters }: { filters: Filters }) => {
-    const { gains, pertes, totalGains, totalPertes, chartData } = useMemo(() => generateData(filters), [filters]);
+    const { gains, pertes, totalGains, totalPertes, chartData } = useMemo(() => generateDynamicsData(filters), [filters]);
 
     return (
         <div className="space-y-6">
@@ -144,17 +179,60 @@ const DynamicsTab = ({ filters }: { filters: Filters }) => {
 };
 
 
+const SalesTree = ({ data }: { data: any }) => {
+    const Node = ({ title, value, trend, isCurrency = false }: { title: string, value: number, trend: number, isCurrency?: boolean }) => (
+        <div className="border rounded-lg p-2 text-center w-48 bg-background">
+            <p className="text-xs text-muted-foreground">{title}</p>
+            <p className="text-lg font-bold">{isCurrency ? value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }) : value.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</p>
+            <p className={`text-sm font-medium ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>{trend >= 0 ? '+' : ''}{trend.toFixed(1)}%</p>
+        </div>
+    );
+    
+    return (
+        <div className="flex flex-col items-center gap-4 py-4">
+            {/* Level 1 */}
+            <Node title="Ventes en Valeur" value={data.ca.value} trend={data.ca.trend} isCurrency />
+            
+            {/* Connector to Level 2 */}
+            <div className="h-8 w-px bg-border"></div>
+            <div className="relative flex justify-center w-full">
+                <div className="absolute top-0 h-px w-2/3 bg-border"></div>
+                <div className="absolute top-0 left-1/2 h-8 w-px bg-border"></div>
+            </div>
+
+            {/* Level 2 */}
+            <div className="flex gap-16">
+                <div className="flex flex-col items-center gap-4">
+                    <Node title="Nombre d'Acheteurs" value={data.acheteurs.value} trend={data.acheteurs.trend} />
+                </div>
+                <div className="flex flex-col items-center gap-4">
+                    <Node title="Dépense / Acheteur" value={data.depense.value} trend={data.depense.trend} isCurrency />
+                    {/* Connector to Level 3 */}
+                    <div className="h-8 w-px bg-border"></div>
+                    <div className="relative flex justify-center w-full">
+                        <div className="absolute top-0 h-px w-[200%] bg-border -translate-x-1/2"></div>
+                        <div className="absolute top-0 left-1/2 h-8 w-px bg-border"></div>
+                    </div>
+                    {/* Level 3 */}
+                    <div className="flex gap-8">
+                         <Node title="Fréquence d'Achat" value={data.frequence.value} trend={data.frequence.trend} />
+                         <Node title="Dépense par Acte" value={data.panier.value} trend={data.panier.trend} isCurrency />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// --- Main Page Component ---
+
 export default function ConsumerDataPage() {
     const [selectedRetailer, setSelectedRetailer] = useState(retailerOptions[0].value);
     const [selectedBrand, setSelectedBrand] = useState(brandOptions[0].value);
 
     const filters = { retailer: selectedRetailer, brand: selectedBrand };
-
-    const kpiData = [
-        { title: "Taux de Pénétration", value: "15.7%", change: "-0.2pt", icon: Users },
-        { title: "Fréquence d'Achat", value: "4.7", change: "+0.0pt", icon: Repeat },
-        { title: "Dépense par Acte", value: "3.50€", change: "-0.0pt", icon: HandCoins },
-    ];
+    
+    const { salesTree, kpis } = useMemo(() => generateKpisData(filters), [filters]);
   
     return (
         <div className="space-y-6">
@@ -183,7 +261,7 @@ export default function ConsumerDataPage() {
                         </CardHeader>
                     </Card>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {kpiData.map(kpi => (
+                        {kpis.map(kpi => (
                             <Card key={kpi.title}>
                                 <CardHeader>
                                     <CardTitle className="text-sm font-medium text-muted-foreground">{kpi.title}</CardTitle>
@@ -198,35 +276,13 @@ export default function ConsumerDataPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <Card className="lg:col-span-2">
                             <CardHeader><CardTitle>Arbre de Décomposition des Ventes</CardTitle></CardHeader>
-                            <CardContent className="flex justify-center items-center">
-                                {/* Simplified sales tree */}
-                                <div className="text-center">
-                                    <div className="p-4 border rounded-lg inline-block">
-                                        <p className="text-sm">Ventes en Valeur</p>
-                                        <p className="text-xl font-bold">4.70M €</p>
-                                        <p className="text-sm text-green-500">+8.6%</p>
-                                    </div>
-                                    <div className="flex justify-center mt-4">
-                                        <div className="w-px bg-gray-300 h-8"></div>
-                                    </div>
-                                    <div className="flex justify-center">
-                                        <div className="p-4 border rounded-lg inline-block mx-4">
-                                            <p className="text-sm">Nombre d'Acheteurs</p>
-                                            <p className="text-xl font-bold">2.80M</p>
-                                            <p className="text-sm text-green-500">+1.8%</p>
-                                        </div>
-                                        <div className="p-4 border rounded-lg inline-block mx-4">
-                                            <p className="text-sm">Dépense / Acheteur</p>
-                                            <p className="text-xl font-bold">1.68 €</p>
-                                            <p className="text-sm text-green-500">+3.5%</p>
-                                        </div>
-                                    </div>
-                                </div>
+                            <CardContent className="flex justify-center items-center overflow-x-auto">
+                                <SalesTree data={salesTree} />
                             </CardContent>
                         </Card>
                         <Card>
                             <CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Analyse des Indicateurs</CardTitle></CardHeader>
-                            <CardContent><p className="text-sm text-muted-foreground">Pour Total Marque / Total Enseignes, la croissance est principalement tirée par la dépense par acheteur (+3.5%), tandis que le nombre d'acheteurs stagne.</p></CardContent>
+                            <CardContent><p className="text-sm text-muted-foreground">La croissance est principalement tirée par la dépense par acheteur (+{salesTree.depense.trend.toFixed(1)}%), elle-même portée par une légère hausse de la fréquence d'achat. Le nombre d'acheteurs stagne, indiquant un levier de croissance potentiel.</p></CardContent>
                         </Card>
                     </div>
                 </TabsContent>
