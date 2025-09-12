@@ -55,8 +55,8 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     if (match && match[1] && match[2]) {
         const width = parseInt(match[1], 10);
         const height = parseInt(match[2], 10);
-        const orientation = width > height ? "paysage" : width < height ? "portrait" : "carré";
-        dimensionInstruction = `Crucially, you MUST regenerate and crop the provided image to a strict ${width}x${height} pixel aspect ratio (${orientation}). Do not distort the image, crop it intelligently. The output must have these exact dimensions.`;
+        const orientation = width > height ? "landscape" : width < height ? "portrait" : "square";
+        dimensionInstruction = `Adapt the image to a strict ${width}x${height} pixel aspect ratio (${orientation}). If needed, generate additional, coherent content to expand the image to these dimensions. Do not distort or crop important elements from the original image.`;
     }
 
     // Build the prompt for the image generation model.
