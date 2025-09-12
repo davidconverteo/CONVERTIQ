@@ -183,14 +183,14 @@ export default function DecisionTreeTab({ filters }: DecisionTreeTabProps) {
                     <p>
                         Le besoin <strong>"Snack Sain"</strong> (30%) est une autre opportunité majeure. Votre gamme Skyr capte bien ce besoin sur les pots individuels, mais vous êtes quasi-absent du format "à boire", dominé par Yoplait et Danone.
                     </p>
-                    <p>
+                    <div>
                         <strong>Recommandation Stratégique :</strong>
                         <ol className="mt-2 list-decimal pl-5 space-y-1">
                             <li><strong>Défendre :</strong> Protéger votre position sur les pots individuels "plaisir" et "sain".</li>
                             <li><strong>Attaquer :</strong> Envisager le lancement d'un produit "à boire" sous la gamme Skyr pour concurrencer directement Yop et Actimel sur le segment "Snack Sain".</li>
                             <li><strong>Développer :</strong> Augmenter la part de voix sur les formats "Pack Plaisir" via des offres promotionnelles ciblées pour contester la dominance de la MDD.</li>
                         </ol>
-                    </p>
+                    </div>
                 </CardContent>
             </Card>
         </div>
