@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 
 // --- Données enrichies ---
 
-const campaignDataByCountry = {
+const generateCampaignData = () => ({
   France: [
     // Always On Amazon
     { id: 'RM-FR-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 5.8, sales_attributed: 350000, spend: 60345, details: { type: 'Sponsored Products', acos: '17.2%', clicks: 180000, ctr: '1.5%', cpc: '0.34€', recommendation: "Campagne 'always-on' très performante. Maintenir le budget et optimiser la liste de mots-clés négatifs tous les mois." }},
@@ -120,7 +120,7 @@ const campaignDataByCountry = {
         }
     }),
   ]
-};
+});
 
 const performanceByRetailer = {
   France: [ { retailer: 'Unlimitail', ROI: 5.1, CPA: 0.71 }, { retailer: 'Amazon Ads', ROI: 5.8, CPA: 0.34 }, { retailer: 'Carrefour', ROI: 10, CPA: 0.8 }, { retailer: 'Système U', ROI: 4, CPA: 1.0 } ],
@@ -287,20 +287,33 @@ const RetailPlanner = ({ campaigns }: { campaigns: any[] }) => {
 // --- Main Page Component ---
 
 export default function RetailMediaPage() {
+  const [campaignDataByCountry, setCampaignDataByCountry] = useState<any>(null);
   const [country, setCountry] = useState<'France' | 'USA' | 'Japan'>('France');
   const [retailer, setRetailer] = useState('all');
   const [brand, setBrand] = useState('all');
 
+  useEffect(() => {
+    setCampaignDataByCountry(generateCampaignData());
+  }, []);
+
+  if (!campaignDataByCountry) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <p>Loading data...</p>
+      </div>
+    );
+  }
+
   const currentCampaigns = campaignDataByCountry[country]
-      .filter(c => retailer === 'all' || c.retailer === retailer)
-      .filter(c => brand === 'all' || c.brand === brand);
+      .filter((c: any) => retailer === 'all' || c.retailer === retailer)
+      .filter((c: any) => brand === 'all' || c.brand === brand);
   
   const currentRetailerPerf = performanceByRetailer[country];
   
-  const availableRetailers = ['all', ...Array.from(new Set(campaignDataByCountry[country].map(c => c.retailer)))];
-  const availableBrands = ['all', ...Array.from(new Set(campaignDataByCountry[country].map(c => c.brand)))];
+  const availableRetailers = ['all', ...Array.from(new Set(campaignDataByCountry[country].map((c: any) => c.retailer)))];
+  const availableBrands = ['all', ...Array.from(new Set(campaignDataByCountry[country].map((c: any) => c.brand)))];
 
-  const aggregatedKpis = currentCampaigns.reduce((acc, campaign) => {
+  const aggregatedKpis = currentCampaigns.reduce((acc: any, campaign: any) => {
     if (campaign.status.toLowerCase() !== 'planifiée') {
         acc.spend += campaign.spend || 0;
         acc.sales_attributed += campaign.sales_attributed || 0;
@@ -310,9 +323,9 @@ export default function RetailMediaPage() {
 
   const globalRoi = aggregatedKpis.spend > 0 ? (aggregatedKpis.sales_attributed / aggregatedKpis.spend) : 0;
   
-  const currentBudget = currentCampaigns.reduce((acc, campaign) => {
+  const currentBudget = currentCampaigns.reduce((acc: any, campaign: any) => {
         if(campaign.spend) {
-            const existing = acc.find(item => item.name === campaign.lever);
+            const existing = acc.find((item: any) => item.name === campaign.lever);
             if (existing) {
                 existing.value += campaign.spend;
             } else {
@@ -349,7 +362,7 @@ export default function RetailMediaPage() {
                                 <SelectValue placeholder="Enseigne" />
                             </SelectTrigger>
                             <SelectContent>
-                                {availableRetailers.map(r => <SelectItem key={r} value={r}>{r === 'all' ? 'Toutes les enseignes' : r}</SelectItem>)}
+                                {availableRetailers.map(r => <SelectItem key={r as string} value={r as string}>{(r as string) === 'all' ? 'Toutes les enseignes' : r}</SelectItem>)}
                             </SelectContent>
                         </Select>
                         <Select onValueChange={setBrand} value={brand}>
@@ -357,7 +370,7 @@ export default function RetailMediaPage() {
                                 <SelectValue placeholder="Marque" />
                             </SelectTrigger>
                             <SelectContent>
-                                {availableBrands.map(b => <SelectItem key={b} value={b}>{b === 'all' ? 'Toutes les marques' : b}</SelectItem>)}
+                                {availableBrands.map(b => <SelectItem key={b as string} value={b as string}>{(b as string) === 'all' ? 'Toutes les marques' : b}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -435,7 +448,7 @@ export default function RetailMediaPage() {
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie data={currentBudget} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                                    {currentBudget.map((entry, index) => (
+                                    {currentBudget.map((entry: any, index: number) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
@@ -467,7 +480,7 @@ export default function RetailMediaPage() {
                             </TableRow>
                         </TableHeader>
                          <TableBody>
-                            {currentCampaigns.length > 0 ? currentCampaigns.map(campaign => (
+                            {currentCampaigns.length > 0 ? currentCampaigns.map((campaign: any) => (
                                 <Dialog key={campaign.id}>
                                     <TableRow>
                                         <TableCell>
