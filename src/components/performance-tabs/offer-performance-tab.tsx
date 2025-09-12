@@ -1,18 +1,42 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Legend, ZAxis } from 'recharts';
 import { Sparkles } from "lucide-react";
 
-const rankingData = [
-    { rank: 1, name: 'Yaourt Brassé Fraise 4x125g', ca: 4800, vmh: 1200, marge: 1.2, exclusifs: 18, nourriture: 35 },
-    { rank: 2, name: 'Grand Pot Nature Bio 450g', ca: 3500, vmh: 800, marge: 1.5, exclusifs: 25, nourriture: 45 },
-    { rank: 3, name: 'Skyr Nature 150g', ca: 3200, vmh: 1500, marge: 0.8, exclusifs: 12, nourriture: 25 },
-    { rank: 4, name: 'Yaourt à la Grecque Miel 2x150g', ca: 2800, vmh: 700, marge: 1.8, exclusifs: 22, nourriture: 30 },
-    { rank: 5, name: 'Gourde Fraise-Banane 4x90g', ca: 2500, vmh: 900, marge: 1.1, exclusifs: 15, nourriture: 40 },
-];
+type Filters = {
+    country: string;
+    retailer: string;
+    brand: string;
+    gamme: string;
+};
+
+interface OfferPerformanceTabProps {
+    filters: Filters;
+}
+
+const generateRankingData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const seededRandom = (min: number, max: number) => {
+        let t = seed + 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
+        return result * (max-min) + min;
+    };
+    
+    return [
+        { rank: 1, name: 'Yaourt Brassé Fraise 4x125g', ca: seededRandom(4000, 5000), vmh: seededRandom(1000, 1400), marge: seededRandom(1.0, 1.4), exclusifs: seededRandom(15, 20), nourriture: seededRandom(30, 40) },
+        { rank: 2, name: 'Grand Pot Nature Bio 450g', ca: seededRandom(3000, 4000), vmh: seededRandom(700, 900), marge: seededRandom(1.3, 1.7), exclusifs: seededRandom(20, 30), nourriture: seededRandom(40, 50) },
+        { rank: 3, name: 'Skyr Nature 150g', ca: seededRandom(2800, 3500), vmh: seededRandom(1300, 1700), marge: seededRandom(0.7, 1.0), exclusifs: seededRandom(10, 15), nourriture: seededRandom(20, 30) },
+        { rank: 4, name: 'Yaourt à la Grecque Miel 2x150g', ca: seededRandom(2500, 3000), vmh: seededRandom(600, 800), marge: seededRandom(1.6, 2.0), exclusifs: seededRandom(20, 25), nourriture: seededRandom(25, 35) },
+        { rank: 5, name: 'Gourde Fraise-Banane 4x90g', ca: seededRandom(2200, 2800), vmh: seededRandom(800, 1000), marge: seededRandom(1.0, 1.3), exclusifs: seededRandom(13, 18), nourriture: seededRandom(35, 45) },
+    ].sort((a,b) => b.ca - a.ca).map((item, index) => ({...item, rank: index + 1}));
+};
 
 const bcgData = [
   { name: 'Vaches à Lait', vmh: 300, marge: 8, ca: 8000 },
@@ -21,8 +45,9 @@ const bcgData = [
   { name: 'Poids Morts', vmh: 80, marge: 5, ca: 1000 },
 ];
 
+export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProps) {
+  const rankingData = useMemo(() => generateRankingData(filters), [filters]);
 
-export default function OfferPerformanceTab() {
   return (
     <div className="space-y-6">
         <Card>
@@ -47,11 +72,11 @@ export default function OfferPerformanceTab() {
                         <TableRow key={row.rank}>
                             <TableCell className="font-bold">{row.rank}</TableCell>
                             <TableCell className="font-medium">{row.name}</TableCell>
-                            <TableCell className="text-right">€{row.ca.toLocaleString('fr-FR')}</TableCell>
-                            <TableCell className="text-right">{row.vmh.toLocaleString('fr-FR')}</TableCell>
+                            <TableCell className="text-right">€{row.ca.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
+                            <TableCell className="text-right">{row.vmh.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
                             <TableCell className="text-right">€{row.marge.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">{row.exclusifs}%</TableCell>
-                            <TableCell className="text-right">{row.nourriture}%</TableCell>
+                            <TableCell className="text-right">{row.exclusifs.toFixed(0)}%</TableCell>
+                            <TableCell className="text-right">{row.nourriture.toFixed(0)}%</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -86,7 +111,7 @@ export default function OfferPerformanceTab() {
             </CardHeader>
             <CardContent>
                 <p className="text-sm text-muted-foreground">Votre produit <strong>Skyr Nature</strong> est un "Dilemme" : forte rentabilité mais faible performance commerciale. Il nécessite un plan d'action pour le faire passer en "Étoile".</p>
-                <p className="text-sm text-muted-foreground mt-4">Le <strong>Grand Pot Nature Bio</strong> est un produit clé, avec un fort taux d'acheteurs exclusifs (25%). Il est crucial pour la fidélisation.</p>
+                <p className="text-sm text-muted-foreground mt-4">Le <strong>Grand Pot Nature Bio</strong> est un produit clé, avec un fort taux d'acheteurs exclusifs ({rankingData.find(p => p.name.includes('Bio'))?.exclusifs.toFixed(0)}%). Il est crucial pour la fidélisation.</p>
                 <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Investir en promotion ou en visibilité sur le Skyr Nature pour augmenter ses ventes (VMH). Protéger la position du Grand Pot Bio en assurant une disponibilité parfaite.</p>
             </CardContent>
         </Card>

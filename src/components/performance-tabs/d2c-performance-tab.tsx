@@ -1,31 +1,59 @@
 
 'use client';
 
-import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { useState, useMemo, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LineChart, Line, CartesianGrid } from 'recharts';
 import { DollarSign, ShoppingCart, Users, Percent, UserPlus, Repeat, TrendingUp, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from '@/components/ui/checkbox';
 
-const kpiData = [
-    { title: "Chiffre d'Affaires", value: "€125,400", change: "+12.5%", icon: DollarSign },
-    { title: "Commandes", value: "3,450", change: "+8.2%", icon: ShoppingCart },
-    { title: "Panier Moyen", value: "€36.35", change: "+4.1%", icon: DollarSign },
-    { title: "Nouveaux Clients", value: "1,980", change: "+21%", icon: UserPlus },
-    { title: "Taux Conv.", value: "2.8%", change: "+0.3 pts", icon: Percent },
-    { title: "CAC", value: "12.50 €", change: "-5%", icon: TrendingUp },
-    { title: "LTV", value: "85.20 €", change: "+10%", icon: Users },
-    { title: "Taux Rachat", value: "35%", change: "+5 pts", icon: Repeat },
-];
+type Filters = {
+    country: string;
+    retailer: string;
+    brand: string;
+    gamme: string;
+};
 
-const evolutionData = Array.from({length: 12}, (_, i) => ({
-    name: `S-${12-i}`,
-    'Chiffre d\'Affaires': 8000 + Math.random() * 4000 + i * 400,
-    'Commandes': 220 + Math.random() * 100 + i * 12,
-    'Panier Moyen': 35 + Math.random() * 2,
-    'Taux de Conversion': 2.5 + Math.random() * 0.5 + i * 0.05
-}));
+interface D2CPerformanceTabProps {
+    filters: Filters;
+}
+
+const generateKpiData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const random = (min: number, max: number) => ((seed & 0xffff) / 0xffff) * (max - min) + min;
+
+    return [
+        { title: "Chiffre d'Affaires", value: `€${random(100000, 150000).toLocaleString('fr-FR', {maximumFractionDigits: 0})}`, change: `+${random(5,15).toFixed(1)}%`, icon: DollarSign },
+        { title: "Commandes", value: `${random(3000, 4000).toLocaleString('fr-FR', {maximumFractionDigits: 0})}`, change: `+${random(5,10).toFixed(1)}%`, icon: ShoppingCart },
+        { title: "Panier Moyen", value: `€${random(35, 40).toFixed(2)}`, change: `+${random(1,5).toFixed(1)}%`, icon: DollarSign },
+        { title: "Nouveaux Clients", value: `${random(1800, 2200).toLocaleString('fr-FR', {maximumFractionDigits: 0})}`, change: `+${random(15,25).toFixed(1)}%`, icon: UserPlus },
+        { title: "Taux Conv.", value: `${random(2.5, 3.5).toFixed(1)}%`, change: `+${random(0.1, 0.5).toFixed(1)} pts`, icon: Percent },
+        { title: "CAC", value: `€${random(10, 15).toFixed(2)}`, change: `-${random(2,8).toFixed(1)}%`, icon: TrendingUp },
+        { title: "LTV", value: `€${random(80, 90).toFixed(2)}`, change: `+${random(8,12).toFixed(1)}%`, icon: Users },
+        { title: "Taux Rachat", value: `${random(30, 40).toFixed(0)}%`, change: `+${random(3,7).toFixed(0)} pts`, icon: Repeat },
+    ];
+};
+
+const generateEvolutionData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const seededRandom = () => {
+        let t = seed + 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+
+    return Array.from({length: 12}, (_, i) => ({
+        name: `S-${12-i}`,
+        'Chiffre d\'Affaires': (8000 + seededRandom() * 4000 + i * 400) * (1 + (i/24)),
+        'Commandes': (220 + seededRandom() * 100 + i * 12) * (1 + (i/24)),
+        'Panier Moyen': 35 + seededRandom() * 2,
+        'Taux de Conversion': 2.5 + seededRandom() * 0.5 + i * 0.05
+    }));
+};
 
 const funnelData = {
     'all': [125000, 80000, 25000, 15000, 3450],
@@ -41,9 +69,12 @@ const funnelChartData = (type: keyof typeof funnelData) => funnelData[type].map(
 }));
 
 
-export default function D2CPerformanceTab() {
+export default function D2CPerformanceTab({ filters }: D2CPerformanceTabProps) {
   const [selectedFunnel, setSelectedFunnel] = useState<keyof typeof funnelData>('all');
   const [visibleKpis, setVisibleKpis] = useState<string[]>(["Chiffre d'Affaires"]);
+
+  const kpiData = useMemo(() => generateKpiData(filters), [filters]);
+  const evolutionData = useMemo(() => generateEvolutionData(filters), [filters]);
 
   const handleKpiToggle = (kpi: string) => {
     setVisibleKpis(prev => prev.includes(kpi) ? prev.filter(item => item !== kpi) : [...prev, kpi]);

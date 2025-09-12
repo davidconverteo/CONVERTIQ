@@ -1,49 +1,87 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, BarChart, Bar } from 'recharts';
-import { DollarSign, Package, ShoppingCart, Percent, Users, Home, TrendingUp, Sparkles } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
+import { DollarSign, Package, Home, Percent, Sparkles } from "lucide-react";
 
-
-const salesOverTime = Array.from({length: 12}, (_, i) => ({
-  name: `S-${12-i}`,
-  GMS: 350000 + Math.random() * 100000 + i * 20000,
-  'En Ligne': 80000 + Math.random() * 40000 + i * 10000
-}));
-
-const topProducts = [
-    {id: 1, name: "Yaourt Nature Bio 4x125g", sales: 45200, evolution: 5.2},
-    {id: 2, name: "Yaourt Grec 2x150g", sales: 38900, evolution: 12.1},
-    {id: 3, name: "Skyr Nature 450g", sales: 35100, evolution: 25.8},
-    {id: 4, name: "Yaourt Fruits Rouges Bio 4x125g", sales: 28500, evolution: 2.3},
-    {id: 5, name: "Yaourt Végétal Amande 2x100g", sales: 22300, evolution: -1.5},
-];
-
-const treeData = {
-    ca: { title: "CA Sell-Out", value: "2.4M €", trend: "+15.2%" },
-    transactions: { title: "Transactions", value: "1.1M", trend: "+12.8%" },
-    panier: { title: "Panier Moyen", value: "2.18 €", trend: "+2.1%" },
-    upt: { title: "Unités / Panier", value: "1.4", trend: "+1.2%" },
-    prix: { title: "Prix Moyen / U", value: "1.56 €", trend: "+0.9%" },
+type Filters = {
+    country: string;
+    retailer: string;
+    brand: string;
+    gamme: string;
 };
 
-const retailerData = [
-    { retailer: 'Carrefour', sellout: '672k €', dn: 98 },
-    { retailer: 'E.Leclerc', sellout: '624k €', dn: 99 },
-    { retailer: 'Intermarché', sellout: '480k €', dn: 95 },
-    { retailer: 'Système U', sellout: '360k €', dn: 96 },
-];
-
-const EvolutionBadge = ({ value }: { value: number }) => {
-    if (value > 0) return <Badge className="bg-green-100 text-green-800">+{value}%</Badge>;
-    return <Badge className="bg-red-100 text-red-800">{value}%</Badge>;
+interface OfflinePerformanceTabProps {
+    filters: Filters;
 }
 
-export default function OfflinePerformanceTab() {
+const generateOfflineData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const random = (min: number, max: number) => {
+        let t = seed + 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
+        return result * (max - min) + min;
+    };
+    
+    const salesOverTime = Array.from({length: 12}, (_, i) => ({
+      name: `S-${12-i}`,
+      GMS: random(350000, 450000) + i * 20000,
+      'En Ligne': random(80000, 120000) + i * 10000
+    }));
+
+    const topProducts = [
+        {id: 1, name: "Yaourt Nature Bio 4x125g", sales: random(40000, 50000), evolution: random(2, 8)},
+        {id: 2, name: "Yaourt Grec 2x150g", sales: random(35000, 45000), evolution: random(8, 15)},
+        {id: 3, name: "Skyr Nature 450g", sales: random(30000, 40000), evolution: random(20, 30)},
+        {id: 4, name: "Yaourt Fruits Rouges Bio 4x125g", sales: random(25000, 35000), evolution: random(0, 5)},
+        {id: 5, name: "Yaourt Végétal Amande 2x100g", sales: random(20000, 30000), evolution: random(-5, 0)},
+    ].sort((a,b) => b.sales - a.sales);
+
+    const treeData = {
+        ca: { title: "CA Sell-Out", value: `${(random(2.2, 2.6)).toFixed(1)}M €`, trend: `+${random(13,17).toFixed(1)}%` },
+        transactions: { title: "Transactions", value: `${random(1.0, 1.2).toFixed(1)}M`, trend: `+${random(10,14).toFixed(1)}%` },
+        panier: { title: "Panier Moyen", value: `€${random(2.1, 2.3).toFixed(2)}`, trend: `+${random(1,3).toFixed(1)}%` },
+        upt: { title: "Unités / Panier", value: `${random(1.3, 1.5).toFixed(1)}`, trend: `+${random(0.5,1.5).toFixed(1)}%` },
+        prix: { title: "Prix Moyen / U", value: `€${random(1.5, 1.6).toFixed(2)}`, trend: `+${random(0.5,1.2).toFixed(1)}%` },
+    };
+
+    const retailerData = [
+        { retailer: 'Carrefour', sellout: `${random(650, 700).toFixed(0)}k €`, dn: 98 },
+        { retailer: 'E.Leclerc', sellout: `${random(600, 650).toFixed(0)}k €`, dn: 99 },
+        { retailer: 'Intermarché', sellout: `${random(450, 500).toFixed(0)}k €`, dn: 95 },
+        { retailer: 'Système U', sellout: `${random(350, 400).toFixed(0)}k €`, dn: 96 },
+    ];
+
+    const kpis = {
+        totalSales: `€${random(2.3, 2.5).toFixed(1)}M`,
+        totalSalesChange: `+${random(14,16).toFixed(1)}% vs. S1 2023`,
+        unitsSold: `${random(1.0, 1.2).toFixed(1)}M`,
+        unitsSoldChange: `+${random(11,14).toFixed(1)}% vs. S1 2023`,
+        penetration: `${random(17,19).toFixed(1)}%`,
+        penetrationChange: `+${random(0.3, 0.7).toFixed(1)} pts vs. S1 2023`,
+        marketShare: `${random(21,23).toFixed(1)}%`,
+        marketShareChange: `+${random(1.0, 1.5).toFixed(1)} pts vs. S1 2023`,
+    };
+
+    return { salesOverTime, topProducts, treeData, retailerData, kpis };
+};
+
+
+const EvolutionBadge = ({ value }: { value: number }) => {
+    if (value > 0) return <Badge className="bg-green-100 text-green-800">+{value.toFixed(1)}%</Badge>;
+    return <Badge className="bg-red-100 text-red-800">{value.toFixed(1)}%</Badge>;
+}
+
+export default function OfflinePerformanceTab({ filters }: OfflinePerformanceTabProps) {
+  const { salesOverTime, topProducts, treeData, retailerData, kpis } = useMemo(() => generateOfflineData(filters), [filters]);
+
   return (
     <div className="space-y-6">
        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -53,8 +91,8 @@ export default function OfflinePerformanceTab() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">€2.4M</div>
-                <p className="text-xs text-muted-foreground">+15.2% vs. S1 2023</p>
+                <div className="text-2xl font-bold">{kpis.totalSales}</div>
+                <p className="text-xs text-muted-foreground">{kpis.totalSalesChange}</p>
             </CardContent>
         </Card>
         <Card>
@@ -63,8 +101,8 @@ export default function OfflinePerformanceTab() {
                 <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">1.1M</div>
-                <p className="text-xs text-muted-foreground">+12.8% vs. S1 2023</p>
+                <div className="text-2xl font-bold">{kpis.unitsSold}</div>
+                <p className="text-xs text-muted-foreground">{kpis.unitsSoldChange}</p>
             </CardContent>
         </Card>
         <Card>
@@ -73,8 +111,8 @@ export default function OfflinePerformanceTab() {
                 <Home className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">18.3%</div>
-                <p className="text-xs text-muted-foreground">+0.5 pts vs. S1 2023</p>
+                <div className="text-2xl font-bold">{kpis.penetration}</div>
+                <p className="text-xs text-muted-foreground">{kpis.penetrationChange}</p>
             </CardContent>
         </Card>
         <Card>
@@ -83,8 +121,8 @@ export default function OfflinePerformanceTab() {
                 <Percent className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">22.1%</div>
-                <p className="text-xs text-muted-foreground">+1.2 pts vs. S1 2023</p>
+                <div className="text-2xl font-bold">{kpis.marketShare}</div>
+                <p className="text-xs text-muted-foreground">{kpis.marketShareChange}</p>
             </CardContent>
         </Card>
       </div>
@@ -160,7 +198,7 @@ export default function OfflinePerformanceTab() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`} />
-                    <Tooltip formatter={(value: number) => `€${value.toLocaleString('fr-FR')}`} />
+                    <Tooltip formatter={(value: number) => `€${value.toLocaleString('fr-FR', {maximumFractionDigits: 0})}`} />
                     <Legend />
                     <Line type="monotone" dataKey="GMS" name="Ventes GMS" stroke="hsl(var(--primary))" strokeWidth={2} />
                     <Line type="monotone" dataKey="En Ligne" name="Ventes en Ligne" stroke="hsl(var(--accent))" strokeWidth={2} />
@@ -185,7 +223,7 @@ export default function OfflinePerformanceTab() {
             {topProducts.map((product) => (
                 <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell className="text-right">€{product.sales.toLocaleString('fr-FR')}</TableCell>
+                    <TableCell className="text-right">€{product.sales.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
                     <TableCell className="text-center">
                         <EvolutionBadge value={product.evolution} />
                     </TableCell>

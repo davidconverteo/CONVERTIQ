@@ -1,26 +1,54 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
 
-const scorecardData = [
-  { retailer: 'E.Leclerc Drive', sellout: '€875k', oos: 1.5, sov: 35, rating: 4.8, priceIndex: 101 },
-  { retailer: 'Carrefour Drive', sellout: '€750k', oos: 2.1, sov: 28, rating: 4.7, priceIndex: 103 },
-  { retailer: 'Courses U', sellout: '€500k', oos: 3.5, sov: 25, rating: 4.5, priceIndex: 102 },
-  { retailer: 'Auchan Drive', sellout: '€375k', oos: 2.8, sov: 22, rating: 4.6, priceIndex: 102 },
-];
+type Filters = {
+    country: string;
+    retailer: string;
+    brand: string;
+    gamme: string;
+};
 
-const comparisonData = [
-    { indicator: 'Panier Moyen', drive: 4.55, offline: 3.79, diff: 20.1 },
-    { indicator: 'Articles / Panier', drive: 1.8, offline: 1.4, diff: 28.6 },
-    { indicator: 'Prix Moyen / Article', drive: 2.53, offline: 2.71, diff: -6.6 },
-    { indicator: 'Poids Ventes Promo', drive: 28, offline: 18, diff: 55.6 },
-];
+interface OnlinePerformanceTabProps {
+    filters: Filters;
+}
 
-export default function OnlinePerformanceTab() {
+const generateOnlineData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const random = (min: number, max: number) => {
+        let t = seed + 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
+        return result * (max-min) + min;
+    };
+    
+    const scorecardData = [
+      { retailer: 'E.Leclerc Drive', sellout: random(800, 900), oos: random(1.0, 2.0), sov: random(33, 38), rating: random(4.7, 4.9), priceIndex: random(100, 102) },
+      { retailer: 'Carrefour Drive', sellout: random(700, 800), oos: random(1.8, 2.5), sov: random(25, 30), rating: random(4.6, 4.8), priceIndex: random(102, 104) },
+      { retailer: 'Courses U', sellout: random(450, 550), oos: random(3.0, 4.0), sov: random(23, 28), rating: random(4.4, 4.6), priceIndex: random(101, 103) },
+      { retailer: 'Auchan Drive', sellout: random(350, 400), oos: random(2.5, 3.2), sov: random(20, 25), rating: random(4.5, 4.7), priceIndex: random(101, 103) },
+    ];
+
+    const comparisonData = [
+        { indicator: 'Panier Moyen', drive: random(4.3, 4.8), offline: 3.79, diff: 0 },
+        { indicator: 'Articles / Panier', drive: random(1.7, 2.0), offline: 1.4, diff: 0 },
+        { indicator: 'Prix Moyen / Article', drive: random(2.5, 2.6), offline: 2.71, diff: 0 },
+        { indicator: 'Poids Ventes Promo', drive: random(25, 30), offline: 18, diff: 0 },
+    ].map(item => ({...item, diff: (item.drive / item.offline - 1) * 100 }));
+
+    return { scorecardData, comparisonData };
+};
+
+
+export default function OnlinePerformanceTab({ filters }: OnlinePerformanceTabProps) {
+  const { scorecardData, comparisonData } = useMemo(() => generateOnlineData(filters), [filters]);
+
   return (
     <div className="space-y-6">
        <Card>
@@ -44,11 +72,11 @@ export default function OnlinePerformanceTab() {
               {scorecardData.map((row) => (
                 <TableRow key={row.retailer}>
                   <TableCell className="font-medium">{row.retailer}</TableCell>
-                  <TableCell className="text-right">{row.sellout}</TableCell>
-                  <TableCell className={`text-right ${row.oos > 3 ? 'text-red-500' : 'text-green-500'}`}>{row.oos}%</TableCell>
-                  <TableCell className="text-right">{row.sov}%</TableCell>
-                  <TableCell className="text-right">{row.rating}</TableCell>
-                  <TableCell className={`text-right ${row.priceIndex > 100 ? 'text-red-500' : 'text-green-500'}`}>{row.priceIndex}</TableCell>
+                  <TableCell className="text-right">€{row.sellout.toFixed(0)}k</TableCell>
+                  <TableCell className={`text-right ${row.oos > 3 ? 'text-red-500' : 'text-green-500'}`}>{row.oos.toFixed(1)}%</TableCell>
+                  <TableCell className="text-right">{row.sov.toFixed(0)}%</TableCell>
+                  <TableCell className="text-right">{row.rating.toFixed(1)}</TableCell>
+                  <TableCell className={`text-right ${row.priceIndex > 100 ? 'text-red-500' : 'text-green-500'}`}>{row.priceIndex.toFixed(0)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -74,8 +102,8 @@ export default function OnlinePerformanceTab() {
                   {comparisonData.map((row) => (
                       <TableRow key={row.indicator}>
                           <TableCell className="font-medium">{row.indicator}</TableCell>
-                          <TableCell className="text-right">{row.indicator.includes('Promo') ? `${row.drive.toFixed(1)}%` : `€${row.drive.toFixed(2)}`}</TableCell>
-                          <TableCell className="text-right">{row.indicator.includes('Promo') ? `${row.offline.toFixed(1)}%` : `€${row.offline.toFixed(2)}`}</TableCell>
+                          <TableCell className="text-right">{row.indicator.includes('%') ? `${row.drive.toFixed(1)}%` : `€${row.drive.toFixed(2)}`}</TableCell>
+                          <TableCell className="text-right">{row.indicator.includes('%') ? `${row.offline.toFixed(1)}%` : `€${row.offline.toFixed(2)}`}</TableCell>
                           <TableCell className={`text-right font-bold ${row.diff > 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {row.diff > 0 ? '+' : ''}{row.diff.toFixed(1)}%
                           </TableCell>
@@ -90,8 +118,8 @@ export default function OnlinePerformanceTab() {
                 <CardTitle>Synthèse & Recommandations IA</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-sm text-muted-foreground">Le canal Drive montre un <strong>panier moyen supérieur de 20%</strong> à l'offline, tiré par un nombre d'articles par panier plus élevé. La sensibilité à la promotion y est également plus forte.</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Le taux de rupture chez Courses U (3.5%) est un point d'attention. Coordonnez-vous avec l'enseigne pour optimiser les stocks sur vos références clés. </p>
+                <p className="text-sm text-muted-foreground">Le canal Drive montre un <strong>panier moyen supérieur de {comparisonData[0].diff.toFixed(0)}%</strong> à l'offline, tiré par un nombre d'articles par panier plus élevé. La sensibilité à la promotion y est également plus forte.</p>
+                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Le taux de rupture chez Courses U ({scorecardData.find(d => d.retailer === 'Courses U')?.oos.toFixed(1)}%) est un point d'attention. Coordonnez-vous avec l'enseigne pour optimiser les stocks sur vos références clés. </p>
             </CardContent>
         </Card>
       </div>

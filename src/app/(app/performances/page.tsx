@@ -20,6 +20,8 @@ export default function PerformancesPage() {
   const [brand, setBrand] = useState(brandOptions[0].value);
   const [gamme, setGamme] = useState(gammeOptions[0].value);
 
+  const filters = { country, retailer, brand, gamme };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -102,22 +104,22 @@ export default function PerformancesPage() {
         </TabsList>
 
         <TabsContent value="d2c" className="mt-6">
-            <D2CPerformanceTab />
+            <D2CPerformanceTab filters={filters} />
         </TabsContent>
         <TabsContent value="offline" className="mt-6">
-            <OfflinePerformanceTab />
+            <OfflinePerformanceTab filters={filters} />
         </TabsContent>
         <TabsContent value="online" className="mt-6">
-            <OnlinePerformanceTab />
+            <OnlinePerformanceTab filters={filters} />
         </TabsContent>
         <TabsContent value="potential" className="mt-6">
-            <PotentialPerformanceTab />
+            <PotentialPerformanceTab filters={filters} />
         </TabsContent>
         <TabsContent value="pricing" className="mt-6">
-            <PricingPerformanceTab />
+            <PricingPerformanceTab filters={filters} />
         </TabsContent>
         <TabsContent value="offer" className="mt-6">
-            <OfferPerformanceTab />
+            <OfferPerformanceTab filters={filters} />
         </TabsContent>
       </Tabs>
     </div>

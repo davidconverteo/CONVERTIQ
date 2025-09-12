@@ -1,37 +1,56 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import { Sparkles } from "lucide-react";
 
-const growthData = [
-  { name: 'CA N-1', value: 4500000 },
-  { name: 'Effet Volume', value: 300000 },
-  { name: 'Effet Prix', value: 150000 },
-  { name: 'Effet Promo', value: -50000 },
-  { name: 'CA N', value: 4900000 },
-];
-
-const priceEvoData = [
-  { retailer: 'Carrefour', avgPrice: 2.75, priceEvo: '+1.2%', promoWeight: '22%', sovProspectus: '30%' },
-  { retailer: 'E.Leclerc', avgPrice: 2.71, priceEvo: '-0.5%', promoWeight: '25%', sovProspectus: '25%' },
-  { retailer: 'Intermarché', avgPrice: 2.78, priceEvo: '+2.1%', promoWeight: '18%', sovProspectus: '20%' },
-  { retailer: 'Système U', avgPrice: 2.73, priceEvo: '+0.8%', promoWeight: '23%', sovProspectus: '15%' },
-];
-
-// Custom bar for waterfall chart
-const WaterfallBar = (props: any) => {
-  const { x, y, width, height, value, name } = props;
-  let color = 'hsl(var(--primary))';
-  if (name === 'CA N-1' || name === 'CA N') color = 'hsl(var(--secondary-foreground))';
-  else if (value < 0) color = 'hsl(var(--destructive))';
-  return <rect x={x} y={y} width={width} height={height} fill={color} />;
+type Filters = {
+    country: string;
+    retailer: string;
+    brand: string;
+    gamme: string;
 };
 
+interface PricingPerformanceTabProps {
+    filters: Filters;
+}
 
-export default function PricingPerformanceTab() {
+const generatePricingData = (filters: Filters) => {
+    const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+    const seed = hashCode(JSON.stringify(filters));
+    const random = (min: number, max: number) => {
+        let t = seed + 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
+        return result * (max-min) + min;
+    };
+    
+    const growthData = [
+      { name: 'CA N-1', value: random(4400000, 4600000) },
+      { name: 'Effet Volume', value: random(250000, 350000) },
+      { name: 'Effet Prix', value: random(100000, 200000) },
+      { name: 'Effet Promo', value: random(-70000, -30000) },
+      { name: 'CA N', value: 0 },
+    ];
+    growthData[4].value = growthData.slice(0,4).reduce((sum, item) => sum + item.value, 0);
+
+    const priceEvoData = [
+      { retailer: 'Carrefour', avgPrice: random(2.7, 2.8), priceEvo: random(1.0, 1.5), promoWeight: random(21, 23), sovProspectus: random(28, 32) },
+      { retailer: 'E.Leclerc', avgPrice: random(2.68, 2.72), priceEvo: random(-0.8, -0.2), promoWeight: random(24, 26), sovProspectus: random(23, 27) },
+      { retailer: 'Intermarché', avgPrice: random(2.75, 2.82), priceEvo: random(1.8, 2.4), promoWeight: random(17, 19), sovProspectus: random(18, 22) },
+      { retailer: 'Système U', avgPrice: random(2.71, 2.76), priceEvo: random(0.6, 1.0), promoWeight: random(22, 24), sovProspectus: random(13, 17) },
+    ];
+
+    return { growthData, priceEvoData };
+};
+
+export default function PricingPerformanceTab({ filters }: PricingPerformanceTabProps) {
+    const { growthData, priceEvoData } = useMemo(() => generatePricingData(filters), [filters]);
+    
     const processedGrowthData = growthData.reduce((acc, entry, index) => {
         if (index === 0 || index === growthData.length - 1) {
             acc.push({ name: entry.name, value: entry.value, range: [0, entry.value] });
@@ -41,7 +60,6 @@ export default function PricingPerformanceTab() {
         }
         return acc;
     }, [] as any[]);
-
 
   return (
     <div className="space-y-6">
@@ -55,7 +73,7 @@ export default function PricingPerformanceTab() {
              <BarChart data={processedGrowthData}>
               <XAxis dataKey="name" />
               <YAxis tickFormatter={(value:number) => `${(value / 1000000).toFixed(1)}M €`} />
-              <Tooltip formatter={(value: number, name: string, props) => [`${props.payload.value.toLocaleString('fr-FR')} €`, name]} />
+              <Tooltip formatter={(value: number, name: string, props) => [`${props.payload.value.toLocaleString('fr-FR', {maximumFractionDigits: 0})} €`, name]} />
               <Bar dataKey="range" name="Contribution">
                 {processedGrowthData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={index === 0 || index === processedGrowthData.length-1 ? 'hsl(var(--secondary-foreground))' : entry.value > 0 ? 'hsl(var(--primary))' : 'hsl(var(--destructive))'}/>
@@ -85,9 +103,9 @@ export default function PricingPerformanceTab() {
               <TableRow key={row.retailer}>
                 <TableCell className="font-medium">{row.retailer}</TableCell>
                 <TableCell className="text-right">€{row.avgPrice.toFixed(2)}</TableCell>
-                <TableCell className={`text-right font-medium ${row.priceEvo.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>{row.priceEvo}</TableCell>
-                <TableCell className="text-right">{row.promoWeight}</TableCell>
-                <TableCell className="text-right">{row.sovProspectus}</TableCell>
+                <TableCell className={`text-right font-medium ${row.priceEvo > 0 ? 'text-green-600' : 'text-red-600'}`}>{row.priceEvo > 0 ? '+' : ''}{row.priceEvo.toFixed(1)}%</TableCell>
+                <TableCell className="text-right">{row.promoWeight.toFixed(0)}%</TableCell>
+                <TableCell className="text-right">{row.sovProspectus.toFixed(0)}%</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -99,7 +117,7 @@ export default function PricingPerformanceTab() {
                 <CardTitle>Synthèse & Recommandations IA</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-sm text-muted-foreground">La croissance du CA de <strong>+400k€</strong> est principalement portée par l'effet <strong>volume (+300k€)</strong> et l'effet <strong>prix (+150k€)</strong>. L'effet promotionnel est négatif (-50k€), suggérant des promotions trop coûteuses ou inefficaces.</p>
+                <p className="text-sm text-muted-foreground">La croissance du CA de <strong>+{((processedGrowthData[4].value / processedGrowthData[0].value) - 1) * 100).toFixed(1)}%</strong> est principalement portée par l'effet <strong>volume (+{growthData[1].value.toLocaleString('fr-FR', {maximumFractionDigits: 0})}€)</strong> et l'effet <strong>prix (+{growthData[2].value.toLocaleString('fr-FR', {maximumFractionDigits: 0})}€)</strong>. L'effet promotionnel est négatif ({growthData[3].value.toLocaleString('fr-FR', {maximumFractionDigits: 0})}€), suggérant des promotions trop coûteuses ou inefficaces.</p>
                 <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Revoir la stratégie promotionnelle chez E.Leclerc où le poids promo est le plus élevé mais l'évolution du prix est négative. Optimiser la mécanique ou la générosité des offres.</p>
             </CardContent>
         </Card>
