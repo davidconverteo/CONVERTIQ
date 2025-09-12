@@ -17,7 +17,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, Palette, Loader2, Wand2 } from "lucide-react";
+import { Sparkles, Palette, Loader2, Wand2, UploadCloud } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional();
 
@@ -35,53 +36,83 @@ const targetChannels = [
 ];
 
 const briefSchema = z.object({
-  prompt: z.string().min(10, { message: "Veuillez entrer une description d'au moins 10 caractères." }),
+  prompt: z.string().optional(),
   inspirationFile: fileListSchema,
-  logoFile: fileListSchema.refine((files) => files?.length === 1, { message: "Vous devez uploader un logo." }),
+  logoFile: fileListSchema,
   guidelinesFile: fileListSchema,
+  baseImageFile: fileListSchema,
+}).refine(data => {
+    // If prompt is empty, baseImageFile must be present
+    if (!data.prompt) {
+        return data.baseImageFile && data.baseImageFile.length > 0;
+    }
+    return true;
+}, {
+    message: "Veuillez soit décrire une image, soit uploader une image de base.",
+    path: ['prompt'],
 });
+
 
 type BriefFormValues = z.infer<typeof briefSchema>;
 
 export default function CreativeStudio() {
   const { toast } = useToast();
+  const [creationMode, setCreationMode] = useState<"generate" | "upload">("generate");
   const [baseImage, setBaseImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [adaptations, setAdaptations] = useState<Record<string, { imageUrl: string; text: string; isLoading: boolean }>>({});
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
-  const [previews, setPreviews] = useState<{ inspiration: string | null; logo: string | null; guidelines: string | null }>({ inspiration: null, logo: null, guidelines: null });
+  const [previews, setPreviews] = useState<{ inspiration: string | null; logo: string | null; guidelines: string | null, baseImage: string | null }>({ inspiration: null, logo: null, guidelines: null, baseImage: null });
 
   const briefForm = useForm<BriefFormValues>({
     resolver: zodResolver(briefSchema),
-    defaultValues: { 
+    defaultValues: {
         prompt: "",
         logoFile: undefined,
         inspirationFile: undefined,
         guidelinesFile: undefined,
-     },
+        baseImageFile: undefined,
+    },
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews, fieldOnChange: (files: FileList | null) => void) => {
     const file = e.target.files?.[0];
+    fieldOnChange(e.target.files);
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setPreviews(p => ({ ...p, [fieldName]: event.target?.result as any }));
+        const result = event.target?.result as string;
+        setPreviews(p => ({ ...p, [fieldName]: result }));
+        if (fieldName === 'baseImage') {
+            setBaseImage(result);
+        }
       };
       reader.readAsDataURL(file);
-      fieldOnChange(e.target.files);
     } else {
       setPreviews(p => ({ ...p, [fieldName]: null }));
-      fieldOnChange(null);
     }
   };
 
   const handleBriefSubmit: SubmitHandler<BriefFormValues> = async (data) => {
     setIsGenerating(true);
-    setBaseImage(null);
     setAdaptations({});
+
+    if (creationMode === "upload") {
+        const baseFile = data.baseImageFile?.[0];
+        if (baseFile) {
+            toast({ title: "Image importée", description: "Vous pouvez maintenant l'adapter aux différents canaux." });
+            setBaseImage(await fileToDataUri(baseFile));
+        } else {
+             toast({ variant: "destructive", title: "Aucune image fournie", description: "Veuillez uploader une image pour continuer." });
+        }
+        setIsGenerating(false);
+        return;
+    }
+    
+    // "generate" mode
+    setBaseImage(null);
     try {
-      let finalPrompt = data.prompt;
+      let finalPrompt = data.prompt || "";
       const file = data.inspirationFile?.[0];
 
       if (file) {
@@ -89,7 +120,7 @@ export default function CreativeStudio() {
         const dataUri = await fileToDataUri(file);
         const promptResponse = await createPromptFromFileUpload({
           fileDataUri: dataUri,
-          userPrompt: data.prompt,
+          userPrompt: finalPrompt,
         });
         finalPrompt = promptResponse.prompt;
         briefForm.setValue('prompt', finalPrompt);
@@ -108,9 +139,8 @@ export default function CreativeStudio() {
   };
 
   const handleAdaptation = async () => {
-    const logoFile = briefForm.getValues("logoFile")?.[0];
-    if (!baseImage || !logoFile) {
-        toast({ variant: "destructive", title: "Éléments manquants", description: "Veuillez générer une image de base et fournir un logo." });
+    if (!baseImage) {
+        toast({ variant: "destructive", title: "Éléments manquants", description: "Veuillez générer ou uploader une image de base." });
         return;
     }
     if(selectedChannels.length === 0) {
@@ -118,12 +148,11 @@ export default function CreativeStudio() {
         return;
     }
 
-    const logoDataUri = await fileToDataUri(logoFile);
+    const logoFile = briefForm.getValues("logoFile")?.[0];
+    const logoDataUri = logoFile ? await fileToDataUri(logoFile) : undefined;
+    
     const guidelinesFile = briefForm.getValues("guidelinesFile")?.[0];
-    let brandGuidelinesDataUri: string | undefined = undefined;
-    if (guidelinesFile) {
-        brandGuidelinesDataUri = await fileToDataUri(guidelinesFile);
-    }
+    const brandGuidelinesDataUri = guidelinesFile ? await fileToDataUri(guidelinesFile) : undefined;
 
     const initialAdaptations: Record<string, { imageUrl: string; text: string; isLoading: boolean }> = {};
     selectedChannels.forEach(channelId => {
@@ -158,62 +187,91 @@ export default function CreativeStudio() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Sparkles className="h-6 w-6 text-accent" />1. Brief Créatif</CardTitle>
-            <CardDescription>Définissez le visuel, l'inspiration et les ressources de votre marque.</CardDescription>
+            <CardDescription>Définissez votre point de départ, vos ressources de marque et générez le visuel principal.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...briefForm}>
               <form onSubmit={briefForm.handleSubmit(handleBriefSubmit)} className="space-y-6">
-                <FormField
-                  control={briefForm.control}
-                  name="prompt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Décrivez l'image souhaitée</FormLabel>
-                      <FormControl><Textarea {...field} rows={4} placeholder={promptExamples[0]} /></FormControl>
-                      <FormMessage />
-                      <div className="text-xs text-muted-foreground pt-2">Exemples:
-                        <ul className="list-disc pl-5">
-                           {promptExamples.slice(0,2).map(ex => <li key={ex}>{ex}</li>)}
-                        </ul>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
+                <Tabs value={creationMode} onValueChange={(value) => setCreationMode(value as any)} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="generate">Générer une image</TabsTrigger>
+                    <TabsTrigger value="upload">Utiliser une image existante</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="generate" className="pt-6">
+                     <FormField
                       control={briefForm.control}
-                      name="inspirationFile"
-                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                      name="prompt"
+                      render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Inspiration (Optionnel)</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              ref={ref}
-                              name={name}
-                              onBlur={onBlur}
-                              onChange={(e) => handleFileChange(e, 'inspiration', onChange)}
-                            />
-                          </FormControl>
+                          <FormLabel>Décrivez l'image souhaitée</FormLabel>
+                          <FormControl><Textarea {...field} rows={4} placeholder={promptExamples[0]} /></FormControl>
                           <FormMessage />
+                           <div className="text-xs text-muted-foreground pt-2">Exemples:
+                            <ul className="list-disc pl-5">
+                               {promptExamples.slice(0,2).map(ex => <li key={ex}>{ex}</li>)}
+                            </ul>
+                          </div>
                         </FormItem>
                       )}
                     />
+                  </TabsContent>
+                  <TabsContent value="upload" className="pt-6">
+                     <FormField
+                        control={briefForm.control}
+                        name="baseImageFile"
+                        render={({ field: { onChange, ...fieldProps } }) => (
+                            <FormItem>
+                                <FormLabel>Uploader votre image</FormLabel>
+                                <FormControl>
+                                    <Input 
+                                        {...fieldProps} 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={(e) => handleFileChange(e, 'baseImage', onChange)}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                  </TabsContent>
+                </Tabs>
+                
+                <div className="space-y-6 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {creationMode === 'generate' && (
+                        <FormField
+                        control={briefForm.control}
+                        name="inspirationFile"
+                        render={({ field: { onChange, ...fieldProps } }) => (
+                            <FormItem>
+                            <FormLabel>Inspiration (Optionnel)</FormLabel>
+                            <FormControl>
+                                <Input 
+                                    {...fieldProps} 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={(e) => handleFileChange(e, 'inspiration', onChange)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    )}
+
                     <FormField
                       control={briefForm.control}
                       name="logoFile"
-                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                      render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
-                          <FormLabel>Logo</FormLabel>
+                          <FormLabel>Logo (Optionnel)</FormLabel>
                           <FormControl>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              ref={ref}
-                              name={name}
-                              onBlur={onBlur}
-                              onChange={(e) => handleFileChange(e, 'logo', onChange)}
+                            <Input 
+                                {...fieldProps}
+                                type="file" 
+                                accept="image/*" 
+                                onChange={(e) => handleFileChange(e, 'logo', onChange)} 
                             />
                           </FormControl>
                           <FormMessage />
@@ -223,34 +281,33 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="guidelinesFile"
-                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                      render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Charte Graphique</FormLabel>
                           <FormControl>
-                            <Input
-                              type="file"
-                              accept="image/*,application/pdf"
-                              ref={ref}
-                              name={name}
-                              onBlur={onBlur}
-                              onChange={(e) => handleFileChange(e, 'guidelines', onChange)}
+                            <Input 
+                                {...fieldProps}
+                                type="file" 
+                                accept="image/*,application/pdf" 
+                                onChange={(e) => handleFileChange(e, 'guidelines', onChange)}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                </div>
-                 <div className="flex justify-center gap-4 min-h-[68px]">
-                    {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
-                    {previews.logo && <Image src={previews.logo} alt="Logo" width={60} height={60} className="object-contain rounded-md border p-1" />}
-                    {previews.guidelines && previews.guidelines.startsWith('data:image') && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}
-                </div>
+                  </div>
+                   <div className="flex justify-center gap-4 min-h-[68px]">
+                      {previews.inspiration && creationMode === 'generate' && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                      {previews.logo && <Image src={previews.logo} alt="Logo" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                      {previews.guidelines && previews.guidelines.startsWith('data:image') && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                  </div>
 
-                <Button type="submit" className="w-full" disabled={isGenerating}>
-                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                  Générer l'Image de Base
-                </Button>
+                  <Button type="submit" className="w-full" disabled={isGenerating}>
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    {creationMode === 'generate' ? "Générer l'Image de Base" : "Importer l'Image"}
+                  </Button>
+                </div>
               </form>
             </Form>
           </CardContent>
@@ -264,18 +321,18 @@ export default function CreativeStudio() {
             <CardDescription>Générez les déclinaisons pour vos canaux de diffusion.</CardDescription>
           </CardHeader>
           <CardContent className="min-h-[400px] lg:min-h-[600px]">
-            {isGenerating ? (
+            {isGenerating && creationMode === 'generate' ? (
                 <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
                     <Loader2 className="h-12 w-12 animate-spin text-primary" /><p className="mt-4 font-semibold">Génération de l'image de base...</p>
                 </div>
             ) : !baseImage ? (
                 <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-center text-muted-foreground">
-                    <Palette className="mx-auto h-12 w-12" /><p className="mt-4 font-semibold">En attente du brief créatif</p><p className="text-sm">L'image de base générée apparaîtra ici.</p>
+                    <Palette className="mx-auto h-12 w-12" /><p className="mt-4 font-semibold">En attente du brief créatif</p><p className="text-sm">L'image principale apparaîtra ici.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                        <h3 className="font-semibold">Image de Base</h3>
+                        <h3 className="font-semibold">Image Principale</h3>
                         <Image src={baseImage} alt="Image de base générée" width={400} height={400} className="rounded-lg object-cover shadow-lg" />
                         
                         <h3 className="font-semibold pt-4">Choisir les canaux</h3>
@@ -300,7 +357,7 @@ export default function CreativeStudio() {
                          <h3 className="font-semibold">Déclinaisons</h3>
                          <div className="space-y-6">
                             {Object.keys(adaptations).length === 0 && <p className="text-sm text-muted-foreground">Les déclinaisons apparaîtront ici.</p>}
-                            {targetChannels.filter(c => adaptations[c.id]).map(channel => {
+                            {targetChannels.filter(channel => adaptations[channel.id]).map(channel => {
                                 const adaptation = adaptations[channel.id];
                                 return (
                                     <div key={channel.id} className="space-y-2">

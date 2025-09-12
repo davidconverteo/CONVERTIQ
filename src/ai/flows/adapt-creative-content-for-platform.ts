@@ -20,6 +20,7 @@ const AdaptCreativeContentForPlatformInputSchema = z.object({
   targetPlatform: z.string().describe('The target activation platform (e.g., "Post Instagram (Carré)", "Story Facebook (Vertical)", "Bannière Web (Large)").'),
   logoDataUri: z
     .string()
+    .optional()
     .describe(
       "The brand logo to be added to the creative content, as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
@@ -71,11 +72,17 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
 
     // Step 2: Generate the adapted image.
     const imagePromptParts: (object)[] = [
-      { text: `Adapt this image for ${input.targetPlatform}. Recrop it to a ${getAspectRatio(input.targetPlatform)} aspect ratio. Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive. If brand guidelines are provided, use them to influence the style, color palette, and typography. ` },
+      { text: `Adapt this image for ${input.targetPlatform}. Recrop it to a ${getAspectRatio(input.targetPlatform)} aspect ratio.`},
       { media: { url: input.baseImage } },
-      { media: { url: input.logoDataUri } },
     ];
+    
+    if (input.logoDataUri) {
+        imagePromptParts[0].text += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`
+        imagePromptParts.push({ media: { url: input.logoDataUri } });
+    }
+
     if (input.brandGuidelinesDataUri) {
+      imagePromptParts[0].text += ` If brand guidelines are provided, use them to influence the style, color palette, and typography.`
       imagePromptParts.push({ media: { url: input.brandGuidelinesDataUri } });
     }
 
