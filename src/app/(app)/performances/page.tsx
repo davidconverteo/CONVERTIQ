@@ -1,10 +1,15 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Package, ShoppingCart, Percent, Users, Store, LineChart as LineChartIcon, Tv, Wifi, Power, TrendingUp, Tag, Boxes } from "lucide-react";
+import { Power, Tv, Wifi, TrendingUp, Tag, Boxes } from "lucide-react";
 import OfflinePerformanceTab from "@/components/performance-tabs/offline-performance-tab";
+import D2CPerformanceTab from "@/components/performance-tabs/d2c-performance-tab";
+import OnlinePerformanceTab from "@/components/performance-tabs/online-performance-tab";
+import PotentialPerformanceTab from "@/components/performance-tabs/potential-performance-tab";
+import PricingPerformanceTab from "@/components/performance-tabs/pricing-performance-tab";
+import OfferPerformanceTab from "@/components/performance-tabs/offer-performance-tab";
 
 
 export default function PerformancesPage() {
@@ -39,22 +44,22 @@ export default function PerformancesPage() {
         </TabsList>
 
         <TabsContent value="d2c" className="mt-6">
-            <Card><CardHeader><CardTitle>D2C</CardTitle><CardContent><p>Contenu à venir pour le D2C.</p></CardContent></CardHeader></Card>
+            <D2CPerformanceTab />
         </TabsContent>
         <TabsContent value="offline" className="mt-6">
             <OfflinePerformanceTab />
         </TabsContent>
         <TabsContent value="online" className="mt-6">
-            <Card><CardHeader><CardTitle>Online (Drive)</CardTitle><CardContent><p>Contenu à venir pour le Online (Drive).</p></CardContent></CardHeader></Card>
+            <OnlinePerformanceTab />
         </TabsContent>
         <TabsContent value="potential" className="mt-6">
-            <Card><CardHeader><CardTitle>Potentiel</CardTitle><CardContent><p>Contenu à venir pour le Potentiel.</p></CardContent></CardHeader></Card>
+            <PotentialPerformanceTab />
         </TabsContent>
         <TabsContent value="pricing" className="mt-6">
-            <Card><CardHeader><CardTitle>Prix & Promotions</CardTitle><CardContent><p>Contenu à venir pour les Prix & Promotions.</p></CardContent></CardHeader></Card>
+            <PricingPerformanceTab />
         </TabsContent>
         <TabsContent value="offer" className="mt-6">
-            <Card><CardHeader><CardTitle>Offre</CardTitle><CardContent><p>Contenu à venir pour l'Offre.</p></CardContent></CardHeader></Card>
+            <OfferPerformanceTab />
         </TabsContent>
       </Tabs>
     </div>
