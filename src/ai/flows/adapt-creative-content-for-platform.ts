@@ -104,3 +104,5 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
 export async function adaptCreativeContentForPlatform(input: AdaptCreativeContentForPlatformInput): Promise<AdaptCreativeContentForPlatformOutput> {
   return adaptCreativeContentForPlatformFlow(input);
 }
+
+    

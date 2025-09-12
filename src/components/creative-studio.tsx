@@ -8,7 +8,6 @@ import Image from 'next/image';
 import { createPromptFromFileUpload } from "@/ai/flows/create-prompt-from-file-upload";
 import { generateMarketingImage } from "@/ai/flows/generate-marketing-image-from-prompt";
 import { adaptCreativeContentForPlatform } from "@/ai/flows/adapt-creative-content-for-platform";
-import { editMarketingImage } from "@/ai/flows/edit-marketing-image";
 import { fileToDataUri } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, Palette, Loader2, UploadCloud, FileImage, Wand2, RefreshCw } from "lucide-react";
+import { Sparkles, Palette, Loader2, Wand2 } from "lucide-react";
 
 const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional();
 
@@ -161,7 +160,7 @@ export default function CreativeStudio() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Décrivez l'image souhaitée</FormLabel>
-                      <FormControl><Textarea {...field} rows={4} placeholder="Ex: Photo réaliste d'un yaourt aux fruits rouges sur une table en bois..." /></FormControl>
+                      <FormControl><Textarea {...field} rows={4} placeholder={promptExamples[0]} /></FormControl>
                       <FormMessage />
                       <div className="text-xs text-muted-foreground pt-2">Exemples:
                         <ul className="list-disc pl-5">
@@ -172,9 +171,9 @@ export default function CreativeStudio() {
                   )}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField control={briefForm.control} name="inspirationFile" render={({ field }) => ( <FormItem><FormLabel>Inspiration</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'inspiration', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="inspirationFile" render={({ field }) => ( <FormItem><FormLabel>Inspiration (Optionnel)</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'inspiration', field)}/></FormControl></FormItem> )} />
                     <FormField control={briefForm.control} name="logoFile" render={({ field }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'logo', field)}/></FormControl></FormItem> )} />
-                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field }) => ( <FormItem><FormLabel>Charte</FormLabel><FormControl><Input type="file" accept="image/*,application/pdf" onChange={e => handleFileChange(e, 'guidelines', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field }) => ( <FormItem><FormLabel>Charte Graphique</FormLabel><FormControl><Input type="file" accept="image/*,application/pdf" onChange={e => handleFileChange(e, 'guidelines', field)}/></FormControl></FormItem> )} />
                 </div>
                  <div className="flex justify-center gap-4 min-h-[68px]">
                     {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
@@ -261,3 +260,5 @@ export default function CreativeStudio() {
     </div>
   );
 }
+
+    
