@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { createPromptFromFileUpload } from "@/ai/flows/create-prompt-from-file-upload";
 import { generateMarketingImage } from "@/ai/flows/generate-marketing-image-from-prompt";
 import { adaptCreativeContentForPlatform } from "@/ai/flows/adapt-creative-content-for-platform";
+import { editMarketingImage } from "@/ai/flows/edit-marketing-image";
 import { fileToDataUri } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -16,9 +17,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, Palette, Loader2, UploadCloud, FileImage, Wand2 } from "lucide-react";
+import { Sparkles, Palette, Loader2, UploadCloud, FileImage, Wand2, RefreshCw } from "lucide-react";
 
-// Helper for client-side FileList schema
 const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional();
 
 const promptExamples = [
@@ -93,7 +93,7 @@ export default function CreativeStudio() {
       toast({ title: "Image de base générée !", description: "Vous pouvez maintenant l'adapter aux différents canaux." });
     } catch (error) {
       console.error("Image generation error:", error);
-      toast({ variant: "destructive", title: "Erreur de Génération", description: "Impossible de générer l'image. Veuillez réessayer." });
+      toast({ variant: "destructive", title: "Erreur de Génération", description: "Impossible de générer l'image. Avez-vous configuré votre clé API ?" });
     } finally {
       setIsGenerating(false);
     }
@@ -117,14 +117,12 @@ export default function CreativeStudio() {
         brandGuidelinesDataUri = await fileToDataUri(guidelinesFile);
     }
 
-    // Set loading state for selected channels
     const initialAdaptations: Record<string, { imageUrl: string; text: string; isLoading: boolean }> = {};
     selectedChannels.forEach(channelId => {
         initialAdaptations[channelId] = { imageUrl: "", text: "", isLoading: true };
     });
     setAdaptations(initialAdaptations);
 
-    // Trigger all adaptations in parallel
     selectedChannels.forEach(async (channelId) => {
         const channelLabel = targetChannels.find(c => c.id === channelId)?.label || channelId;
         try {
@@ -174,11 +172,11 @@ export default function CreativeStudio() {
                   )}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField control={briefForm.control} name="inspirationFile" render={({ field }) => ( <FormItem><FormLabel>Inspiration</FormLabel><FormControl><Input type="file" onChange={e => handleFileChange(e, 'inspiration', field)}/></FormControl></FormItem> )} />
-                    <FormField control={briefForm.control} name="logoFile" render={({ field }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" onChange={e => handleFileChange(e, 'logo', field)}/></FormControl></FormItem> )} />
-                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field }) => ( <FormItem><FormLabel>Charte</FormLabel><FormControl><Input type="file" onChange={e => handleFileChange(e, 'guidelines', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="inspirationFile" render={({ field }) => ( <FormItem><FormLabel>Inspiration</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'inspiration', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="logoFile" render={({ field }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'logo', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field }) => ( <FormItem><FormLabel>Charte</FormLabel><FormControl><Input type="file" accept="image/*,application/pdf" onChange={e => handleFileChange(e, 'guidelines', field)}/></FormControl></FormItem> )} />
                 </div>
-                 <div className="flex justify-center gap-4">
+                 <div className="flex justify-center gap-4 min-h-[68px]">
                     {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
                     {previews.logo && <Image src={previews.logo} alt="Logo" width={60} height={60} className="object-contain rounded-md border p-1" />}
                     {previews.guidelines && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}

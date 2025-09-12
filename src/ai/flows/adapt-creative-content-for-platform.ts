@@ -69,7 +69,7 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     const textGenerationPromise = adaptationPrompt({ platform: input.targetPlatform });
 
     // Step 2: Generate the adapted image.
-    const imagePromptParts = [
+    const imagePromptParts: (object)[] = [
       { text: `Adapt this image for ${input.targetPlatform}. Recrop it to a ${getAspectRatio(input.targetPlatform)} aspect ratio. Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive. If brand guidelines are provided, use them to influence the style, color palette, and typography. ` },
       { media: { url: input.baseImage } },
       { media: { url: input.logoDataUri } },
