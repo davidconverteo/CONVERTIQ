@@ -15,7 +15,7 @@ const GenerateMarketingImageInputSchema = z.object({
 export type GenerateMarketingImageInput = z.infer<typeof GenerateMarketingImageInputSchema>;
 
 const GenerateMarketingImageOutputSchema = z.object({
-  imageUrl: z.string().describe('The URL of the generated marketing image.'),
+  imageUrl: z.string().describe('The URL of the generated marketing image, as a data URI.'),
 });
 export type GenerateMarketingImageOutput = z.infer<typeof GenerateMarketingImageOutputSchema>;
 
@@ -33,19 +33,13 @@ const generateMarketingImageFlow = ai.defineFlow(
   },
   async input => {
     const {media} = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-image-preview',
-      prompt: [
-        {text: 'Generate an image of a cat'},
-        {text: input.prompt},
-      ],
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'],
-      },
+      model: 'googleai/imagen-4.0-fast-generate-001',
+      prompt: input.prompt,
     });
 
-    if (!media) {
+    if (!media || !media.url) {
       throw new Error('No media was returned from image generation.');
     }
-    return {imageUrl: media.url!};
+    return {imageUrl: media.url};
   }
 );

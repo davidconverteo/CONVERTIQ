@@ -33,11 +33,16 @@ const prompt = ai.definePrompt({
   name: 'createPromptFromFileUploadPrompt',
   input: {schema: CreatePromptFromFileUploadInputSchema},
   output: {schema: CreatePromptFromFileUploadOutputSchema},
-  prompt: `You are an AI prompt generator. You will create a detailed text prompt based on the file and the user instructions.
+  prompt: `You are an expert AI prompt engineer. Your task is to generate a highly detailed and effective text prompt for an image generation model (like Imagen).
+
+You will be given user instructions and an optional creative asset (like a reference image or a logo). Your generated prompt should combine the user's intent with a rich, descriptive language that will produce a high-quality, visually appealing marketing image.
 
 User instructions: {{{userPrompt}}}
 
-Creative asset: {{media url=fileDataUri}}`,
+Inspiration Asset:
+{{media url=fileDataUri}}
+
+Based on the provided information, generate a new, detailed text prompt. Describe the scene, the style, the lighting, the composition, and any relevant details from the reference image to guide the image generation AI.`,
 });
 
 const createPromptFromFileUploadFlow = ai.defineFlow(
