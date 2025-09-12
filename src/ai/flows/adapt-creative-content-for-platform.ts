@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Adapts a creative image for a specific marketing platform.
+ * @fileOverview Adapts a creative image for a specific marketing platform using outpainting.
  *
  * - adaptCreativeContentForPlatform - A function that adapts creative content for a given platform.
  * - AdaptCreativeContentForPlatformInput - The input type for the adaptCreativeContentForPlatform function.
@@ -40,6 +40,19 @@ const AdaptCreativeContentForPlatformOutputSchema = z.object({
 export type AdaptCreativeContentForPlatformOutput = z.infer<typeof AdaptCreativeContentForPlatformOutputSchema>;
 
 
+const getAspectRatio = (platform: string): string | undefined => {
+    const match = platform.match(/\((\d+)x(\d+)\)/);
+    if (!match) return undefined;
+    const w = parseInt(match[1], 10);
+    const h = parseInt(match[2], 10);
+
+    const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
+    const divisor = gcd(w, h);
+    
+    return `${w / divisor}:${h / divisor}`;
+}
+
+
 const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   {
     name: 'adaptCreativeContentForPlatformFlow',
@@ -47,33 +60,27 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     outputSchema: AdaptCreativeContentForPlatformOutputSchema,
   },
   async (input) => {
-    // Extract dimensions from the platform string, e.g., "Post Instagram (1080x1080)"
-    const dimensionRegex = /(\d{2,})x(\d{2,})/;
-    const match = input.targetPlatform.match(dimensionRegex);
-    let dimensionInstruction = `Redimensionnez cette image aux dimensions exactes de la plateforme cible: ${input.targetPlatform}.`;
-    
-    if (match && match[1] && match[2]) {
-        const width = parseInt(match[1], 10);
-        const height = parseInt(match[2], 10);
-        dimensionInstruction = `Redimensionnez cette image aux dimensions exactes de ${width} par ${height} pixels. Le format de sortie DOIT être ${width}x${height}.`;
-    }
+    const aspectRatio = getAspectRatio(input.targetPlatform);
 
     // Build the prompt for the image generation model.
+    let textPrompt = `Expand this image to perfectly fit the target aspect ratio of ${aspectRatio || 'the target platform'}. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style.`;
+    
     const imagePromptParts: (object)[] = [
-      { text: dimensionInstruction },
+      { text: textPrompt },
       { media: { url: input.baseImage } },
     ];
     
     if (input.logoDataUri) {
-        (imagePromptParts[0] as {text: string}).text += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`;
+        textPrompt += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`;
+        (imagePromptParts[0] as {text: string}).text = textPrompt;
         imagePromptParts.push({ media: { url: input.logoDataUri } });
     }
 
     const { media } = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-image-preview',
+      model: 'googleai/imagen-4.0-fast-generate-001',
       prompt: imagePromptParts,
       config: {
-        responseModalities: ['TEXT', 'IMAGE'],
+        aspectRatio: aspectRatio,
       },
     });
 
