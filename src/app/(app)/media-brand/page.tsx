@@ -9,64 +9,66 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin } from "lucide-react";
 
-// --- Mock Data ---
+// --- Données initiales restaurées ---
 
-const kpiData = {
+const kpiDataByCountry = {
   France: { spend: 28500, reach: 1200000, clicks: 74700, roi: 4.8 },
   USA: { spend: 75000, reach: 3500000, clicks: 210000, roi: 5.5 },
-  Germany: { spend: 42000, reach: 2100000, clicks: 115000, roi: 4.2 },
+  Japan: { spend: 0, reach: 0, clicks: 0, roi: 0 }, // Ajout du Japon pour la cohérence
 };
 
 const campaignDataByCountry = {
   France: [
-    { id: 'FR1', name: 'Campagne Hiver', platform: 'Facebook', spend: 5000, reach: 120000, clicks: 8500, status: 'active' },
-    { id: 'FR2', name: 'Lancement Végétal', platform: 'Instagram', spend: 7500, reach: 250000, clicks: 15000, status: 'active' },
-    { id: 'FR3', name: 'Recettes Estivales', platform: 'Youtube', spend: 12000, reach: 800000, clicks: 45000, status: 'completed' },
-    { id: 'FR4', name: 'Promo Rentrée', platform: 'Facebook', spend: 4000, reach: 95000, clicks: 6200, status: 'paused' },
+    { id: 'C001', brand: 'La Prairie Gourmande', product: 'Pack de 4 Fraise', start: '01/07/24', end: '31/07/24', lever: 'Social', channel: 'Meta', objective: 'Conversion', status: 'Terminée', roas: 4.2, ca_add: 85200, spend: 20286, reach: 750000, clicks: 15000 },
+    { id: 'C003', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: '01/09/24', end: '30/09/24', lever: 'TV', channel: 'TF1', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 450000, reach: 15000000, clicks: 0 },
+    { id: 'C011', brand: 'Gamme Bio', product: 'Gamme Bio', start: '10/05/25', end: '10/06/25', lever: 'Affichage', channel: 'JCDecaux', objective: 'Notoriété', status: 'Terminée', roas: 1.8, ca_add: 92000, spend: 51111, reach: 5000000, clicks: 0 },
   ],
   USA: [
-    { id: 'US1', name: 'Summer Blast', platform: 'Instagram', spend: 25000, reach: 1200000, clicks: 80000, status: 'active' },
-    { id: 'US2', name: 'New Flavor Launch', platform: 'Youtube', spend: 40000, reach: 2000000, clicks: 110000, status: 'active' },
+    { id: 'CUSA1', brand: 'La Prairie Gourmande', product: 'Grand Pot 450g', start: '15/07/24', end: '15/08/24', lever: 'Social', channel: 'TikTok', objective: 'Engagement', status: 'En cours', roas: 3.1, ca_add: 120500, spend: 38871, reach: 2800000, clicks: 25000 },
+    { id: 'CUSA2', brand: 'Gamme Bio', product: 'Yaourt Bio Fraise', start: '01/08/24', end: '31/08/24', lever: 'Presse', channel: 'NY Times', objective: 'Considération', status: 'Terminée', roas: 1.5, ca_add: 45000, spend: 30000, reach: 1500000, clicks: 0 },
   ],
-  Germany: [
-     { id: 'DE1', name: 'Herbst-Special', platform: 'Facebook', spend: 15000, reach: 700000, clicks: 40000, status: 'completed' },
-     { id: 'DE2', name: 'Bio-Joghurt Einführung', platform: 'Instagram', spend: 20000, reach: 1100000, clicks: 65000, status: 'active' },
+  Japan: [
+     { id: 'CJAP1', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: '01/09/24', end: '30/09/24', lever: 'TV', channel: 'Fuji TV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 660000, reach: 24000000, clicks: 0 },
   ]
 };
 
 const performanceByPlatform = {
   France: [
-    { platform: 'Facebook', ROI: 4.5, CPA: 1.2 }, { platform: 'Instagram', ROI: 5.2, CPA: 0.9 }, { platform: 'Youtube', ROI: 3.8, CPA: 2.5 }, { platform: 'TikTok', ROI: 6.1, CPA: 0.7 },
+    { platform: 'Meta', ROI: 4.2, CPA: 1.35 }, { platform: 'TF1', ROI: 3.8, CPA: 2.5 }, { platform: 'JCDecaux', ROI: 1.8, CPA: 5.0 },
   ],
   USA: [
-    { platform: 'Facebook', ROI: 5.0, CPA: 1.0 }, { platform: 'Instagram', ROI: 6.8, CPA: 0.8 }, { platform: 'Youtube', ROI: 4.1, CPA: 2.1 }, { platform: 'TikTok', ROI: 7.2, CPA: 0.6 },
+    { platform: 'TikTok', ROI: 3.1, CPA: 0.95 }, { platform: 'NY Times', ROI: 1.5, CPA: 4.0 },
   ],
-  Germany: [
-     { platform: 'Facebook', ROI: 4.0, CPA: 1.5 }, { platform: 'Instagram', ROI: 4.8, CPA: 1.1 }, { platform: 'Youtube', ROI: 3.5, CPA: 2.8 }, { platform: 'TikTok', ROI: 5.5, CPA: 0.9 },
+  Japan: [
+     { platform: 'Fuji TV', ROI: 4.0, CPA: 2.8 },
   ]
 };
 
 const budgetAllocation = {
-    France: [{name: 'Facebook', value: 30}, {name: 'Instagram', value: 40}, {name: 'Youtube', value: 20}, {name: 'Autres', value: 10}],
-    USA: [{name: 'Facebook', value: 25}, {name: 'Instagram', value: 45}, {name: 'Youtube', value: 25}, {name: 'Autres', value: 5}],
-    Germany: [{name: 'Facebook', value: 35}, {name: 'Instagram', value: 35}, {name: 'Youtube', value: 15}, {name: 'Autres', value: 15}],
+    France: [{name: 'Social', value: 30}, {name: 'TV', value: 50}, {name: 'Affichage', value: 20}],
+    USA: [{name: 'Social', value: 60}, {name: 'Presse', value: 40}],
+    Japan: [{name: 'TV', value: 100}],
 }
-const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#6B7280'];
+const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280'];
 
 // --- Components ---
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
     switch (platform.toLowerCase()) {
-        case 'facebook': return <Facebook className="h-5 w-5 text-blue-600" />;
-        case 'instagram': return <Instagram className="h-5 w-5 text-pink-500" />;
-        case 'youtube': return <Youtube className="h-5 w-5 text-red-600" />;
+        case 'meta': return <Facebook className="h-5 w-5 text-blue-600" />;
+        case 'tiktok': return <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.02 3.07.02 4.6 0 1.8.01 3.59-.01 5.39-.01 1.25-.08 2.5-.23 3.74-.22 1.7-.63 3.36-1.34 4.94-.84 1.87-2.09 3.4-3.79 4.62-1.25.9-2.72 1.48-4.25 1.76-.9.17-1.8.27-2.71.33-1.89.12-3.79.02-5.68-.08-1.3-.07-2.6-.2-3.88-.42-.8-.15-1.58-.36-2.34-.62-.25-.09-.48-.2-.7-.34.02-2.12.01-4.24.01-6.36 1.1.42 2.22.75 3.36.98.59.12 1.19.2 1.78.26 1.15.11 2.3.13 3.45.11.95-.03 1.9-.11 2.84-.25.86-.12 1.7-.32 2.52-.59.98-.31 1.91-.73 2.77-1.25.6-.37 1.16-.8 1.68-1.28.42-.39.81-.83 1.16-1.3.28-.37.53-.77.75-1.19.42-.8.74-1.66.97-2.55.12-.47.22-.95.3-1.43.08-.5.13-1 .18-1.5.02-.2.03-.4.04-.6.01-1.14.01-2.28.01-3.43.01-.63.01-1.27.02-1.9.01-.2 0-.39-.01-.59Z"/></svg>;
+        case 'tf1':
+        case 'fuji tv': 
+            return <Youtube className="h-5 w-5 text-red-600" />; // Placeholder
         default: return null;
     }
 };
 const StatusBadge = ({ status }: { status: string }) => {
-    switch(status) {
+    switch(status.toLowerCase()) {
+        case 'en cours':
         case 'active': return <Badge className="bg-green-500 hover:bg-green-600">Active</Badge>;
-        case 'paused': return <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600">En Pause</Badge>;
+        case 'planifiée': return <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600">Planifiée</Badge>;
+        case 'terminée':
         case 'completed': return <Badge variant="outline">Terminée</Badge>;
         default: return null;
     }
@@ -75,13 +77,29 @@ const StatusBadge = ({ status }: { status: string }) => {
 // --- Main Page Component ---
 
 export default function MediaBrandPage() {
-  const [country, setCountry] = useState<'France' | 'USA' | 'Germany'>('France');
+  const [country, setCountry] = useState<'France' | 'USA' | 'Japan'>('France');
   const [brand, setBrand] = useState('all');
 
-  const currentKpis = kpiData[country];
-  const currentCampaigns = campaignDataByCountry[country];
+  const currentKpis = kpiDataByCountry[country];
+  const currentCampaigns = campaignDataByCountry[country]
+      .filter(c => brand === 'all' || c.brand === brand);
+
   const currentPlatformPerf = performanceByPlatform[country];
   const currentBudget = budgetAllocation[country];
+  const availableBrands = ['all', ...Array.from(new Set(campaignDataByCountry[country].map(c => c.brand)))];
+
+  const aggregatedKpis = currentCampaigns.reduce((acc, campaign) => {
+    if (campaign.status.toLowerCase() !== 'planifiée') {
+        acc.spend += campaign.spend || 0;
+        acc.reach += campaign.reach || 0;
+        acc.clicks += campaign.clicks || 0;
+        acc.ca_add += campaign.ca_add || 0;
+    }
+    return acc;
+  }, { spend: 0, reach: 0, clicks: 0, ca_add: 0 });
+
+  const globalRoi = aggregatedKpis.spend > 0 ? (aggregatedKpis.ca_add / aggregatedKpis.spend) : 0;
+
 
   return (
     <div className="space-y-6">
@@ -94,23 +112,22 @@ export default function MediaBrandPage() {
                     </div>
                      <div className="flex items-center gap-2">
                         <Filter className="h-5 w-5 text-muted-foreground" />
-                        <Select onValueChange={(val: 'France' | 'USA' | 'Germany') => setCountry(val)} value={country}>
+                        <Select onValueChange={(val: 'France' | 'USA' | 'Japan') => { setCountry(val); setBrand('all'); }} value={country}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Pays" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="France">France</SelectItem>
                                 <SelectItem value="USA">États-Unis</SelectItem>
-                                <SelectItem value="Germany">Allemagne</SelectItem>
+                                <SelectItem value="Japan">Japon</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Select onValueChange={setBrand} value={brand} disabled>
+                        <Select onValueChange={setBrand} value={brand}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Marque" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Toutes les marques</SelectItem>
-                                <SelectItem value="brandA" disabled>Marque A</SelectItem>
+                                {availableBrands.map(b => <SelectItem key={b} value={b}>{b === 'all' ? 'Toutes les marques' : b}</SelectItem>)}
                             </SelectContent>
                         </Select>
                     </div>
@@ -131,8 +148,8 @@ export default function MediaBrandPage() {
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">€{currentKpis.spend.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground">+5% ce mois-ci</p>
+                        <div className="text-2xl font-bold">€{aggregatedKpis.spend.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">sur les campagnes actives/terminées</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -141,7 +158,7 @@ export default function MediaBrandPage() {
                         <Eye className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{currentKpis.reach.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{aggregatedKpis.reach.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">Personnes uniques touchées</p>
                     </CardContent>
                 </Card>
@@ -151,8 +168,8 @@ export default function MediaBrandPage() {
                         <MousePointerClick className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{currentKpis.clicks.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground">Taux de clics moyen: 6.2%</p>
+                        <div className="text-2xl font-bold">{aggregatedKpis.clicks.toLocaleString()}</div>
+                         <p className="text-xs text-muted-foreground">Taux de clics moyen: {aggregatedKpis.reach > 0 ? (aggregatedKpis.clicks / aggregatedKpis.reach * 100).toFixed(2) : 0}%</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -161,7 +178,7 @@ export default function MediaBrandPage() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{currentKpis.roi}x</div>
+                        <div className="text-2xl font-bold">{globalRoi.toFixed(2)}x</div>
                         <p className="text-xs text-muted-foreground">Retour sur investissement</p>
                     </CardContent>
                 </Card>
@@ -190,7 +207,7 @@ export default function MediaBrandPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Allocation Budgétaire</CardTitle>
-                        <CardDescription>Répartition des dépenses par canal.</CardDescription>
+                        <CardDescription>Répartition des dépenses par levier.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -218,23 +235,23 @@ export default function MediaBrandPage() {
                         {currentCampaigns.length > 0 ? currentCampaigns.map(campaign => (
                             <div key={campaign.id} className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center gap-4">
-                                    <PlatformIcon platform={campaign.platform} />
+                                    <PlatformIcon platform={campaign.channel} />
                                     <div>
-                                        <p className="font-semibold">{campaign.name}</p>
-                                        <p className="text-sm text-muted-foreground">{campaign.platform}</p>
+                                        <p className="font-semibold">{campaign.product}</p>
+                                        <p className="text-sm text-muted-foreground">{campaign.brand} | {campaign.channel}</p>
                                     </div>
                                 </div>
                                 <div className="grid flex-1 grid-cols-2 gap-4 text-sm sm:grid-cols-4 sm:text-center">
                                     <div>
-                                        <p className="font-medium">€{campaign.spend.toLocaleString()}</p>
+                                        <p className="font-medium">€{(campaign.spend || 0).toLocaleString()}</p>
                                         <p className="text-muted-foreground">Dépensé</p>
                                     </div>
                                     <div>
-                                        <p className="font-medium">{campaign.reach.toLocaleString()}</p>
+                                        <p className="font-medium">{(campaign.reach || 0).toLocaleString()}</p>
                                         <p className="text-muted-foreground">Portée</p>
                                     </div>
                                     <div>
-                                        <p className="font-medium">{campaign.clicks.toLocaleString()}</p>
+                                        <p className="font-medium">{(campaign.clicks || 0).toLocaleString()}</p>
                                         <p className="text-muted-foreground">Clics</p>
                                     </div>
                                     <div className="flex items-center justify-end sm:justify-center">
@@ -244,7 +261,7 @@ export default function MediaBrandPage() {
                             </div>
                         )) : (
                             <div className="text-center py-12 text-muted-foreground">
-                                <p>Aucune donnée de campagne disponible pour ce pays.</p>
+                                <p>Aucune donnée de campagne disponible pour cette sélection.</p>
                             </div>
                         )}
                     </div>
@@ -255,3 +272,5 @@ export default function MediaBrandPage() {
     </div>
   );
 }
+
+    
