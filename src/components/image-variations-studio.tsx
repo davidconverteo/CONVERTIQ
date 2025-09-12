@@ -9,7 +9,7 @@ import { editMarketingImage } from "@/ai/flows/edit-marketing-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Loader2, Sparkles, UploadCloud, Wand2 } from "lucide-react";
+import { Loader2, Sparkles, UploadCloud, Wand2, Palette } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 
 const variationFilters = [
@@ -33,10 +33,12 @@ export default function ImageVariationsStudio() {
   const [baseImage, setBaseImage] = useState<string | null>(null);
   const [variations, setVariations] = useState<Variation[]>([]);
   const [refineStates, setRefineStates] = useState<Record<string, { prompt: string; isLoading: boolean }>>({});
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setIsUploading(true);
       try {
         const dataUri = await fileToDataUri(file);
         setBaseImage(dataUri);
@@ -44,6 +46,8 @@ export default function ImageVariationsStudio() {
         setRefineStates({});
       } catch (error) {
         toast({ variant: "destructive", title: "Erreur de Fichier", description: "Impossible de lire le fichier image." });
+      } finally {
+        setIsUploading(false);
       }
     }
   };
@@ -61,7 +65,7 @@ export default function ImageVariationsStudio() {
       imageUrl: "",
       isLoading: true,
     };
-    setVariations(prev => [...prev, newVariation]);
+    setVariations(prev => [newVariation, ...prev]);
 
     try {
       const result = await editMarketingImage({
@@ -72,7 +76,7 @@ export default function ImageVariationsStudio() {
       setVariations(prev => prev.map(v => v.id === variationId ? { ...v, imageUrl: result.editedImageUrl, isLoading: false } : v));
     } catch (error) {
       console.error("Variation generation error:", error);
-      toast({ variant: "destructive", title: `Erreur pour "${filter.label}"`, description: "La génération a échoué. Veuillez réessayer." });
+      toast({ variant: "destructive", title: `Erreur pour "${filter.label}"`, description: "La génération a échoué. Avez-vous bien configuré votre clé API ?" });
       setVariations(prev => prev.filter(v => v.id !== variationId));
     }
   };
@@ -114,8 +118,9 @@ export default function ImageVariationsStudio() {
           <CardDescription>Uploadez le visuel que vous souhaitez décliner.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Input type="file" accept="image/*" onChange={handleFileChange} className="max-w-md" />
-          {baseImage && (
+          <Input type="file" accept="image/*" onChange={handleFileChange} className="max-w-md" disabled={isUploading}/>
+          {isUploading && <div className="flex items-center gap-2 mt-4 text-muted-foreground"><Loader2 className="animate-spin" />Chargement de l'image...</div>}
+          {baseImage && !isUploading && (
             <div className="mt-6">
               <h3 className="font-semibold mb-2">Visuel actuel :</h3>
               <Image src={baseImage} alt="Image de base" width={200} height={200} className="rounded-lg border shadow-md" />
