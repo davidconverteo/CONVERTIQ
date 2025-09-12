@@ -180,9 +180,66 @@ export default function CreativeStudio() {
                   )}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField control={briefForm.control} name="inspirationFile" render={({ field: { onChange, onBlur, name, ref } }) => ( <FormItem><FormLabel>Inspiration (Optionnel)</FormLabel><FormControl><Input type="file" accept="image/*" ref={ref} name={name} onBlur={onBlur} onChange={e => handleFileChange(e, 'inspiration', onChange)}/></FormControl><FormMessage /></FormItem> )} />
-                    <FormField control={briefForm.control} name="logoFile" render={({ field: { onChange, onBlur, name, ref } }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" accept="image/*" ref={ref} name={name} onBlur={onBlur} onChange={e => handleFileChange(e, 'logo', onChange)}/></FormControl><FormMessage /></FormItem> )} />
-                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field: { onChange, onBlur, name, ref } }) => ( <FormItem><FormLabel>Charte Graphique</FormLabel><FormControl><Input type="file" accept="image/*,application/pdf" ref={ref} name={name} onBlur={onBlur} onChange={e => handleFileChange(e, 'guidelines', onChange)}/></FormControl><FormMessage /></FormItem> )} />
+                    <FormField
+                      control={briefForm.control}
+                      name="inspirationFile"
+                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                        <FormItem>
+                          <FormLabel>Inspiration (Optionnel)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              ref={ref}
+                              name={name}
+                              onBlur={onBlur}
+                              onChange={(e) => handleFileChange(e, 'inspiration', onChange)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={briefForm.control}
+                      name="logoFile"
+                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                        <FormItem>
+                          <FormLabel>Logo</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              ref={ref}
+                              name={name}
+                              onBlur={onBlur}
+                              onChange={(e) => handleFileChange(e, 'logo', onChange)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={briefForm.control}
+                      name="guidelinesFile"
+                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                        <FormItem>
+                          <FormLabel>Charte Graphique</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*,application/pdf"
+                              ref={ref}
+                              name={name}
+                              onBlur={onBlur}
+                              onChange={(e) => handleFileChange(e, 'guidelines', onChange)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                 </div>
                  <div className="flex justify-center gap-4 min-h-[68px]">
                     {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
@@ -244,7 +301,7 @@ export default function CreativeStudio() {
                          <div className="space-y-6">
                             {Object.keys(adaptations).length === 0 && <p className="text-sm text-muted-foreground">Les déclinaisons apparaîtront ici.</p>}
                             {targetChannels.filter(c => adaptations[c.id]).map(channel => {
-                                const adaptation = adaptations[c.id];
+                                const adaptation = adaptations[channel.id];
                                 return (
                                     <div key={channel.id} className="space-y-2">
                                         <h4 className="font-medium text-sm">{channel.label}</h4>
@@ -269,6 +326,5 @@ export default function CreativeStudio() {
     </div>
   );
 }
-
 
     
