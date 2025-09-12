@@ -103,7 +103,7 @@ export default function SalesPerformancePage() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `€${value.toLocaleString()}`} />
+                    <Tooltip formatter={(value: number) => `€${value.toLocaleString('fr-FR')}`} />
                     <Legend />
                     <Line type="monotone" dataKey="GMS" stroke="hsl(var(--primary))" strokeWidth={2} />
                     <Line type="monotone" dataKey="En Ligne" stroke="hsl(var(--accent))" strokeWidth={2} />
@@ -131,7 +131,7 @@ export default function SalesPerformancePage() {
                 <TableRow key={product.id}>
                     <TableCell className="font-bold">{index+1}</TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell className="text-right">€{product.sales.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">€{product.sales.toLocaleString('fr-FR')}</TableCell>
                     <TableCell className="text-center">
                         <EvolutionBadge value={product.evolution} />
                     </TableCell>
