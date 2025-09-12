@@ -36,7 +36,7 @@ const targetChannels = [
 const briefSchema = z.object({
   prompt: z.string().min(10, { message: "Veuillez entrer une description d'au moins 10 caractères." }),
   inspirationFile: fileListSchema,
-  logoFile: fileListSchema,
+  logoFile: fileListSchema.refine((files) => files?.length === 1, { message: "Vous devez uploader un logo." }),
   guidelinesFile: fileListSchema,
 });
 
@@ -48,7 +48,7 @@ export default function CreativeStudio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [adaptations, setAdaptations] = useState<Record<string, { imageUrl: string; text: string; isLoading: boolean }>>({});
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
-  const [previews, setPreviews] = useState({ inspiration: null, logo: null, guidelines: null });
+  const [previews, setPreviews] = useState<{ inspiration: string | null; logo: string | null; guidelines: string | null }>({ inspiration: null, logo: null, guidelines: null });
 
   const briefForm = useForm<BriefFormValues>({
     resolver: zodResolver(briefSchema),
@@ -171,9 +171,9 @@ export default function CreativeStudio() {
                   )}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField control={briefForm.control} name="inspirationFile" render={({ field }) => ( <FormItem><FormLabel>Inspiration (Optionnel)</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'inspiration', field)}/></FormControl></FormItem> )} />
-                    <FormField control={briefForm.control} name="logoFile" render={({ field }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'logo', field)}/></FormControl></FormItem> )} />
-                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field }) => ( <FormItem><FormLabel>Charte Graphique</FormLabel><FormControl><Input type="file" accept="image/*,application/pdf" onChange={e => handleFileChange(e, 'guidelines', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="inspirationFile" render={({ field: { onChange, ...fieldProps } }) => ( <FormItem><FormLabel>Inspiration (Optionnel)</FormLabel><FormControl><Input {...fieldProps} type="file" accept="image/*" onChange={e => handleFileChange(e, 'inspiration', { onChange })}/></FormControl><FormMessage /></FormItem> )} />
+                    <FormField control={briefForm.control} name="logoFile" render={({ field: { onChange, ...fieldProps } }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input {...fieldProps} type="file" accept="image/*" onChange={e => handleFileChange(e, 'logo', { onChange })}/></FormControl><FormMessage /></FormItem> )} />
+                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field: { onChange, ...fieldProps } }) => ( <FormItem><FormLabel>Charte Graphique</FormLabel><FormControl><Input {...fieldProps} type="file" accept="image/*,application/pdf" onChange={e => handleFileChange(e, 'guidelines', { onChange })}/></FormControl><FormMessage /></FormItem> )} />
                 </div>
                  <div className="flex justify-center gap-4 min-h-[68px]">
                     {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
@@ -194,7 +194,7 @@ export default function CreativeStudio() {
       <div className="xl:col-span-3">
         <Card className="sticky top-24">
           <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Palette className="h-6 w-6 text-accent" />2. Adaptation & Finalisation</CardTitle>
+            <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Palette className="h-6 w-6 text-accent" />2. Adaptation &amp; Finalisation</CardTitle>
             <CardDescription>Générez les déclinaisons pour vos canaux de diffusion.</CardDescription>
           </CardHeader>
           <CardContent className="min-h-[400px] lg:min-h-[600px]">
@@ -260,5 +260,3 @@ export default function CreativeStudio() {
     </div>
   );
 }
-
-    
