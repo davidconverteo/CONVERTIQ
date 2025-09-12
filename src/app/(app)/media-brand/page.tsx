@@ -373,7 +373,7 @@ export default function MediaBrandPage() {
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
-                                <Pie data={currentBudget} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                <Pie data={currentBudget} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
                                     {currentBudget.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
