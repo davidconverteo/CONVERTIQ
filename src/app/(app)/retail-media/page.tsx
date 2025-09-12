@@ -13,6 +13,7 @@ import { ShoppingCart, Filter, MapPin, DollarSign, Eye, MousePointerClick, Trend
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { generateRetailMediaCampaignData, retailMediaPerformanceByRetailer } from '@/services/data-service';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 
 const COLORS = ['#16a34a', '#0ea5e9', '#f97316', '#6366f1', '#f59e0b', '#84cc16'];
@@ -114,7 +115,8 @@ const RetailPlanner = ({ campaigns }: { campaigns: any[] }) => {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><CalendarDays /> Planning Annuel des Activations {year}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 overflow-x-auto p-4">
+                <CardContent className="p-4">
+                  <ScrollArea>
                     <div className="relative" style={{minWidth: '800px'}}>
                         {/* Grid des mois */}
                         <div className="relative grid h-10 grid-cols-12 border-b">
@@ -162,6 +164,8 @@ const RetailPlanner = ({ campaigns }: { campaigns: any[] }) => {
                             ))}
                         </div>
                     </div>
+                    <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
                 </CardContent>
             </Card>
         </TooltipProvider>
@@ -434,4 +438,6 @@ export default function RetailMediaPage() {
 }
 
     
+    
+
     

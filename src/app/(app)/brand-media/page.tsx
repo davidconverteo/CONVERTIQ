@@ -13,6 +13,7 @@ import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, Trend
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { campaignDataByCountry, mediaBrandPerformanceByPlatform, mediaBrandBudgetAllocation } from '@/services/data-service';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 
 const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280', '#06B6D4', '#8B5CF6'];
@@ -116,7 +117,8 @@ const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><CalendarDays /> Planning Annuel des Campagnes {year}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 overflow-x-auto p-4">
+                <CardContent className="p-4">
+                  <ScrollArea>
                     <div className="relative" style={{minWidth: '800px'}}>
                         {/* Grid des mois */}
                         <div className="relative grid h-10 grid-cols-12 border-b">
@@ -164,6 +166,8 @@ const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
                             ))}
                         </div>
                     </div>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
                 </CardContent>
             </Card>
         </TooltipProvider>
@@ -404,3 +408,5 @@ export default function BrandMediaPage() {
     </div>
   );
 }
+
+    
