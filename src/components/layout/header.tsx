@@ -4,10 +4,11 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Menu, BrainCircuit } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Sidebar from './sidebar';
 import Link from 'next/link';
+import ChatbotTrigger from '@/components/chatbot';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Cockpit Marketing', subtitle: "Vue d'ensemble de votre performance." },
@@ -40,10 +41,12 @@ export default function Header() {
             <div className="flex h-full flex-col text-sidebar-foreground">
                 <div className="flex h-20 items-center gap-3 px-6">
                   <Link href="/dashboard" className="flex items-center gap-3">
-                     <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain invert brightness-0" />
+                     <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain brightness-0 invert" />
                   </Link>
                 </div>
-                <Sidebar />
+                <Sidebar>
+                  <ChatbotTrigger />
+                </Sidebar>
             </div>
           </SheetContent>
         </Sheet>
