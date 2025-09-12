@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -76,7 +77,7 @@ export const mediaBrandBudgetAllocation = {
     ],
 }
 
-export const generateRetailMediaCampaignData = () => ({
+export const generateRetailMediaCampaignData = async () => ({
   France: [
     // Always On Amazon
     { id: 'RM-FR-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 5.8, sales_attributed: 350000, spend: 60345, details: { type: 'Sponsored Products', acos: '17.2%', clicks: 180000, ctr: '1.5%', cpc: '0.34€', recommendation: "Campagne 'always-on' très performante. Maintenir le budget et optimiser la liste de mots-clés négatifs tous les mois." }},
@@ -224,7 +225,7 @@ export const mmmData = {
 export const DataCategorySchema = z.enum(['mediaBrand', 'retailMedia', 'mmm']);
 export type DataCategory = z.infer<typeof DataCategorySchema>;
 
-export function getDataSummary(category: DataCategory) {
+export async function getDataSummary(category: DataCategory) {
     if (category === 'mediaBrand') {
         const summary = Object.entries(campaignDataByCountry).map(([country, campaigns]) => {
             const { spend, ca_add } = campaigns.reduce((acc, c) => {
@@ -240,9 +241,9 @@ export function getDataSummary(category: DataCategory) {
         return summary;
     }
     if (category === 'retailMedia') {
-        const retailData = generateRetailMediaCampaignData();
+        const retailData = await generateRetailMediaCampaignData();
         const summary = Object.entries(retailData).map(([country, campaigns]) => {
-             const { spend, sales_attributed } = campaigns.reduce((acc: any, c: any) => {
+             const { spend, sales_attributed } = (campaigns as any[]).reduce((acc: any, c: any) => {
                 if (c.status.toLowerCase() !== 'planifiée') {
                     acc.spend += c.spend || 0;
                     acc.sales_attributed += c.sales_attributed || 0;
@@ -250,7 +251,7 @@ export function getDataSummary(category: DataCategory) {
                 return acc;
             }, { spend: 0, sales_attributed: 0 });
             const roas = spend > 0 ? sales_attributed / spend : 0;
-            return { country, totalSpend: spend, totalSalesAttributed: sales_attributed, globalRoas: roas, campaignCount: campaigns.length };
+            return { country, totalSpend: spend, totalSalesAttributed: sales_attributed, globalRoas: roas, campaignCount: (campaigns as any[]).length };
         });
         return summary;
     }
@@ -283,3 +284,5 @@ export function getDataSummary(category: DataCategory) {
     }
     return { error: 'Unknown category' };
 }
+
+    

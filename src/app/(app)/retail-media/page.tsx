@@ -177,8 +177,11 @@ export default function RetailMediaPage() {
   const [brand, setBrand] = useState('all');
 
   useEffect(() => {
-    // This now only runs on the client, preventing hydration mismatch
-    setCampaignDataByCountry(generateRetailMediaCampaignData());
+    const fetchData = async () => {
+        const data = await generateRetailMediaCampaignData();
+        setCampaignDataByCountry(data);
+    }
+    fetchData();
   }, []);
 
   if (!campaignDataByCountry) {
@@ -430,4 +433,5 @@ export default function RetailMediaPage() {
   );
 }
 
+    
     
