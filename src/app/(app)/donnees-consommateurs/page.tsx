@@ -60,20 +60,15 @@ const generateDataForFilters = (filters: Filters) => {
 
     // --- Fidélité & Mixité Data ---
     const loyaltyData = [{ name: 'Acheteurs Exclusifs', value: random(15, 20, 'l1') }, { name: 'Acheteurs Réguliers', value: random(30, 40, 'l2') }, { name: 'Acheteurs Occasionnels', value: random(45, 55, 'l3') }];
-    const proximityCategories = ['Yaourt LPG', 'Salades Traiteur', 'Charcuterie', 'Jus Frais', 'Viennoiserie'];
+    const proximityCategories = ['La Prairie Gourmande', 'Danone', 'Yoplait', 'MDD'];
     const proximityMatrix = proximityCategories.map((cat1, i) => {
         const row: { [key: string]: number | string } = { category: cat1 };
         proximityCategories.forEach((cat2, j) => {
             if (i === j) {
                 row[cat2] = 100;
             } else {
-                const salt = `${cat1}-${cat2}`;
-                if (j < i) { // Ensure symmetry
-                    const reverseSalt = `${cat2}-${cat1}`;
-                    row[cat2] = random(10, 80, reverseSalt);
-                } else {
-                    row[cat2] = random(10, 80, salt);
-                }
+                const salt = `${cat1}-${cat2}`.split('').sort().join(''); // Ensure salt is symmetrical
+                row[cat2] = random(10, 80, salt);
             }
         });
         return row;
@@ -162,7 +157,7 @@ const LoyaltyTab = ({ data }: { data: any }) => {
     const getBgColor = (value: number) => {
         if (value === 100) return 'bg-primary/80 text-primary-foreground';
         const opacity = Math.max(10, Math.floor(value / 10) * 10);
-        return `bg-green-600/${opacity}`;
+        return `bg-green-600/${opacity} text-white`;
     };
 
     return (
@@ -173,14 +168,14 @@ const LoyaltyTab = ({ data }: { data: any }) => {
             </Card>
              <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><ShoppingBasket />Matrice de Proximité (Co-achat)</CardTitle>
-                    <CardDescription>Indice de 100 = corrélation parfaite. Plus la couleur est foncée, plus l'affinité est forte.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><ShoppingBasket />Matrice de Proximité (Co-achat des Marques)</CardTitle>
+                    <CardDescription>Indice 100 = les acheteurs d'une marque achètent aussi cette marque. Un score élevé signifie une forte proximité dans le panier.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Catégorie</TableHead>
+                                <TableHead>Marque</TableHead>
                                 {proximityCategories.map((cat: string) => <TableHead key={cat} className="text-center">{cat}</TableHead>)}
                             </TableRow>
                         </TableHeader>
@@ -201,7 +196,7 @@ const LoyaltyTab = ({ data }: { data: any }) => {
                     </Table>
                 </CardContent>
             </Card>
-            <Card className="lg:col-span-3"><CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Synthèse & Recommandations IA</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">La part d'acheteurs **exclusifs est de {(loyaltyData.find((l: any) => l.name.includes('Exclusifs')).value).toFixed(0)}%**, ce qui est un bon signe de fidélité. Cependant, une grande partie de votre base est **occasionnelle**.</p><p className="text-sm text-muted-foreground mt-2">La matrice de proximité met en évidence une très forte affinité entre l'achat de vos **Yaourts LPG** et les **Salades Traiteur**. Cela indique un usage "repas rapide et sain". L'affinité avec les **Jus Frais** est également notable.</p><p className="text-sm text-muted-foreground mt-2"><strong>Recommandation :</strong> Créez des offres promotionnelles croisées (cross-selling) avec le rayon traiteur pour renforcer cette association et augmenter la fréquence d'achat. Ciblez les acheteurs occasionnels avec des campagnes de fidélisation basées sur ces affinités.</p></CardContent></Card>
+            <Card className="lg:col-span-3"><CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Synthèse & Recommandations IA</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">La part d'acheteurs **exclusifs est de {(loyaltyData.find((l: any) => l.name.includes('Exclusifs')).value).toFixed(0)}%**, ce qui est un bon signe de fidélité. Cependant, une grande partie de votre base est **occasionnelle**.</p><p className="text-sm text-muted-foreground mt-2">La matrice de proximité montre une faible concurrence directe avec **Yoplait** (indice bas), mais une forte concurrence avec la **MDD**, indiquant une sensibilité au prix. L'affinité avec **Danone** est modérée, suggérant des portefeuilles de produits complémentaires dans le panier.</p><p className="text-sm text-muted-foreground mt-2"><strong>Recommandation :</strong> Pour convertir les acheteurs occasionnels, lancez une campagne promotionnelle ciblée pour contrer l'attrait de la MDD. Explorez les synergies avec Danone via des communications sur la complémentarité de vos gammes (ex: Skyr LPG pour le matin, Danette pour le dessert).</p></CardContent></Card>
         </div>
     );
 }
