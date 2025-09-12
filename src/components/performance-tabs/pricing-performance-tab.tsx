@@ -51,15 +51,17 @@ const generatePricingData = (filters: Filters) => {
 export default function PricingPerformanceTab({ filters }: PricingPerformanceTabProps) {
     const { growthData, priceEvoData } = useMemo(() => generatePricingData(filters), [filters]);
     
-    const processedGrowthData = growthData.reduce((acc, entry, index) => {
-        if (index === 0 || index === growthData.length - 1) {
-            acc.push({ name: entry.name, value: entry.value, range: [0, entry.value] });
-        } else {
-            const prevEnd = acc[acc.length - 1].range[1];
-            acc.push({ name: entry.name, value: entry.value, range: [prevEnd, prevEnd + entry.value] });
-        }
-        return acc;
-    }, [] as any[]);
+    const processedGrowthData = useMemo(() => {
+        return growthData.reduce((acc, entry, index) => {
+            if (index === 0 || index === growthData.length - 1) {
+                acc.push({ name: entry.name, value: entry.value, range: [0, entry.value] });
+            } else {
+                const prevEnd = acc[acc.length - 1].range[1];
+                acc.push({ name: entry.name, value: entry.value, range: [prevEnd, prevEnd + entry.value] });
+            }
+            return acc;
+        }, [] as any[]);
+    }, [growthData]);
 
   return (
     <div className="space-y-6">
