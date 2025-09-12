@@ -50,13 +50,12 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     // Extract dimensions from the platform string, e.g., "Post Instagram (1080x1080)"
     const dimensionRegex = /(\d{2,})x(\d{2,})/;
     const match = input.targetPlatform.match(dimensionRegex);
-    let dimensionInstruction = `Adapt this image for the target platform: ${input.targetPlatform}.`;
+    let dimensionInstruction = `Redimensionnez cette image aux dimensions exactes de la plateforme cible: ${input.targetPlatform}.`;
     
     if (match && match[1] && match[2]) {
         const width = parseInt(match[1], 10);
         const height = parseInt(match[2], 10);
-        const orientation = width > height ? "landscape" : width < height ? "portrait" : "square";
-        dimensionInstruction = `Adapt the image to a strict ${width}x${height} pixel aspect ratio (${orientation}). If needed, generate additional, coherent content to expand the image to these dimensions. Do not distort or crop important elements from the original image.`;
+        dimensionInstruction = `Redimensionnez cette image aux dimensions exactes de ${width} par ${height} pixels. Le format de sortie DOIT être ${width}x${height}.`;
     }
 
     // Build the prompt for the image generation model.
@@ -68,11 +67,6 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     if (input.logoDataUri) {
         (imagePromptParts[0] as {text: string}).text += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`;
         imagePromptParts.push({ media: { url: input.logoDataUri } });
-    }
-
-    if (input.brandGuidelinesDataUri) {
-      (imagePromptParts[0] as {text: string}).text += ` If brand guidelines are provided, use them to influence the style, color palette, and typography.`;
-      imagePromptParts.push({ media: { url: input.brandGuidelinesDataUri } });
     }
 
     const { media } = await ai.generate({
@@ -87,11 +81,9 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
       throw new Error('Image adaptation failed to return an image.');
     }
     
-    // Remove text generation as it's not needed for this flow.
-    // The focus is on correctly resized images.
     return {
       adaptedImageUrl: media.url,
-      adaptedText: "",
+      adaptedText: "", // Text generation is removed to focus on resizing.
     };
   }
 );
