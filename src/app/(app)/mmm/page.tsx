@@ -28,16 +28,34 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
     }, [contributions]);
 
     const contributionChartData = useMemo(() => {
-        const totalSales = baseline + totalContribution;
-        return [
-            {
-                name: 'Ventes Totales',
-                Baseline: baseline,
-                ...contributions,
-                total: totalSales
-            }
-        ];
-    }, [contributions, baseline, totalContribution]);
+    const totalSales = baseline + totalContribution;
+    const contributionEntries = Object.entries(contributions);
+
+    let cumulative = 0;
+    const waterfallData = [
+      {
+        name: 'Baseline',
+        value: baseline,
+        range: [0, baseline],
+      },
+      ...contributionEntries.map(([name, value]) => {
+        const start = cumulative + baseline;
+        cumulative += value;
+        return {
+          name,
+          value,
+          range: [start, start + value],
+        };
+      }),
+      {
+        name: 'Ventes Totales',
+        value: totalSales,
+        range: [0, totalSales],
+      },
+    ];
+
+    return waterfallData;
+  }, [contributions, baseline, totalContribution]);
 
     const roasTableData = useMemo(() => {
         return Object.entries(investments).map(([lever, investment]) => {
@@ -91,21 +109,39 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                             </CardHeader>
                             <CardContent>
                                 <ResponsiveContainer width="100%" height={300}>
-                                     <BarChart data={contributionChartData} layout="vertical" stackOffset="expand">
-                                        <XAxis type="number" hide tickFormatter={(tick) => `${tick * 100}%`} />
-                                        <YAxis type="category" dataKey="name" width={0} />
-                                        <Tooltip formatter={(value, name, props) => {
-                                            const total = props.payload.total;
-                                            const rawValue = props.payload[name];
-                                            const percentage = (rawValue / total * 100).toFixed(1);
-                                            return [`${rawValue.toLocaleString('fr-FR')}€ (${percentage}%)`, name];
-                                        }} />
-                                        <Legend />
-                                        <Bar dataKey="Baseline" stackId="a" fill="#e2e8f0" name="Baseline" />
-                                        {Object.keys(contributions).map((key, index) => (
-                                            <Bar key={key} dataKey={key} stackId="a" fill={COLORS[index % COLORS.length]} name={key} />
-                                        ))}
-                                    </BarChart>
+                                     <BarChart
+                                        data={contributionChartData}
+                                        layout="vertical"
+                                      >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis type="number" tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M €`} />
+                                        <YAxis dataKey="name" type="category" width={80} />
+                                        <Tooltip formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`} />
+                                        <Bar dataKey="range" stackId="a">
+                                          {contributionChartData.map((entry, index) => {
+                                             let color = 'transparent';
+                                             if (entry.name === 'Baseline') color = '#e2e8f0';
+                                             else if (entry.name === 'Ventes Totales') color = '#10b981';
+                                             else color = COLORS[index % COLORS.length];
+
+                                             // Transparent bar for positioning
+                                             if (index > 0 && index < contributionChartData.length -1) {
+                                                color = 'transparent'
+                                             }
+
+                                             return <Cell key={`cell-${index}`} fill={color} />;
+                                          })}
+                                        </Bar>
+                                        <Bar dataKey="value" stackId="a">
+                                            {contributionChartData.map((entry, index) => {
+                                                let color = 'transparent';
+                                                if (index > 0 && index < contributionChartData.length - 1) {
+                                                    color = COLORS[index % COLORS.length];
+                                                }
+                                                return <Cell key={`cell-value-${index}`} fill={color} />;
+                                            })}
+                                        </Bar>
+                                      </BarChart>
                                 </ResponsiveContainer>
                             </CardContent>
                         </Card>
