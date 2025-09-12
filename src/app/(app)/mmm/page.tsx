@@ -22,9 +22,13 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
     const data = useMemo(() => mmmData[country][selectedPeriod as keyof typeof mmmData[typeof country]], [country, selectedPeriod]);
 
     const { contributions, investments, baseline } = data;
+    
+    const totalContribution = useMemo(() => {
+        return Object.values(contributions).reduce((a, b) => a + b, 0);
+    }, [contributions]);
 
     const contributionChartData = useMemo(() => {
-        const totalSales = baseline + Object.values(contributions).reduce((a, b) => a + b, 0);
+        const totalSales = baseline + totalContribution;
         return [
             {
                 name: 'Ventes Totales',
@@ -33,7 +37,7 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                 total: totalSales
             }
         ];
-    }, [contributions, baseline]);
+    }, [contributions, baseline, totalContribution]);
 
     const roasTableData = useMemo(() => {
         return Object.entries(investments).map(([lever, investment]) => {
@@ -45,9 +49,8 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
     
     const globalRoas = useMemo(() => {
         const totalInvestment = Object.values(investments).reduce((a, b) => a + b, 0);
-        const totalContribution = Object.values(contributions).reduce((a, b) => a + b, 0);
         return totalInvestment > 0 ? totalContribution / totalInvestment : 0;
-    }, [investments, contributions]);
+    }, [investments, totalContribution]);
 
     return (
         <div className="space-y-6">
@@ -136,7 +139,7 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                         <CardContent>
                             <p className="text-sm text-muted-foreground">
                                 Le modèle MMM pour la période <strong>{selectedPeriod.replace('-', ' ')}</strong> en <strong>{country}</strong> montre que <strong>{roasTableData[0]?.lever}</strong> est le levier le plus performant avec un ROAS de <strong>{roasTableData[0]?.roi.toFixed(2)}x</strong>. 
-                                La baseline représente <strong>{(baseline / (baseline + totalContribution) * 100).toFixed(0)}%</strong> des ventes. 
+                                La baseline représente <strong>{((baseline / (baseline + totalContribution)) * 100).toFixed(0)}%</strong> des ventes. 
                                 <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget de <strong>{roasTableData[roasTableData.length-1]?.lever}</strong> (ROAS: {roasTableData[roasTableData.length-1]?.roi.toFixed(2)}x) vers <strong>{roasTableData[0]?.lever}</strong> pour maximiser le retour sur investissement global. Utilisez le simulateur pour tester ce scénario.
                             </p>
                         </CardContent>
