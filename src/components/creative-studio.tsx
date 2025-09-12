@@ -101,7 +101,8 @@ export default function CreativeStudio() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews) => {
     const file = e.target.files?.[0];
     if (file) {
-      briefForm.setValue(fieldName === 'inspiration' ? 'inspirationFile' : fieldName === 'logo' ? 'logoFile' : fieldName === 'guidelines' ? 'guidelinesFile' : 'baseImageFile', e.target.files);
+      const fieldToUpdate = fieldName === 'inspiration' ? 'inspirationFile' : fieldName === 'logo' ? 'logoFile' : fieldName === 'guidelines' ? 'guidelinesFile' : 'baseImageFile';
+      briefForm.setValue(fieldToUpdate, e.target.files as FileList);
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result as string;
@@ -112,7 +113,8 @@ export default function CreativeStudio() {
       };
       reader.readAsDataURL(file);
     } else {
-      briefForm.setValue(fieldName === 'inspiration' ? 'inspirationFile' : fieldName === 'logo' ? 'logoFile' : fieldName === 'guidelines' ? 'guidelinesFile' : 'baseImageFile', undefined);
+       const fieldToUpdate = fieldName === 'inspiration' ? 'inspirationFile' : fieldName === 'logo' ? 'logoFile' : fieldName === 'guidelines' ? 'guidelinesFile' : 'baseImageFile';
+      briefForm.setValue(fieldToUpdate, undefined);
       setPreviews(p => ({ ...p, [fieldName]: null }));
     }
   };
@@ -297,7 +299,7 @@ export default function CreativeStudio() {
                          <FormField
                           control={briefForm.control}
                           name="inspirationFile"
-                          render={({ field: { onChange, value, ...fieldProps } }) => (
+                          render={({ field: { onChange, ...fieldProps } }) => (
                               <FormItem>
                                   <FormLabel>Inspiration (Optionnel)</FormLabel>
                                   <FormControl>
@@ -317,7 +319,7 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="logoFile"
-                      render={({ field: { onChange, value, ...fieldProps } }) => (
+                      render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Logo (Optionnel)</FormLabel>
                           <FormControl>
@@ -335,7 +337,7 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="guidelinesFile"
-                      render={({ field: { onChange, value, ...fieldProps } }) => (
+                      render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Charte Graphique (Optionnel)</FormLabel>
                           <FormControl>
@@ -431,7 +433,7 @@ export default function CreativeStudio() {
                                             <div className="flex items-center justify-center w-full rounded-lg bg-muted min-h-[150px]"><Loader2 className="h-6 w-6 animate-spin" /></div>
                                         ) : adaptation.imageUrl ? (
                                             <>
-                                                <Image src={adaptation.imageUrl} alt={`Adaptation pour ${channel.label}`} width={0} height={0} sizes="100vw" className="w-full h-auto rounded-lg object-contain border" />
+                                                <Image src={adaptation.imageUrl} alt={`Adaptation pour ${channel.label}`} width={0} height={0} sizes="100vw" className="w-full h-auto rounded-lg border" />
                                                 <p className="text-xs text-muted-foreground p-2 bg-muted rounded-md">{adaptation.text}</p>
                                             </>
                                         ) : null}
