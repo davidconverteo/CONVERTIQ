@@ -1,11 +1,13 @@
 
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Legend, ZAxis } from 'recharts';
 import { Sparkles } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import OfferByRetailerTab from './offer-by-retailer-tab';
 
 type Filters = {
     country: string;
@@ -45,77 +47,94 @@ const bcgData = [
   { name: 'Poids Morts', vmh: 80, marge: 5, ca: 1000 },
 ];
 
-export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProps) {
-  const rankingData = useMemo(() => generateRankingData(filters), [filters]);
+const AssortmentAnalysisTab = ({ filters }: { filters: Filters }) => {
+    const rankingData = useMemo(() => generateRankingData(filters), [filters]);
 
-  return (
-    <div className="space-y-6">
-        <Card>
-            <CardHeader>
-                <CardTitle>Classement des Références</CardTitle>
-                <CardDescription>Performance de chaque produit de votre assortiment.</CardDescription>
-            </CardHeader>
-             <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Rang</TableHead>
-                        <TableHead>Référence</TableHead>
-                        <TableHead className="text-right">CA Hebdo.</TableHead>
-                        <TableHead className="text-right">VMH</TableHead>
-                        <TableHead className="text-right">Marge (€)</TableHead>
-                        <TableHead className="text-right">% Acheteurs Excl.</TableHead>
-                        <TableHead className="text-right">Taux Nourriture</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {rankingData.map((row) => (
-                        <TableRow key={row.rank}>
-                            <TableCell className="font-bold">{row.rank}</TableCell>
-                            <TableCell className="font-medium">{row.name}</TableCell>
-                            <TableCell className="text-right">€{row.ca.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
-                            <TableCell className="text-right">{row.vmh.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
-                            <TableCell className="text-right">€{row.marge.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">{row.exclusifs.toFixed(0)}%</TableCell>
-                            <TableCell className="text-right">{row.nourriture.toFixed(0)}%</TableCell>
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Classement des Références</CardTitle>
+                    <CardDescription>Performance de chaque produit de votre assortiment.</CardDescription>
+                </CardHeader>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Rang</TableHead>
+                            <TableHead>Référence</TableHead>
+                            <TableHead className="text-right">CA Hebdo.</TableHead>
+                            <TableHead className="text-right">VMH</TableHead>
+                            <TableHead className="text-right">Marge (€)</TableHead>
+                            <TableHead className="text-right">% Acheteurs Excl.</TableHead>
+                            <TableHead className="text-right">Taux Nourriture</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </Card>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-         <Card>
-            <CardHeader>
-                <CardTitle>Matrice de l'Offre (BCG)</CardTitle>
-                <CardDescription>Positionnement stratégique de vos produits (VMH vs Marge).</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                    <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
-                        <XAxis type="number" dataKey="vmh" name="Performance (VMH)" domain={[0, 'dataMax + 50']} />
-                        <YAxis type="number" dataKey="marge" name="Rentabilité (Marge %)" unit="%" domain={[0, 'dataMax + 5']} />
-                        <ZAxis type="number" dataKey="ca" range={[500, 4000]} name="CA (€)" />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => (name === 'CA (€)' ? `${(value as number).toLocaleString('fr-FR')}€` : value)} />
-                        <Legend />
-                        <Scatter name="Vaches à Lait" data={[bcgData[0]]} fill="hsl(var(--chart-1))" />
-                        <Scatter name="Étoiles" data={[bcgData[1]]} fill="hsl(var(--chart-2))" />
-                        <Scatter name="Dilemmes" data={[bcgData[2]]} fill="hsl(var(--chart-3))" />
-                        <Scatter name="Poids Morts" data={[bcgData[3]]} fill="hsl(var(--chart-4))" />
-                    </ScatterChart>
-                </ResponsiveContainer>
-            </CardContent>
-        </Card>
-         <Card>
-            <CardHeader className="flex-row items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>Synthèse & Recommandations IA</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">Votre produit <strong>Skyr Nature</strong> est un "Dilemme" : forte rentabilité mais faible performance commerciale. Il nécessite un plan d'action pour le faire passer en "Étoile".</p>
-                <p className="text-sm text-muted-foreground mt-4">Le <strong>Grand Pot Nature Bio</strong> est un produit clé, avec un fort taux d'acheteurs exclusifs ({rankingData.find(p => p.name.includes('Bio'))?.exclusifs.toFixed(0)}%). Il est crucial pour la fidélisation.</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Investir en promotion ou en visibilité sur le Skyr Nature pour augmenter ses ventes (VMH). Protéger la position du Grand Pot Bio en assurant une disponibilité parfaite.</p>
-            </CardContent>
-        </Card>
+                    </TableHeader>
+                    <TableBody>
+                        {rankingData.map((row) => (
+                            <TableRow key={row.rank}>
+                                <TableCell className="font-bold">{row.rank}</TableCell>
+                                <TableCell className="font-medium">{row.name}</TableCell>
+                                <TableCell className="text-right">€{row.ca.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
+                                <TableCell className="text-right">{row.vmh.toLocaleString('fr-FR', {maximumFractionDigits: 0})}</TableCell>
+                                <TableCell className="text-right">€{row.marge.toFixed(2)}</TableCell>
+                                <TableCell className="text-right">{row.exclusifs.toFixed(0)}%</TableCell>
+                                <TableCell className="text-right">{row.nourriture.toFixed(0)}%</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Matrice de l'Offre (BCG)</CardTitle>
+                    <CardDescription>Positionnement stratégique de vos produits (VMH vs Marge).</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ResponsiveContainer width="100%" height={350}>
+                        <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+                            <XAxis type="number" dataKey="vmh" name="Performance (VMH)" domain={[0, 'dataMax + 50']} />
+                            <YAxis type="number" dataKey="marge" name="Rentabilité (Marge %)" unit="%" domain={[0, 'dataMax + 5']} />
+                            <ZAxis type="number" dataKey="ca" range={[500, 4000]} name="CA (€)" />
+                            <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => (name === 'CA (€)' ? `${(value as number).toLocaleString('fr-FR')}€` : value)} />
+                            <Legend />
+                            <Scatter name="Vaches à Lait" data={[bcgData[0]]} fill="hsl(var(--chart-1))" />
+                            <Scatter name="Étoiles" data={[bcgData[1]]} fill="hsl(var(--chart-2))" />
+                            <Scatter name="Dilemmes" data={[bcgData[2]]} fill="hsl(var(--chart-3))" />
+                            <Scatter name="Poids Morts" data={[bcgData[3]]} fill="hsl(var(--chart-4))" />
+                        </ScatterChart>
+                    </ResponsiveContainer>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex-row items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-accent" />
+                    <CardTitle>Synthèse & Recommandations IA</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">Votre produit <strong>Skyr Nature</strong> est un "Dilemme" : forte rentabilité mais faible performance commerciale. Il nécessite un plan d'action pour le faire passer en "Étoile".</p>
+                    <p className="text-sm text-muted-foreground mt-4">Le <strong>Grand Pot Nature Bio</strong> est un produit clé, avec un fort taux d'acheteurs exclusifs ({rankingData.find(p => p.name.includes('Bio'))?.exclusifs.toFixed(0)}%). Il est crucial pour la fidélisation.</p>
+                    <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Investir en promotion ou en visibilité sur le Skyr Nature pour augmenter ses ventes (VMH). Protéger la position du Grand Pot Bio en assurant une disponibilité parfaite.</p>
+                </CardContent>
+            </Card>
+            </div>
         </div>
-    </div>
+    );
+};
+
+export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProps) {
+  return (
+    <Tabs defaultValue="assortment" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="assortment">Analyse Assortiment</TabsTrigger>
+        <TabsTrigger value="retailer">Analyse par Enseigne</TabsTrigger>
+      </TabsList>
+      <TabsContent value="assortment" className="mt-6">
+        <AssortmentAnalysisTab filters={filters} />
+      </TabsContent>
+      <TabsContent value="retailer" className="mt-6">
+        <OfferByRetailerTab filters={filters} />
+      </TabsContent>
+    </Tabs>
   );
 }
