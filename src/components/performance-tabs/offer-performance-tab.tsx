@@ -8,6 +8,7 @@ import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Lege
 import { Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OfferByRetailerTab from './offer-by-retailer-tab';
+import DecisionTreeTab from './decision-tree-tab';
 
 type Filters = {
     country: string;
@@ -125,15 +126,19 @@ const AssortmentAnalysisTab = ({ filters }: { filters: Filters }) => {
 export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProps) {
   return (
     <Tabs defaultValue="assortment" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="assortment">Analyse Assortiment</TabsTrigger>
         <TabsTrigger value="retailer">Analyse par Enseigne</TabsTrigger>
+        <TabsTrigger value="decision-tree">Arbre de Décision</TabsTrigger>
       </TabsList>
       <TabsContent value="assortment" className="mt-6">
         <AssortmentAnalysisTab filters={filters} />
       </TabsContent>
       <TabsContent value="retailer" className="mt-6">
         <OfferByRetailerTab filters={filters} />
+      </TabsContent>
+      <TabsContent value="decision-tree" className="mt-6">
+        <DecisionTreeTab filters={filters} />
       </TabsContent>
     </Tabs>
   );
