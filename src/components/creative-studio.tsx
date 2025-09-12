@@ -38,17 +38,17 @@ const targetChannelsByCategory = [
         category: "Formats les plus courants",
         channels: [
             { id: 'rect_medium_300x250', label: 'Rectangle moyen (300x250)' },
-            { id: 'leaderboard_728x90', label: 'Classement (728x90)' },
+            { id: 'leaderboard_728x90', label: 'Leaderboard (728x90)' },
             { id: 'rect_large_336x280', label: 'Grand rectangle (336x280)' },
             { id: 'skyscraper_wide_160x600', label: 'Large gratte-ciel (160x600)' },
-            { id: 'mobile_leaderboard_320x50', label: 'Classement mobile (320x50)' },
+            { id: 'mobile_leaderboard_320x50', label: 'Leaderboard mobile (320x50)' },
         ]
     },
     {
         category: "Bannières Google Ads",
         channels: [
             { id: 'square_250x250', label: 'Carré (250x250)' },
-            { id: 'leaderboard_large_970x90', label: 'Grand classement (970x90)' },
+            { id: 'leaderboard_large_970x90', label: 'Grand Leaderboard (970x90)' },
             { id: 'half_page_300x600', label: 'Demi-page (300x600)' },
             { id: 'skyscraper_120x600', label: 'Gratte-ciel (120x600)' },
             { id: 'small_square_200x200', label: 'Petit carré (200x200)' },
@@ -270,6 +270,7 @@ export default function CreativeStudio() {
                                         type="file"
                                         accept="image/*"
                                         onChange={(e) => handleFileChange(e, 'baseImage')}
+                                        {...fieldProps}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -296,7 +297,7 @@ export default function CreativeStudio() {
                          <FormField
                           control={briefForm.control}
                           name="inspirationFile"
-                          render={() => (
+                          render={({ field: { onChange, value, ...fieldProps } }) => (
                               <FormItem>
                                   <FormLabel>Inspiration (Optionnel)</FormLabel>
                                   <FormControl>
@@ -304,6 +305,7 @@ export default function CreativeStudio() {
                                           type="file"
                                           accept="image/*"
                                           onChange={(e) => handleFileChange(e, 'inspiration')}
+                                          {...fieldProps}
                                       />
                                   </FormControl>
                                   <FormMessage />
@@ -315,7 +317,7 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="logoFile"
-                      render={() => (
+                      render={({ field: { onChange, value, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Logo (Optionnel)</FormLabel>
                           <FormControl>
@@ -323,6 +325,7 @@ export default function CreativeStudio() {
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) => handleFileChange(e, 'logo')}
+                                {...fieldProps}
                             />
                           </FormControl>
                           <FormMessage />
@@ -332,7 +335,7 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="guidelinesFile"
-                      render={() => (
+                      render={({ field: { onChange, value, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>Charte Graphique (Optionnel)</FormLabel>
                           <FormControl>
@@ -340,6 +343,7 @@ export default function CreativeStudio() {
                                 type="file"
                                 accept="image/*,application/pdf"
                                 onChange={(e) => handleFileChange(e, 'guidelines')}
+                                {...fieldProps}
                             />
                           </FormControl>
                           <FormMessage />
@@ -424,10 +428,10 @@ export default function CreativeStudio() {
                                     <div key={channel.id} className="space-y-2">
                                         <h4 className="font-medium text-sm">{channel.label}</h4>
                                         {adaptation.isLoading ? (
-                                            <div className="flex items-center justify-center aspect-square w-full rounded-lg bg-muted"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                                            <div className="flex items-center justify-center w-full rounded-lg bg-muted min-h-[150px]"><Loader2 className="h-6 w-6 animate-spin" /></div>
                                         ) : adaptation.imageUrl ? (
                                             <>
-                                                <Image src={adaptation.imageUrl} alt={`Adaptation pour ${channel.label}`} width={300} height={300} className="rounded-lg object-contain border" />
+                                                <Image src={adaptation.imageUrl} alt={`Adaptation pour ${channel.label}`} width={0} height={0} sizes="100vw" className="w-full h-auto rounded-lg object-contain border" />
                                                 <p className="text-xs text-muted-foreground p-2 bg-muted rounded-md">{adaptation.text}</p>
                                             </>
                                         ) : null}
