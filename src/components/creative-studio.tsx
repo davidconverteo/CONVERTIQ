@@ -53,7 +53,10 @@ export default function CreativeStudio() {
 
   const briefForm = useForm<BriefFormValues>({
     resolver: zodResolver(briefSchema),
-    defaultValues: { prompt: "" },
+    defaultValues: { 
+        prompt: "",
+        logoFile: undefined,
+     },
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews, formField: any) => {
@@ -264,5 +267,3 @@ export default function CreativeStudio() {
     </div>
   );
 }
-
-    
