@@ -21,26 +21,43 @@ const campaignDataByCountry = {
     { id: 'RM-FR-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 5.8, sales_attributed: 350000, spend: 60345, details: { type: 'Sponsored Products', acos: '17.2%', clicks: 180000, ctr: '1.5%', cpc: '0.34€', recommendation: "Campagne 'always-on' très performante. Maintenir le budget et optimiser la liste de mots-clés négatifs tous les mois." }},
     
     // Unlimitail - Gamme Bio
-    ...Array.from({ length: 10 }, (_, i) => ({
-      id: `RM-FR-U-GB-${i+1}`, brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date(2024, i, 15), end: new Date(2024, i, 28), retailer: 'Unlimitail', lever: 'Sponsored Products', objective: i % 2 === 0 ? 'Visibilité' : 'Conversion', status: i < 8 ? 'Terminée' : 'En cours', roas: 4.5 + Math.random() * 2, sales_attributed: 30000 + Math.random() * 15000, spend: 6000 + Math.random() * 3000, details: { acos: `${(18 + Math.random()*5).toFixed(1)}%`, recommendation: `Campagne ${i+1} pour la Gamme Bio.` }
-    })),
+    ...Array.from({ length: 10 }, (_, i) => {
+      const levers = ['Sponsored Products', 'Display On-site', 'Coupons'];
+      const lever = levers[i % levers.length];
+      return {
+        id: `RM-FR-U-GB-${i+1}`, brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date(2024, i, 15), end: new Date(2024, i, 28), retailer: 'Unlimitail', lever: lever, objective: i % 2 === 0 ? 'Visibilité' : 'Conversion', status: i < 8 ? 'Terminée' : 'En cours', roas: 4.5 + Math.random() * 2, sales_attributed: 30000 + Math.random() * 15000, spend: 6000 + Math.random() * 3000, details: { acos: `${(18 + Math.random()*5).toFixed(1)}%`, recommendation: `Campagne ${i+1} (${lever}) pour la Gamme Bio.` }
+      };
+    }),
     // Unlimitail - Dessert Soja
-     ...Array.from({ length: 5 }, (_, i) => ({
-      id: `RM-FR-U-DS-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Soja', start: new Date(2024, i*2, 10), end: new Date(2024, i*2, 24), retailer: 'Unlimitail', lever: 'Display Off-site', objective: 'Considération', status: i < 4 ? 'Terminée' : 'Planifiée', roas: 3.0 + Math.random() * 1.5, sales_attributed: 15000 + Math.random() * 10000, spend: 4500 + Math.random() * 2000, details: { reach: 800000, recommendation: `Vague ${i+1} de la campagne display.` }
-    })),
+     ...Array.from({ length: 5 }, (_, i) => {
+      const levers = ['Display Off-site', 'Sponsored Products'];
+      const lever = levers[i % levers.length];
+      return {
+        id: `RM-FR-U-DS-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Soja', start: new Date(2024, i*2, 10), end: new Date(2024, i*2, 24), retailer: 'Unlimitail', lever: lever, objective: 'Considération', status: i < 4 ? 'Terminée' : 'Planifiée', roas: 3.0 + Math.random() * 1.5, sales_attributed: 15000 + Math.random() * 10000, spend: 4500 + Math.random() * 2000, details: { reach: 800000, recommendation: `Vague ${i+1} de la campagne ${lever}.` }
+      };
+    }),
 
     // Amazon Ads - Skyr
-    ...Array.from({ length: 10 }, (_, i) => ({
-      id: `RM-FR-A-S-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date(2024, i, 1), end: new Date(2024, i, 28), retailer: 'Amazon Ads', lever: 'Display On-site', objective: 'Notoriété', status: i < 8 ? 'Terminée' : 'En cours', roas: 2.5 + Math.random(), sales_attributed: 20000 + Math.random() * 5000, spend: 8000 + Math.random() * 2000, details: { impressions: 2500000, recommendation: `Campagne mensuelle ${i+1} pour le Skyr.`}
-    })),
-     ...Array.from({ length: 8 }, (_, i) => ({
-      id: `RM-FR-A-SF-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Fruits', start: new Date(2024, i+2, 5), end: new Date(2024, i+2, 25), retailer: 'Amazon Ads', lever: 'Sponsored Brands', objective: 'Notoriété', status: i < 6 ? 'Terminée' : 'Planifiée', roas: 3.5 + Math.random(), sales_attributed: 15000 + Math.random() * 5000, spend: 4000 + Math.random() * 1000, details: { impressions: 1000000, recommendation: `Lancement Skyr Fruits, vague ${i+1}.` }
-    })),
+    ...Array.from({ length: 10 }, (_, i) => {
+      const levers = ['Display On-site', 'Sponsored Brands', 'Sponsored Products'];
+      const lever = levers[i % levers.length];
+      return {
+      id: `RM-FR-A-S-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date(2024, i, 1), end: new Date(2024, i, 28), retailer: 'Amazon Ads', lever: lever, objective: 'Notoriété', status: i < 8 ? 'Terminée' : 'En cours', roas: 2.5 + Math.random(), sales_attributed: 20000 + Math.random() * 5000, spend: 8000 + Math.random() * 2000, details: { impressions: 2500000, recommendation: `Campagne mensuelle ${i+1} (${lever}) pour le Skyr.`}
+    }}),
+     ...Array.from({ length: 8 }, (_, i) => {
+      const levers = ['Sponsored Brands', 'Display On-site'];
+      const lever = levers[i % levers.length];
+      return {
+      id: `RM-FR-A-SF-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Fruits', start: new Date(2024, i+2, 5), end: new Date(2024, i+2, 25), retailer: 'Amazon Ads', lever: lever, objective: 'Notoriété', status: i < 6 ? 'Terminée' : 'Planifiée', roas: 3.5 + Math.random(), sales_attributed: 15000 + Math.random() * 5000, spend: 4000 + Math.random() * 1000, details: { impressions: 1000000, recommendation: `Lancement Skyr Fruits (${lever}), vague ${i+1}.` }
+    }}),
 
     // Carrefour
-    ...Array.from({ length: 6 }, (_, i) => ({
-      id: `RM-FR-C-${i+1}`, brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date(2024, i*2, 5), end: new Date(2024, i*2, 7), retailer: 'Carrefour', lever: 'Animation Magasin', objective: 'Recrutement', status: 'Terminée', roas: 10 + Math.random()*5, sales_attributed: 50000 + Math.random()*10000, spend: 5000 + Math.random()*1000, details: { sales_uplift_vs_control: `${(20+Math.random()*10).toFixed(0)}%`, recommendation: `Animation magasin ${i+1}.` }
-    })),
+    ...Array.from({ length: 6 }, (_, i) => {
+        const levers = ['Animation Magasin', 'Coupons', 'Display On-site'];
+        const lever = levers[i % levers.length];
+        return {
+      id: `RM-FR-C-${i+1}`, brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date(2024, i*2, 5), end: new Date(2024, i*2, 18), retailer: 'Carrefour', lever: lever, objective: 'Recrutement', status: 'Terminée', roas: 10 + Math.random()*5, sales_attributed: 50000 + Math.random()*10000, spend: 5000 + Math.random()*1000, details: { sales_uplift_vs_control: `${(20+Math.random()*10).toFixed(0)}%`, recommendation: `Activation ${lever} ${i+1}.` }
+    }}),
     
     // Système U
     ...Array.from({ length: 12 }, (_, i) => ({
@@ -51,21 +68,33 @@ const campaignDataByCountry = {
      // Always On Amazon
     { id: 'RM-US-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 6.5, sales_attributed: 850000, spend: 130769, details: { type: 'Sponsored Products', acos: '15.4%', clicks: 450000, ctr: '2.0%', cpc: '0.95$', recommendation: "Excellent ROAS pour une campagne 'always-on'. La part de voix est dominante sur les mots-clés principaux." }},
     // Walmart Connect
-    ...Array.from({ length: 10 }, (_, i) => ({
-      id: `RM-US-W-GE-${i+1}`, brand: 'Gourdes Enfant', product: 'Gourde Fraise-Banane', start: new Date(2024, i, 10), end: new Date(2024, i, 24), retailer: 'Walmart Connect', lever: 'Sponsored Products', objective: 'Conversion', status: i < 8 ? 'Terminée' : 'En cours', roas: 6 + Math.random(), sales_attributed: 100000 + Math.random()*20000, spend: 16000 + Math.random()*3000, details: { acos: `${(15+Math.random()*2).toFixed(1)}%`, recommendation: `Campagne ${i+1} pour les gourdes.`}
-    })),
+    ...Array.from({ length: 10 }, (_, i) => {
+      const levers = ['Sponsored Products', 'Display On-site'];
+      const lever = levers[i % levers.length];
+      return {
+        id: `RM-US-W-GE-${i+1}`, brand: 'Gourdes Enfant', product: 'Gourde Fraise-Banane', start: new Date(2024, i, 10), end: new Date(2024, i, 24), retailer: 'Walmart Connect', lever: lever, objective: 'Conversion', status: i < 8 ? 'Terminée' : 'En cours', roas: 6 + Math.random(), sales_attributed: 100000 + Math.random()*20000, spend: 16000 + Math.random()*3000, details: { acos: `${(15+Math.random()*2).toFixed(1)}%`, recommendation: `Campagne ${lever} ${i+1} pour les gourdes.`}
+      }
+    }),
     // Instacart Ads
-    ...Array.from({ length: 8 }, (_, i) => ({
-      id: `RM-US-I-GB-${i+1}`, brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date(2024, i+1, 1), end: new Date(2024, i+1, 28), retailer: 'Instacart Ads', lever: 'Audience Extension', objective: 'Recrutement', status: i < 7 ? 'Terminée' : 'En cours', roas: 3.5 + Math.random(), sales_attributed: 60000 + Math.random()*10000, spend: 17000 + Math.random()*2000, details: { offsite_sales_lift: `${(10+Math.random()*4).toFixed(1)}%`, recommendation: `Campagne de recrutement ${i+1}.` }
-    })),
+    ...Array.from({ length: 8 }, (_, i) => {
+        const levers = ['Audience Extension', 'Sponsored Products'];
+        const lever = levers[i % levers.length];
+        return {
+          id: `RM-US-I-GB-${i+1}`, brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date(2024, i+1, 1), end: new Date(2024, i+1, 28), retailer: 'Instacart Ads', lever: lever, objective: 'Recrutement', status: i < 7 ? 'Terminée' : 'En cours', roas: 3.5 + Math.random(), sales_attributed: 60000 + Math.random()*10000, spend: 17000 + Math.random()*2000, details: { offsite_sales_lift: `${(10+Math.random()*4).toFixed(1)}%`, recommendation: `Campagne de recrutement ${lever} ${i+1}.` }
+        }
+    }),
     // Kroger Precision Marketing
     ...Array.from({ length: 4 }, (_, i) => ({
       id: `RM-US-K-SN-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date(2024, i*3, 1), end: new Date(2024, i*3, 30), retailer: 'Kroger Precision Marketing', lever: 'Coupons', objective: 'Essai', status: i < 3 ? 'Terminée' : 'Planifiée', roas: null, sales_attributed: null, spend: 40000 + Math.random()*5000, details: { estimated_redemption: `${(5+Math.random()*2).toFixed(1)}%`, recommendation: `Campagne couponing trimestrielle ${i+1}.` }
     })),
      // Amazon Ads - Gamme Végétale
-    ...Array.from({ length: 10 }, (_, i) => ({
-      id: `RM-US-A-GV-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Amande', start: new Date(2024, i, 15), end: new Date(2024, i, 30), retailer: 'Amazon Ads', lever: 'Display On-site', objective: 'Considération', status: i < 8 ? 'Terminée' : 'En cours', roas: 3.0 + Math.random(), sales_attributed: 45000 + Math.random()*10000, spend: 15000 + Math.random()*3000, details: { brand_uplift: `${(8+Math.random()*4).toFixed(1)}%`, recommendation: `Campagne de considération ${i+1}.`}
-    })),
+    ...Array.from({ length: 10 }, (_, i) => {
+        const levers = ['Display On-site', 'Sponsored Products', 'Sponsored Brands'];
+        const lever = levers[i % levers.length];
+        return {
+          id: `RM-US-A-GV-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Amande', start: new Date(2024, i, 15), end: new Date(2024, i, 30), retailer: 'Amazon Ads', lever: lever, objective: 'Considération', status: i < 8 ? 'Terminée' : 'En cours', roas: 3.0 + Math.random(), sales_attributed: 45000 + Math.random()*10000, spend: 15000 + Math.random()*3000, details: { brand_uplift: `${(8+Math.random()*4).toFixed(1)}%`, recommendation: `Campagne de considération ${lever} ${i+1}.`}
+        }
+    }),
   ],
   Japan: [
     // Always On Amazon
@@ -75,9 +104,13 @@ const campaignDataByCountry = {
       id: `RM-JP-R-DS-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Soja Chocolat', start: new Date(2024, i*2, 1), end: new Date(2024, i*2, 28), retailer: 'Rakuten Ads', lever: 'Coupons', objective: 'Essai Produit', status: i < 4 ? 'Terminée' : 'Planifiée', roas: null, sales_attributed: null, spend: 14000 + Math.random()*2000, details: { estimated_redemption: `${(7+Math.random()*3).toFixed(1)}%`, recommendation: `Offre couponing ${i+1}.` }
     })),
     // Yahoo! Shopping
-    ...Array.from({ length: 10 }, (_, i) => ({
-      id: `RM-JP-Y-GP-${i+1}`, brand: 'Gourdes Enfant', product: 'Gourde Pomme', start: new Date(2024, i, 1), end: new Date(2024, i, 28), retailer: 'Yahoo! Shopping', lever: 'Sponsored Products', objective: 'Conversion', status: i < 8 ? 'Terminée' : 'En cours', roas: 4.5 + Math.random()*0.5, sales_attributed: 80000 + Math.random()*10000, spend: 18000 + Math.random()*2000, details: { acos: `${(21+Math.random()*3).toFixed(1)}%`, recommendation: `Campagne mensuelle ${i+1} sur Yahoo.`}
-    })),
+    ...Array.from({ length: 10 }, (_, i) => {
+        const levers = ['Sponsored Products', 'Display On-site'];
+        const lever = levers[i % levers.length];
+        return {
+          id: `RM-JP-Y-GP-${i+1}`, brand: 'Gourdes Enfant', product: 'Gourde Pomme', start: new Date(2024, i, 1), end: new Date(2024, i, 28), retailer: 'Yahoo! Shopping', lever: lever, objective: 'Conversion', status: i < 8 ? 'Terminée' : 'En cours', roas: 4.5 + Math.random()*0.5, sales_attributed: 80000 + Math.random()*10000, spend: 18000 + Math.random()*2000, details: { acos: `${(21+Math.random()*3).toFixed(1)}%`, recommendation: `Campagne mensuelle ${lever} ${i+1} sur Yahoo.`}
+        }
+    }),
   ]
 };
 
@@ -124,7 +157,8 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
         'Audience Extension': (d: any) => [renderKpi('Portée', d.reach?.toLocaleString('fr-FR')), renderKpi('CPM', d.cpm), renderKpi('ROAS', campaign.roas, 'x'), renderKpi('Sales Lift Off-site', d.offsite_sales_lift)].join(''),
         'Animation Magasin': (d: any) => [renderKpi('Uplift Ventes', d.sales_uplift_vs_control, '%'), renderKpi('Visiteurs Engagés', d.visitors_engaged?.toLocaleString('fr-FR')), renderKpi('Coût / Visiteur', d.cost_per_visitor), renderKpi('Magasins Participants', d.stores_participating)].join(''),
         'Coupons': (d: any) => [renderKpi('Taux de Rédemption', d.estimated_redemption || d.redemption_rate, '%'), renderKpi('Coupons Distribués', d.coupons_distributed?.toLocaleString('fr-FR')), renderKpi('Valeur Offre', d.offer_value)].join(''),
-        'Sponsored Brands': (d: any) => [renderKpi('Objectif Impressions', '1M'), renderKpi('Statut', 'Planifié')].join('')
+        'Sponsored Brands': (d: any) => [renderKpi('Impressions', d.impressions?.toLocaleString('fr-FR'))].join(''),
+        'Display Off-site': (d: any) => [renderKpi('Portée', d.reach?.toLocaleString('fr-FR')), renderKpi('CPM', d.cpm)].join(''),
     };
 
     return (
@@ -148,8 +182,7 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                 </div>
                  <div>
                     <h4 className="font-semibold text-foreground mb-2">Performance Média</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {kpiHtml[campaign.lever as keyof typeof kpiHtml] ? kpiHtml[campaign.lever as keyof typeof kpiHtml](campaign.details) : <p>Données non disponibles.</p>}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4" dangerouslySetInnerHTML={{ __html: kpiHtml[campaign.lever as keyof typeof kpiHtml] ? kpiHtml[campaign.lever as keyof typeof kpiHtml](campaign.details) : '<p>Données non disponibles.</p>' }}>
                     </div>
                 </div>
                  <Card className="bg-background">
