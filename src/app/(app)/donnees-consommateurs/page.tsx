@@ -10,6 +10,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieC
 import { Sparkles, TrendingUp, TrendingDown, Users, Repeat, HandCoins, Cake, Heart, Rocket, UserCheck, ShoppingBasket, Soup, Sun, Milk, Briefcase } from 'lucide-react';
 import { retailerOptions, brandOptions } from '@/services/filters-data';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 type Filters = {
     retailer: string;
@@ -60,15 +61,22 @@ const generateDataForFilters = (filters: Filters) => {
 
     // --- Fidélité & Mixité Data ---
     const loyaltyData = [{ name: 'Acheteurs Exclusifs', value: random(15, 20, 'l1') }, { name: 'Acheteurs Réguliers', value: random(30, 40, 'l2') }, { name: 'Acheteurs Occasionnels', value: random(45, 55, 'l3') }];
-    const proximityCategories = ['La Prairie Gourmande', 'Danone', 'Yoplait', 'MDD'];
-    const proximityMatrix = proximityCategories.map((cat1, i) => {
-        const row: { [key: string]: number | string } = { category: cat1 };
-        proximityCategories.forEach((cat2, j) => {
+    
+    const proximityReferences = [
+        'LPG-Skyr Nat 150g', 'LPG-Bio Fraise 4x125g', 'LPG-Grec Miel 2x150g', 'LPG-Végé Amande 2x100g', 'LPG-Gourde Pomme 4x90g',
+        'Danone-Danette Choc 4x100g', 'Danone-Activia Nat 4x125g', 'Danone-Velouté Fruix 4x125g', 'Danone-Light&Free Pêche 4x115g', 'Danone-Actimel Nat x10',
+        'Yoplait-Panier de Yoplait 4x125g', 'Yoplait-Perle de Lait Nat 4x125g', 'Yoplait-Yop Fraise 825g', 'Yoplait-Petits Filous x12', 'Yoplait-Skyr Nature 140g',
+        'MDD-Yaourt Nat 16x125g', 'MDD-Fromage Blanc 1kg', 'MDD-Yaourt Fruits 8x125g', 'MDD-Crème Dessert Choc 4x125g', 'MDD-Bio Nature 4x125g',
+    ];
+
+    const proximityMatrix = proximityReferences.map((ref1, i) => {
+        const row: { [key: string]: number | string } = { product: ref1 };
+        proximityReferences.forEach((ref2, j) => {
             if (i === j) {
-                row[cat2] = 100;
+                row[ref2] = 100;
             } else {
-                const salt = `${cat1}-${cat2}`.split('').sort().join(''); // Ensure salt is symmetrical
-                row[cat2] = random(10, 80, salt);
+                const salt = `${ref1}-${ref2}`.split('').sort().join(''); // Ensure salt is symmetrical
+                row[ref2] = random(5, 95, salt);
             }
         });
         return row;
@@ -83,7 +91,7 @@ const generateDataForFilters = (filters: Filters) => {
         salesTree, kpis,
         gains, pertes, totalGains, totalPertes, dynamicsChartData,
         ageData, cspData, foyerData,
-        loyaltyData, proximityMatrix,
+        loyaltyData, proximityMatrix, proximityReferences,
         momentData, benefitData
     };
 };
@@ -151,52 +159,60 @@ const ProfileTab = ({ data }: { data: any }) => {
 };
 
 const LoyaltyTab = ({ data }: { data: any }) => {
-    const { loyaltyData, proximityMatrix } = data;
-    const proximityCategories = proximityMatrix.map((p: any) => p.category);
+    const { loyaltyData, proximityMatrix, proximityReferences } = data;
 
     const getBgColor = (value: number) => {
         if (value === 100) return 'bg-primary/80 text-primary-foreground';
-        const opacity = Math.max(10, Math.floor(value / 10) * 10);
-        return `bg-green-600/${opacity} text-white`;
+        if (value > 75) return 'bg-green-700 text-white';
+        if (value > 50) return 'bg-green-500 text-white';
+        if (value > 25) return 'bg-yellow-400 text-yellow-900';
+        return 'bg-amber-200 text-amber-800';
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><UserCheck />Matrice de Fidélité</CardTitle></CardHeader>
-                <CardContent><ResponsiveContainer width="100%" height={300}><BarChart data={loyaltyData} layout="vertical"><XAxis type="number" unit="%" /><YAxis type="category" dataKey="name" width={150} /><Tooltip formatter={(v: number) => `${v.toFixed(1)}%`} /><Bar dataKey="value" fill="hsl(var(--primary))" /></BarChart></ResponsiveContainer></CardContent>
-            </Card>
-             <Card className="lg:col-span-2">
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card>
+                    <CardHeader><CardTitle className="flex items-center gap-2"><UserCheck />Matrice de Fidélité</CardTitle></CardHeader>
+                    <CardContent><ResponsiveContainer width="100%" height={300}><BarChart data={loyaltyData} layout="vertical"><XAxis type="number" unit="%" /><YAxis type="category" dataKey="name" width={150} /><Tooltip formatter={(v: number) => `${v.toFixed(1)}%`} /><Bar dataKey="value" fill="hsl(var(--primary))" /></BarChart></ResponsiveContainer></CardContent>
+                </Card>
+                <Card className="lg:col-span-2"><CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Synthèse & Recommandations IA</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">La part d'acheteurs **exclusifs est de {(loyaltyData.find((l: any) => l.name.includes('Exclusifs')).value).toFixed(0)}%**, ce qui est un bon signe de fidélité. Cependant, une grande partie de votre base est **occasionnelle**.</p><p className="text-sm text-muted-foreground mt-2">La matrice de proximité au niveau référence (ci-dessous) révèle des informations clés. Par exemple, une forte proximité entre votre **LPG-Skyr Nature** et le **Yoplait-Skyr Nature** (indice élevé) indique une concurrence directe et une forte substituabilité. À l'inverse, une faible proximité entre votre **LPG-Gourde Pomme** et **Danette** suggère des usages et des consommateurs très différents.</p><p className="text-sm text-muted-foreground mt-2"><strong>Recommandation :</strong> Pour convertir les acheteurs occasionnels, lancez une campagne promotionnelle ciblée sur les références où la concurrence avec la MDD est la plus forte (ex: Yaourt Nature vs MDD Yaourt Nature). Utilisez les proximités fortes pour des actions de défense (si un concurrent est en promo, protégez votre référence concurrente) et les proximités faibles pour identifier des opportunités de cross-selling au sein de votre propre gamme.</p></CardContent></Card>
+            </div>
+             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><ShoppingBasket />Matrice de Proximité (Co-achat des Marques)</CardTitle>
-                    <CardDescription>Indice 100 = les acheteurs d'une marque achètent aussi cette marque. Un score élevé signifie une forte proximité dans le panier.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><ShoppingBasket />Matrice de Proximité au niveau Référence</CardTitle>
+                    <CardDescription>Indice de co-achat entre 20 références clés. Un score élevé signifie une forte probabilité que les deux produits se retrouvent dans le même panier.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Marque</TableHead>
-                                {proximityCategories.map((cat: string) => <TableHead key={cat} className="text-center">{cat}</TableHead>)}
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {proximityMatrix.map((row: any) => (
-                                <TableRow key={row.category}>
-                                    <TableCell className="font-bold">{row.category}</TableCell>
-                                    {proximityCategories.map((cat: string) => (
-                                        <TableCell key={`${row.category}-${cat}`} className="text-center p-0">
-                                             <div className={cn("m-1 rounded-md p-2 font-bold text-center", getBgColor(row[cat]))}>
-                                                {Math.round(row[cat])}
-                                            </div>
-                                        </TableCell>
+                    <ScrollArea className="w-full whitespace-nowrap">
+                        <div className="overflow-auto" style={{ maxWidth: 'calc(100vw - 150px)'}}>
+                            <Table className="min-w-max border-collapse border border-border">
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="sticky left-0 z-10 bg-card p-2 text-xs w-[150px] border-r border-border">Référence</TableHead>
+                                        {proximityReferences.map((ref: string) => <TableHead key={ref} className="p-1 text-center text-[10px] h-32" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{ref}</TableHead>)}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {proximityMatrix.map((row: any) => (
+                                        <TableRow key={row.product}>
+                                            <TableCell className="sticky left-0 z-10 bg-card p-2 text-xs font-bold w-[150px] border-r border-border">{row.product}</TableCell>
+                                            {proximityReferences.map((ref: string) => (
+                                                <TableCell key={`${row.product}-${ref}`} className="p-0 text-center border border-border">
+                                                    <div className={cn("m-0 flex h-12 w-12 items-center justify-center text-xs font-bold", getBgColor(row[ref]))}>
+                                                        {Math.round(row[ref])}
+                                                    </div>
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
                                     ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                                </TableBody>
+                            </Table>
+                        </div>
+                        <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
                 </CardContent>
             </Card>
-            <Card className="lg:col-span-3"><CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Synthèse & Recommandations IA</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">La part d'acheteurs **exclusifs est de {(loyaltyData.find((l: any) => l.name.includes('Exclusifs')).value).toFixed(0)}%**, ce qui est un bon signe de fidélité. Cependant, une grande partie de votre base est **occasionnelle**.</p><p className="text-sm text-muted-foreground mt-2">La matrice de proximité montre une faible concurrence directe avec **Yoplait** (indice bas), mais une forte concurrence avec la **MDD**, indiquant une sensibilité au prix. L'affinité avec **Danone** est modérée, suggérant des portefeuilles de produits complémentaires dans le panier.</p><p className="text-sm text-muted-foreground mt-2"><strong>Recommandation :</strong> Pour convertir les acheteurs occasionnels, lancez une campagne promotionnelle ciblée pour contrer l'attrait de la MDD. Explorez les synergies avec Danone via des communications sur la complémentarité de vos gammes (ex: Skyr LPG pour le matin, Danette pour le dessert).</p></CardContent></Card>
         </div>
     );
 }
@@ -347,3 +363,4 @@ export default function ConsumerDataPage() {
         </div>
     );
 }
+
