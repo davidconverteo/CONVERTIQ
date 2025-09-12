@@ -84,9 +84,13 @@ const campaignDataByCountry = {
         }
     }),
     // Kroger Precision Marketing
-    ...Array.from({ length: 4 }, (_, i) => ({
-      id: `RM-US-K-SN-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date(2024, i*3, 1), end: new Date(2024, i*3, 30), retailer: 'Kroger Precision Marketing', lever: 'Coupons', objective: 'Essai', status: i < 3 ? 'Terminée' : 'Planifiée', roas: null, sales_attributed: null, spend: 40000 + Math.random()*5000, details: { estimated_redemption: `${(5+Math.random()*2).toFixed(1)}%`, recommendation: `Campagne couponing trimestrielle ${i+1}.` }
-    })),
+    ...Array.from({ length: 4 }, (_, i) => {
+        const levers = ['Coupons', 'Display On-site'];
+        const lever = levers[i % levers.length];
+        return {
+          id: `RM-US-K-SN-${i+1}`, brand: 'Gamme Skyr', product: 'Skyr Nature', start: new Date(2024, i*3, 1), end: new Date(2024, i*3, 30), retailer: 'Kroger Precision Marketing', lever: lever, objective: 'Essai', status: i < 3 ? 'Terminée' : 'Planifiée', roas: null, sales_attributed: null, spend: 40000 + Math.random()*5000, details: { estimated_redemption: `${(5+Math.random()*2).toFixed(1)}%`, recommendation: `Campagne couponing trimestrielle ${i+1}.` }
+        }
+    }),
      // Amazon Ads - Gamme Végétale
     ...Array.from({ length: 10 }, (_, i) => {
         const levers = ['Display On-site', 'Sponsored Products', 'Sponsored Brands'];
@@ -100,9 +104,13 @@ const campaignDataByCountry = {
     // Always On Amazon
     { id: 'RM-JP-A1', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-01-01'), end: new Date('2024-12-31'), retailer: 'Amazon Ads', lever: 'Sponsored Products', objective: 'Visibilité', status: 'En cours', roas: 4.9, sales_attributed: 250000, spend: 51020, details: { type: 'Sponsored Products', acos: '20.4%', clicks: 300000, ctr: '1.0%', cpc: '20 JPY', recommendation: "La campagne maintient une bonne visibilité. L'ACoS est plus élevé qu'en EU/US, ce qui est normal pour le marché japonais. Continuer à optimiser." }},
     // Rakuten Ads
-    ...Array.from({ length: 6 }, (_, i) => ({
-      id: `RM-JP-R-DS-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Soja Chocolat', start: new Date(2024, i*2, 1), end: new Date(2024, i*2, 28), retailer: 'Rakuten Ads', lever: 'Coupons', objective: 'Essai Produit', status: i < 4 ? 'Terminée' : 'Planifiée', roas: null, sales_attributed: null, spend: 14000 + Math.random()*2000, details: { estimated_redemption: `${(7+Math.random()*3).toFixed(1)}%`, recommendation: `Offre couponing ${i+1}.` }
-    })),
+    ...Array.from({ length: 6 }, (_, i) => {
+        const levers = ['Coupons', 'Display On-site'];
+        const lever = levers[i % levers.length];
+        return {
+          id: `RM-JP-R-DS-${i+1}`, brand: 'Gamme Végétale', product: 'Dessert Soja Chocolat', start: new Date(2024, i*2, 1), end: new Date(2024, i*2, 28), retailer: 'Rakuten Ads', lever: lever, objective: 'Essai Produit', status: i < 4 ? 'Terminée' : 'Planifiée', roas: null, sales_attributed: null, spend: 14000 + Math.random()*2000, details: { estimated_redemption: `${(7+Math.random()*3).toFixed(1)}%`, recommendation: `Offre couponing ${i+1}.` }
+        }
+    }),
     // Yahoo! Shopping
     ...Array.from({ length: 10 }, (_, i) => {
         const levers = ['Sponsored Products', 'Display On-site'];
