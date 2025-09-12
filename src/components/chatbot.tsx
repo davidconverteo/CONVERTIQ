@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
@@ -14,27 +14,104 @@ type Message = {
   sender: "user" | "ai";
 };
 
-export default function Chatbot() {
+function ChatWindow({ isOpen, onToggle, messages, isLoading, input, setInput, handleSendMessage, messagesEndRef }: any) {
+    return (
+        <div className={cn(
+          "fixed bottom-6 right-6 z-50 transition-all sm:w-96 w-80",
+          isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+        )}>
+          <Card className="flex h-[70vh] max-h-[600px] flex-col shadow-2xl">
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <BrainCircuit className="h-5 w-5 text-primary" /> Assistant ConvertIQ
+              </CardTitle>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onToggle}>
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden p-0">
+              <ScrollArea className="h-full p-4">
+                <div className="space-y-4">
+                  {messages.map((msg: Message, index: number) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "flex items-end gap-2",
+                        msg.sender === "user" ? "justify-end" : "justify-start"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "max-w-[80%] rounded-lg p-3 text-sm",
+                          msg.sender === "user"
+                            ? "rounded-br-none bg-primary text-primary-foreground"
+                            : "rounded-bl-none bg-muted"
+                        )}
+                      >
+                        {msg.text}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                     <div className="flex items-end gap-2 justify-start">
+                       <div className="rounded-lg p-3 text-sm bg-muted flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Réflexion...</span>
+                       </div>
+                     </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+            </CardContent>
+            <CardFooter>
+              <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Posez votre question..."
+                  autoComplete="off"
+                  disabled={isLoading}
+                />
+                <Button type="submit" size="icon" disabled={isLoading}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
+            </CardFooter>
+          </Card>
+        </div>
+    );
+}
+
+export default function ChatbotTrigger() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const addWelcomeMessage = useCallback(() => {
+    setMessages([
+      {
+        text: "Bonjour ! Je suis l'assistant ConvertIQ. Comment puis-je vous aider à analyser vos données ?",
+        sender: "ai",
+      },
+    ]);
+  }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      setMessages([
-        {
-          text: "Bonjour ! Je suis l'assistant AdForge. Comment puis-je vous aider à analyser vos données ?",
-          sender: "ai",
-        },
-      ]);
+    if (isOpen && messages.length === 0) {
+      addWelcomeMessage();
     }
-  }, [isOpen]);
+  }, [isOpen, messages, addWelcomeMessage]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleToggle = () => {
+    setIsOpen(prev => !prev);
+  }
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,76 +139,27 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <div className={cn("mb-2 w-80 origin-bottom-right transition-all sm:w-96", isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none")}>
-        <Card className="flex h-[70vh] max-h-[500px] flex-col">
-          <CardHeader className="flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <BrainCircuit className="h-5 w-5 text-primary" /> Assistant AdForge
-            </CardTitle>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsOpen(false)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-full p-4">
-              <div className="space-y-4">
-                {messages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex items-end gap-2",
-                      msg.sender === "user" ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "max-w-[80%] rounded-lg p-3 text-sm",
-                        msg.sender === "user"
-                          ? "rounded-br-none bg-primary text-primary-foreground"
-                          : "rounded-bl-none bg-muted"
-                      )}
-                    >
-                      {msg.text}
-                    </div>
-                  </div>
-                ))}
-                {isLoading && (
-                   <div className="flex items-end gap-2 justify-start">
-                     <div className="rounded-lg p-3 text-sm bg-muted flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Réflexion...</span>
-                     </div>
-                   </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
-          </CardContent>
-          <CardFooter>
-            <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Posez votre question..."
-                autoComplete="off"
-                disabled={isLoading}
-              />
-              <Button type="submit" size="icon" disabled={isLoading}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </CardFooter>
-        </Card>
-      </div>
-      <Button
-        size="icon"
-        className="h-16 w-16 rounded-full shadow-lg"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle Chatbot"
+    <>
+      <button
+        onClick={handleToggle}
+        className={cn(
+          'flex w-full items-center gap-4 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+          'hover:bg-sidebar-accent/50'
+        )}
       >
-        <BrainCircuit className={cn("h-7 w-7 transition-transform duration-300", isOpen && "rotate-12")} />
-      </Button>
-    </div>
+        <BrainCircuit className="h-5 w-5" />
+        <span>Assistant IA</span>
+      </button>
+      <ChatWindow 
+        isOpen={isOpen}
+        onToggle={handleToggle}
+        messages={messages}
+        isLoading={isLoading}
+        input={input}
+        setInput={setInput}
+        handleSendMessage={handleSendMessage}
+        messagesEndRef={messagesEndRef}
+      />
+    </>
   );
 }

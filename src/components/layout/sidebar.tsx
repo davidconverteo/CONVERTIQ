@@ -15,6 +15,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Accueil' },
@@ -27,7 +28,7 @@ const navItems = [
   { href: '/donnees-consommateurs', icon: Users, label: 'Données Conso.' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ children }: { children?: ReactNode }) {
   const pathname = usePathname();
 
   return (
@@ -57,7 +58,7 @@ export default function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="p-4">
+      <div className="space-y-2 p-4">
         <Link
           href="/settings"
           className={cn(
@@ -70,6 +71,7 @@ export default function Sidebar() {
           <Settings className="h-5 w-5" />
           <span>Paramètres</span>
         </Link>
+        {children}
       </div>
     </aside>
   );

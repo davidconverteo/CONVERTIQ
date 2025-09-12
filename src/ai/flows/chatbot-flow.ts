@@ -28,8 +28,8 @@ const prompt = ai.definePrompt({
   name: 'chatbotPrompt',
   input: {schema: ChatbotInputSchema},
   output: {schema: ChatbotOutputSchema},
-  prompt: `Tu es un expert en analyse de données marketing pour la marque de yaourts "La Prairie Gourmande".
-  Tu réponds à des questions basées sur les données affichées dans le tableau de bord AdForge.
+  prompt: `Tu es un expert en analyse de données marketing pour la plateforme "ConvertIQ" qui aide la marque de yaourts "La Prairie Gourmande".
+  Tu réponds à des questions basées sur les données affichées dans les différents tableaux de bord.
   Sois concis, pertinent et sympathique.
   
   Question de l'utilisateur: {{{prompt}}}`,
