@@ -174,22 +174,27 @@ const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
                                         const width = getWidth(campaign.start, campaign.end);
                                         const isTooSmall = width < 5;
                                         return (
-                                            <UITooltip key={campaign.id}>
-                                                <TooltipTrigger asChild>
-                                                    <div 
-                                                        className="absolute top-0 flex h-10 items-center justify-start rounded-lg bg-primary/80 px-2 text-primary-foreground shadow transition-all hover:bg-primary"
-                                                        style={{ left: `${left}%`, width: `${width}%`, marginLeft: '10rem' /* 160px for product name */ }}
-                                                    >
-                                                        <PlatformIcon lever={campaign.lever} />
-                                                        {!isTooSmall && <span className="ml-2 truncate text-xs">{campaign.channel}</span>}
-                                                    </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p className="font-bold">{campaign.lever} - {campaign.channel}</p>
-                                                    <p>{new Date(campaign.start).toLocaleDateString('fr-FR')} - {new Date(campaign.end).toLocaleDateString('fr-FR')}</p>
-                                                    <p>Budget: {campaign.spend.toLocaleString('fr-FR')}€</p>
-                                                </TooltipContent>
-                                            </UITooltip>
+                                            <Dialog key={`${campaign.id}-planner`}>
+                                                <UITooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <DialogTrigger asChild>
+                                                            <div 
+                                                                className="absolute top-0 flex h-10 items-center justify-start rounded-lg bg-primary/80 px-2 text-primary-foreground shadow transition-all hover:bg-primary cursor-pointer"
+                                                                style={{ left: `${left}%`, width: `${width}%`, marginLeft: '10rem' /* 160px for product name */ }}
+                                                            >
+                                                                <PlatformIcon lever={campaign.lever} />
+                                                                {!isTooSmall && <span className="ml-2 truncate text-xs">{campaign.channel}</span>}
+                                                            </div>
+                                                        </DialogTrigger>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p className="font-bold">{campaign.lever} - {campaign.channel}</p>
+                                                        <p>{new Date(campaign.start).toLocaleDateString('fr-FR')} - {new Date(campaign.end).toLocaleDateString('fr-FR')}</p>
+                                                        <p>Budget: {campaign.spend.toLocaleString('fr-FR')}€</p>
+                                                    </TooltipContent>
+                                                </UITooltip>
+                                                <CampaignModal campaign={campaign} />
+                                            </Dialog>
                                         )
                                     })}
                                 </div>
