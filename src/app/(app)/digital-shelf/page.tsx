@@ -58,15 +58,17 @@ const generateDigitalShelfData = (filters: Filters) => {
         Object.entries(row)
             .filter(([key, value]) => key !== 'product' && value !== 'in_stock')
             .map(([enseigne, statut]) => ({
-                product: row.product,
-                enseigne,
-                statut,
+                product: row.product as string,
+                enseigne: enseigne,
+                statut: statut as string,
                 duree: `${Math.floor(seededRandom(1, 4, row.product + enseigne))} jours`
             }))
     );
     
     const oosCount = alerts.filter(a => a.statut === 'out_of_stock').length;
-    const availabilityRate = (1 - (oosCount / (products.length * activeRetailers.length))) * 100;
+    const availabilityRate = (products.length * activeRetailers.length > 0) 
+        ? (1 - (oosCount / (products.length * activeRetailers.length))) * 100 
+        : 100;
     const notReferencedCount = Math.floor(seededRandom(0, 3, "non-ref"));
 
     // Search Data
@@ -237,7 +239,7 @@ export default function DigitalShelfPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Produit</TableHead>
-                                    {Object.keys(availabilityMatrix[0] || {}).filter(k => k !== 'product').map(retailerName => (
+                                    {availabilityMatrix.length > 0 && Object.keys(availabilityMatrix[0]).filter(k => k !== 'product').map(retailerName => (
                                         <TableHead key={retailerName} className="text-center">{retailerName}</TableHead>
                                     ))}
                                 </TableRow>
@@ -438,7 +440,5 @@ export default function DigitalShelfPage() {
     </div>
   );
 }
-
-    
 
     
