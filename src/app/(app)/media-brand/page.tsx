@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { Badge } from "@/components/ui/badge";
 import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp } from "lucide-react";
 
