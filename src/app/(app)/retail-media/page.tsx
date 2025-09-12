@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, Filter, MapPin, DollarSign, Eye, MousePointerClick, TrendingUp, CalendarDays, ChevronRight, Presentation, Sparkles } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { retailMediaData, retailMediaPerformanceByRetailer } from '@/services/data-service';
+import { generateRetailMediaCampaignData, retailMediaPerformanceByRetailer } from '@/services/data-service';
 
 
 const COLORS = ['#16a34a', '#0ea5e9', '#f97316', '#6366f1', '#f59e0b', '#84cc16'];
@@ -178,7 +178,7 @@ export default function RetailMediaPage() {
 
   useEffect(() => {
     // This now only runs on the client, preventing hydration mismatch
-    setCampaignDataByCountry(retailMediaData);
+    setCampaignDataByCountry(generateRetailMediaCampaignData());
   }, []);
 
   if (!campaignDataByCountry) {
@@ -429,3 +429,5 @@ export default function RetailMediaPage() {
     </div>
   );
 }
+
+    
