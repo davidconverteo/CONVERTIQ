@@ -21,13 +21,16 @@ import { Sparkles, Palette, Loader2, UploadCloud, FileImage, Wand2 } from "lucid
 const platforms = ["Facebook", "Instagram", "Google Ads", "TikTok", "LinkedIn"];
 const formats = ["PNG", "JPEG", "SVG"];
 
+// Conditionally define schema for client-side FileList
+const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList);
+
 const generationSchema = z.object({
   prompt: z.string().min(10, { message: "Veuillez entrer une description d'au moins 10 caractères." }),
-  inspirationFile: z.instanceof(FileList).optional(),
+  inspirationFile: fileListSchema.optional(),
 });
 
 const adaptationSchema = z.object({
-    logoFile: z.instanceof(FileList).optional(),
+    logoFile: fileListSchema.optional(),
     outputFormat: z.enum(["PNG", "JPEG", "SVG"]),
     targetPlatform: z.string().min(1, { message: "Veuillez choisir une plateforme."}),
 });
