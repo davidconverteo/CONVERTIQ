@@ -35,7 +35,7 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
     <aside className="fixed left-0 top-0 hidden h-screen w-64 flex-col bg-sidebar text-sidebar-foreground md:flex">
       <div className="flex h-20 items-center gap-3 px-6">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain brightness-0 invert" />
+          <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain brightness-[10] contrast-[1.2]" />
         </Link>
       </div>
       <nav className="flex-1 space-y-2 px-4">

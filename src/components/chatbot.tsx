@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { BrainCircuit, Send, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { askChatbot } from "@/ai/flows/chatbot-flow";
+import Image from "next/image";
 
 type Message = {
   text: string;
@@ -93,7 +94,7 @@ export default function ChatbotTrigger() {
   const addWelcomeMessage = useCallback(() => {
     setMessages([
       {
-        text: "Bonjour ! Je suis l'assistant ConvertIQ. Comment puis-je vous aider à analyser vos données ?",
+        text: "Bonjour ! Je suis l'assistant ConvertIQ. Comment puis-je vous aider ?",
         sender: "ai",
       },
     ]);
@@ -147,7 +148,7 @@ export default function ChatbotTrigger() {
           'hover:bg-sidebar-accent/50'
         )}
       >
-        <BrainCircuit className="h-5 w-5" />
+        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain brightness-[10] contrast-[1.2]" />
         <span>Assistant IA</span>
       </button>
       <ChatWindow 
