@@ -4,6 +4,7 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles } from "lucide-react";
 
 const scorecardData = [
   { retailer: 'E.Leclerc Drive', sellout: '€875k', oos: 1.5, sov: 35, rating: 4.8, priceIndex: 101 },
@@ -17,7 +18,7 @@ const comparisonData = [
     { indicator: 'Articles / Panier', drive: 1.8, offline: 1.4, diff: 28.6 },
     { indicator: 'Prix Moyen / Article', drive: 2.53, offline: 2.71, diff: -6.6 },
     { indicator: 'Poids Ventes Promo', drive: 28, offline: 18, diff: 55.6 },
-]
+];
 
 export default function OnlinePerformanceTab() {
   return (
@@ -33,9 +34,9 @@ export default function OnlinePerformanceTab() {
               <TableRow>
                 <TableHead>Enseigne</TableHead>
                 <TableHead className="text-right">CA Sell-Out</TableHead>
-                <TableHead className="text-right">Taux Rupture</TableHead>
-                <TableHead className="text-right">Part de Voix</TableHead>
-                <TableHead className="text-right">Note Moyenne</TableHead>
+                <TableHead className="text-right">Taux Rupture (%)</TableHead>
+                <TableHead className="text-right">Part de Voix (%)</TableHead>
+                <TableHead className="text-right">Note Moyenne (/5)</TableHead>
                 <TableHead className="text-right">Indice Prix</TableHead>
               </TableRow>
             </TableHeader>
@@ -44,16 +45,17 @@ export default function OnlinePerformanceTab() {
                 <TableRow key={row.retailer}>
                   <TableCell className="font-medium">{row.retailer}</TableCell>
                   <TableCell className="text-right">{row.sellout}</TableCell>
-                  <TableCell className="text-right">{row.oos}%</TableCell>
+                  <TableCell className={`text-right ${row.oos > 3 ? 'text-red-500' : 'text-green-500'}`}>{row.oos}%</TableCell>
                   <TableCell className="text-right">{row.sov}%</TableCell>
-                  <TableCell className="text-right">{row.rating}/5</TableCell>
-                  <TableCell className="text-right">{row.priceIndex}</TableCell>
+                  <TableCell className="text-right">{row.rating}</TableCell>
+                  <TableCell className={`text-right ${row.priceIndex > 100 ? 'text-red-500' : 'text-green-500'}`}>{row.priceIndex}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card>
           <CardHeader>
               <CardTitle>Analyse Stratégique : Drive vs. Offline</CardTitle>
@@ -82,6 +84,17 @@ export default function OnlinePerformanceTab() {
               </TableBody>
           </Table>
       </Card>
+       <Card>
+             <CardHeader className="flex-row items-center gap-2">
+                <Sparkles className="h-5 w-5 text-accent" />
+                <CardTitle>Synthèse & Recommandations IA</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-sm text-muted-foreground">Le canal Drive montre un <strong>panier moyen supérieur de 20%</strong> à l'offline, tiré par un nombre d'articles par panier plus élevé. La sensibilité à la promotion y est également plus forte.</p>
+                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Le taux de rupture chez Courses U (3.5%) est un point d'attention. Coordonnez-vous avec l'enseigne pour optimiser les stocks sur vos références clés. </p>
+            </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

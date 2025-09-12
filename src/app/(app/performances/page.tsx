@@ -15,7 +15,7 @@ import OfferPerformanceTab from "@/components/performance-tabs/offer-performance
 export default function PerformancesPage() {
   return (
     <div className="space-y-6">
-       <Tabs defaultValue="offline" className="w-full">
+       <Tabs defaultValue="d2c" className="w-full">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-6">
           <TabsTrigger value="d2c">
             <Power className="mr-2"/>
