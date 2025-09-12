@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin, Sparkles, Tv, Newspaper, Radio, CalendarDays, ExternalLink, Presentation, ChevronRight } from "lucide-react";
+import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin, Sparkles, Tv, Newspaper, Radio, CalendarDays, ExternalLink, Presentation, ChevronRight, Megaphone } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 
 // --- Données enrichies ---
 
@@ -82,7 +84,7 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
         return (
             <div className="rounded-lg bg-muted/50 p-3 text-center">
                 <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="text-xl font-bold text-foreground">{value.toLocaleString('fr-FR')}{unit}</p>
+                <p className="text-xl font-bold text-foreground">{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}{unit}</p>
             </div>
         );
     };
@@ -95,7 +97,7 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                     {campaign.product} - {campaign.channel}
                 </DialogTitle>
                 <DialogDescription>
-                    {campaign.objective} | {new Date(campaign.start).toLocaleDateString()} - {new Date(campaign.end).toLocaleDateString()}
+                    {campaign.objective} | {new Date(campaign.start).toLocaleDateString('fr-FR')} - {new Date(campaign.end).toLocaleDateString('fr-FR')}
                 </DialogDescription>
             </DialogHeader>
             <div className="space-y-6 py-4">
@@ -146,55 +148,57 @@ const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
     }, {});
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><CalendarDays /> Planning Annuel des Campagnes {year}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 overflow-x-auto p-4">
-                <div className="relative" style={{minWidth: '800px'}}>
-                    {/* Grid des mois */}
-                    <div className="relative grid h-10 grid-cols-12 border-b">
-                        {months.map(month => (
-                            <div key={month} className="text-center text-xs font-semibold text-muted-foreground">{month.toUpperCase()}</div>
-                        ))}
-                    </div>
+        <TooltipProvider>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><CalendarDays /> Planning Annuel des Campagnes {year}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6 overflow-x-auto p-4">
+                    <div className="relative" style={{minWidth: '800px'}}>
+                        {/* Grid des mois */}
+                        <div className="relative grid h-10 grid-cols-12 border-b">
+                            {months.map(month => (
+                                <div key={month} className="text-center text-xs font-semibold text-muted-foreground">{month.toUpperCase()}</div>
+                            ))}
+                        </div>
 
-                    {/* Lignes de produits */}
-                    <div className="mt-4 space-y-4">
-                        {Object.entries(campaignsByProduct).map(([product, productCampaigns]: [string, any[]]) => (
-                             <div key={product} className="relative h-12">
-                                 <div className="absolute top-0 flex h-full w-full items-center border-b border-dashed">
-                                    <p className="w-40 shrink-0 pr-4 text-right text-sm font-medium text-foreground">{product}</p>
-                                 </div>
-                                {productCampaigns.map(campaign => {
-                                    const left = getPosition(campaign.start);
-                                    const width = getWidth(campaign.start, campaign.end);
-                                    const isTooSmall = width < 5;
-                                    return (
-                                        <Tooltip key={campaign.id}>
-                                            <TooltipTrigger asChild>
-                                                <div 
-                                                    className="absolute top-0 flex h-10 items-center justify-start rounded-lg bg-primary/80 px-2 text-primary-foreground shadow transition-all hover:bg-primary"
-                                                    style={{ left: `${left}%`, width: `${width}%`, marginLeft: '10rem' /* 160px for product name */ }}
-                                                >
-                                                    <PlatformIcon lever={campaign.lever} />
-                                                    {!isTooSmall && <span className="ml-2 truncate text-xs">{campaign.channel}</span>}
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p className="font-bold">{campaign.lever} - {campaign.channel}</p>
-                                                <p>{new Date(campaign.start).toLocaleDateString()} - {new Date(campaign.end).toLocaleDateString()}</p>
-                                                <p>Budget: {campaign.spend.toLocaleString('fr-FR')}€</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    )
-                                })}
-                            </div>
-                        ))}
+                        {/* Lignes de produits */}
+                        <div className="mt-4 space-y-4">
+                            {Object.entries(campaignsByProduct).map(([product, productCampaigns]: [string, any[]]) => (
+                                <div key={product} className="relative h-12">
+                                    <div className="absolute top-0 flex h-full w-full items-center border-b border-dashed">
+                                        <p className="w-40 shrink-0 pr-4 text-right text-sm font-medium text-foreground">{product}</p>
+                                    </div>
+                                    {productCampaigns.map((campaign: any) => {
+                                        const left = getPosition(campaign.start);
+                                        const width = getWidth(campaign.start, campaign.end);
+                                        const isTooSmall = width < 5;
+                                        return (
+                                            <UITooltip key={campaign.id}>
+                                                <TooltipTrigger asChild>
+                                                    <div 
+                                                        className="absolute top-0 flex h-10 items-center justify-start rounded-lg bg-primary/80 px-2 text-primary-foreground shadow transition-all hover:bg-primary"
+                                                        style={{ left: `${left}%`, width: `${width}%`, marginLeft: '10rem' /* 160px for product name */ }}
+                                                    >
+                                                        <PlatformIcon lever={campaign.lever} />
+                                                        {!isTooSmall && <span className="ml-2 truncate text-xs">{campaign.channel}</span>}
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p className="font-bold">{campaign.lever} - {campaign.channel}</p>
+                                                    <p>{new Date(campaign.start).toLocaleDateString('fr-FR')} - {new Date(campaign.end).toLocaleDateString('fr-FR')}</p>
+                                                    <p>Budget: {campaign.spend.toLocaleString('fr-FR')}€</p>
+                                                </TooltipContent>
+                                            </UITooltip>
+                                        )
+                                    })}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        </TooltipProvider>
     );
 }
 
@@ -273,7 +277,7 @@ export default function MediaBrandPage() {
                         <DollarSign />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">€{aggregatedKpis.spend.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">€{aggregatedKpis.spend.toLocaleString('fr-FR')}</div>
                         <p className="text-xs text-muted-foreground">sur les campagnes actives/terminées</p>
                     </CardContent>
                 </Card>
@@ -283,7 +287,7 @@ export default function MediaBrandPage() {
                         <Eye />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{aggregatedKpis.reach.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{aggregatedKpis.reach.toLocaleString('fr-FR')}</div>
                         <p className="text-xs text-muted-foreground">Personnes uniques touchées</p>
                     </CardContent>
                 </Card>
@@ -293,7 +297,7 @@ export default function MediaBrandPage() {
                         <MousePointerClick />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{aggregatedKpis.clicks.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{aggregatedKpis.clicks.toLocaleString('fr-FR')}</div>
                          <p className="text-xs text-muted-foreground">Taux de clics moyen: {aggregatedKpis.reach > 0 ? (aggregatedKpis.clicks / aggregatedKpis.reach * 100).toFixed(2) : 0}%</p>
                     </CardContent>
                 </Card>
@@ -377,14 +381,14 @@ export default function MediaBrandPage() {
                                             <div className="font-medium">{campaign.product}</div>
                                             <div className="text-sm text-muted-foreground">{campaign.brand}</div>
                                         </TableCell>
-                                        <TableCell>{new Date(campaign.start).toLocaleDateString()} - {new Date(campaign.end).toLocaleDateString()}</TableCell>
+                                        <TableCell>{new Date(campaign.start).toLocaleDateString('fr-FR')} - {new Date(campaign.end).toLocaleDateString('fr-FR')}</TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
                                                 <PlatformIcon lever={campaign.lever} />
                                                 {campaign.lever}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right">€{(campaign.spend || 0).toLocaleString()}</TableCell>
+                                        <TableCell className="text-right">€{(campaign.spend || 0).toLocaleString('fr-FR')}</TableCell>
                                         <TableCell className={`text-right font-bold ${campaign.roas && campaign.roas > 3 ? 'text-green-600' : 'text-amber-600'}`}>
                                             {campaign.roas ? `${campaign.roas.toFixed(1)}x` : 'N/A'}
                                         </TableCell>
@@ -419,5 +423,3 @@ export default function MediaBrandPage() {
     </div>
   );
 }
-
-    
