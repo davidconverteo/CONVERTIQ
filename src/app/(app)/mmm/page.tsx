@@ -10,15 +10,10 @@ import { TrendingUp, Percent, Download, BrainCircuit, Sparkles, SlidersHorizonta
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { mmmData } from '@/services/data-service';
+import { mmmData, countryData } from '@/services/data-service';
 
 const COLORS = ['#1e293b', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-const countryData: Record<string, { flag: string, lastUpdate: string }> = {
-    'France': { flag: '🇫🇷', lastUpdate: '01/07/2025' },
-    'USA': { flag: '🇺🇸', lastUpdate: '15/07/2025' },
-    'Japan': { flag: '🇯🇵', lastUpdate: '20/06/2025' }
-};
 
 const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japan', onBack: () => void }) => {
     const countryPeriods = Object.keys(mmmData[country]);
@@ -29,8 +24,15 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
     const { contributions, investments, baseline } = data;
 
     const contributionChartData = useMemo(() => {
-        const mediaContributions = Object.entries(contributions).map(([channel, value]) => ({ name: channel, value }));
-        return [{ name: 'Baseline', value: baseline }, ...mediaContributions];
+        const totalSales = baseline + Object.values(contributions).reduce((a, b) => a + b, 0);
+        return [
+            {
+                name: 'Ventes Totales',
+                Baseline: baseline,
+                ...contributions,
+                total: totalSales
+            }
+        ];
     }, [contributions, baseline]);
 
     const roasTableData = useMemo(() => {
@@ -59,6 +61,7 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                         <CardDescription>Analysez la contribution et le ROI de chaque levier marketing.</CardDescription>
                     </div>
                     <div className="flex items-center gap-4">
+                        <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Télécharger le rapport</Button>
                         <Select onValueChange={setSelectedPeriod} value={selectedPeriod}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Période" />
@@ -85,15 +88,20 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                             </CardHeader>
                             <CardContent>
                                 <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={contributionChartData} layout="vertical" stackOffset="expand">
+                                     <BarChart data={contributionChartData} layout="vertical" stackOffset="expand">
                                         <XAxis type="number" hide tickFormatter={(tick) => `${tick * 100}%`} />
                                         <YAxis type="category" dataKey="name" width={0} />
-                                        <Tooltip formatter={(value, name, props) => [`${(props.payload.value).toLocaleString('fr-FR')}€ (${(value * 100).toFixed(1)}%)`, name]} />
+                                        <Tooltip formatter={(value, name, props) => {
+                                            const total = props.payload.total;
+                                            const rawValue = props.payload[name];
+                                            const percentage = (rawValue / total * 100).toFixed(1);
+                                            return [`${rawValue.toLocaleString('fr-FR')}€ (${percentage}%)`, name];
+                                        }} />
                                         <Legend />
+                                        <Bar dataKey="Baseline" stackId="a" fill="#e2e8f0" name="Baseline" />
                                         {Object.keys(contributions).map((key, index) => (
                                             <Bar key={key} dataKey={key} stackId="a" fill={COLORS[index % COLORS.length]} name={key} />
                                         ))}
-                                        <Bar dataKey="Baseline" stackId="a" fill="#e2e8f0" name="Baseline" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </CardContent>
@@ -120,6 +128,19 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                             </CardContent>
                         </Card>
                     </div>
+                     <Card>
+                        <CardHeader className="flex-row items-center gap-2 space-y-0">
+                            <Sparkles className="h-5 w-5 text-accent" />
+                            <CardTitle className="text-lg">Synthèse et Recommandation IA</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                Le modèle MMM pour la période <strong>{selectedPeriod.replace('-', ' ')}</strong> en <strong>{country}</strong> montre que <strong>{roasTableData[0]?.lever}</strong> est le levier le plus performant avec un ROAS de <strong>{roasTableData[0]?.roi.toFixed(2)}x</strong>. 
+                                La baseline représente <strong>{(baseline / (baseline + totalContribution) * 100).toFixed(0)}%</strong> des ventes. 
+                                <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget de <strong>{roasTableData[roasTableData.length-1]?.lever}</strong> (ROAS: {roasTableData[roasTableData.length-1]?.roi.toFixed(2)}x) vers <strong>{roasTableData[0]?.lever}</strong> pour maximiser le retour sur investissement global. Utilisez le simulateur pour tester ce scénario.
+                            </p>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
                 <TabsContent value="simulation" className="mt-6">
                     <SimulationTab />
@@ -135,6 +156,7 @@ const SimulationTab = () => {
 
     const [budgets, setBudgets] = useState<Record<string, number>>(initialBudgets);
     const [visibleLevers, setVisibleLevers] = useState<string[]>(simConfig.datasets.map(d => d.id));
+    const totalContribution = useMemo(() => Object.values(mmmData.France["s1-2025"].contributions).reduce((a, b) => a + b, 0), []);
 
     const handleBudgetChange = (id: string, value: number) => {
         setBudgets(prev => ({...prev, [id]: value}));
@@ -145,7 +167,7 @@ const SimulationTab = () => {
     }
     
     const { totalCa, totalRoas } = useMemo(() => {
-        let totalInvest = 0, totalCa = 0;
+        let totalInvest = 0, totalCaContribution = 0;
         const interpolate = (x: number, x_points: number[], y_points: number[]) => { 
             if (x <= x_points[0]) return y_points[0]; 
             if (x >= x_points[x_points.length - 1]) return y_points[y_points.length - 1]; 
@@ -156,13 +178,21 @@ const SimulationTab = () => {
         simConfig.datasets.forEach(lever => {
             const investment = budgets[lever.id];
             totalInvest += investment;
-            totalCa += interpolate(investment, simConfig.labels, lever.values);
+            totalCaContribution += interpolate(investment, simConfig.labels, lever.values);
         });
+        
+        // Note: totalCaContribution from simulation is a relative value (k€). 
+        // We can scale it to the actual contribution values from the MMM model for a more realistic total CA.
+        const totalSimulatedContribution = simConfig.datasets.reduce((sum, d) => sum + interpolate(d.initialBudget, simConfig.labels, d.values), 0);
+        const scalingFactor = totalContribution / totalSimulatedContribution;
+
+        const finalTotalCa = mmmData.France["s1-2025"].baseline + (totalCaContribution * scalingFactor);
+
         return {
-            totalCa: totalCa,
-            totalRoas: totalInvest > 0 ? totalCa / totalInvest : 0,
+            totalCa: finalTotalCa,
+            totalRoas: totalInvest > 0 ? (totalCaContribution * scalingFactor) / (totalInvest * 1000) : 0,
         }
-    }, [budgets, simConfig]);
+    }, [budgets, simConfig, totalContribution]);
 
     return (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -183,12 +213,12 @@ const SimulationTab = () => {
                     <ResponsiveContainer width="100%" height={400}>
                         <LineChart margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="x" type="number" domain={[0, 'dataMax']} label={{ value: 'Investissement (k€)', position: 'insideBottom', offset: -5 }} />
-                            <YAxis label={{ value: 'CA Additionnel (k€)', angle: -90, position: 'insideLeft' }} />
-                            <Tooltip formatter={(value, name) => [`${value}k€`, name]}/>
+                            <XAxis dataKey="x" type="number" domain={[0, 'dataMax']} label={{ value: 'Investissement (k€)', position: 'insideBottom', offset: -5 }} tickFormatter={(val) => (val/1000).toFixed(0)+'k'} />
+                            <YAxis label={{ value: 'Contribution CA (k€)', angle: -90, position: 'insideLeft' }} tickFormatter={(val) => (val/1000).toFixed(0)+'k'} />
+                            <Tooltip formatter={(value, name) => [`${(value as number).toLocaleString('fr-FR')}k€`, name]} labelFormatter={(label) => `Invest: ${label.toLocaleString('fr-FR')}k€`} />
                             <Legend />
                              {simConfig.datasets.filter(d => visibleLevers.includes(d.id)).map(lever => (
-                                <Line key={lever.id} type="monotone" dataKey="y" data={lever.values.map((v, i) => ({x: simConfig.labels[i], y: v}))} name={lever.name} stroke={lever.color} dot={false} strokeWidth={2} />
+                                <Line key={lever.id} type="monotone" dataKey="y" data={lever.values.map((v, i) => ({x: simConfig.labels[i] * 1000, y: v * 1000}))} name={lever.name} stroke={lever.color} dot={false} strokeWidth={2} />
                             ))}
                         </LineChart>
                     </ResponsiveContainer>
@@ -217,7 +247,7 @@ const SimulationTab = () => {
                         <CardTitle>Résultats de la Simulation</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-lg">
-                        <div className="flex justify-between"><span>CA Total Prévu:</span> <span className="font-bold text-primary">€{Math.round(totalCa * 1000).toLocaleString('fr-FR')}</span></div>
+                        <div className="flex justify-between"><span>CA Total Prévu:</span> <span className="font-bold text-primary">€{Math.round(totalCa).toLocaleString('fr-FR')}</span></div>
                         <div className="flex justify-between"><span>ROAS Total Prévu:</span> <span className="font-bold text-primary">{totalRoas.toFixed(2)}x</span></div>
                     </CardContent>
                 </Card>
@@ -271,4 +301,3 @@ export default function MMMPage() {
 
   return <MmmCountryView country={selectedCountry} onBack={() => setSelectedCountry(null)} />;
 }
-

@@ -194,20 +194,72 @@ export const retailMediaBudgetAllocation = {
     Japan: [{name: 'Sponsored Products', value: 69909}, {name: 'Coupons', value: 14000}],
 };
 
-export const mmmData = {
-    France: {
-        's1-2025': { baseline: 1350000, contributions: { TV: 400000, Social: 280000, 'Retail Media': 200000, SEA: 120000, Affichage: 100000, Presse: 50000 }, investments: { TV: 100000, Social: 70000, 'Retail Media': 50000, SEA: 40000, Affichage: 50000, Presse: 25000 } },
-        's2-2024': { baseline: 1200000, contributions: { 'Retail Media': 300000, Social: 250000, TV: 150000, SEA: 100000, Presse: 80000 }, investments: { 'Retail Media': 75000, Social: 60000, TV: 50000, SEA: 35000, Presse: 40000 } },
-    },
-    USA: {
-        's1-2025': { baseline: 2500000, contributions: { 'Retail Media': 800000, Social: 600000, TV: 300000, 'OOH': 200000 }, investments: { 'Retail Media': 200000, Social: 150000, TV: 100000, 'OOH': 80000 } },
-        's2-2024': { baseline: 2200000, contributions: { 'Retail Media': 700000, Social: 550000, TV: 250000, 'OOH': 150000 }, investments: { 'Retail Media': 180000, Social: 130000, TV: 90000, 'OOH': 70000 } },
-    },
-    Japan: {
-        's1-2025': { baseline: 180000000, contributions: { TV: 90000000, 'Retail Media': 40000000, Social: 20000000 }, investments: { TV: 30000000, 'Retail Media': 10000000, Social: 5000000 } },
-        's2-2024': { baseline: 170000000, contributions: { TV: 85000000, 'Retail Media': 35000000, Social: 18000000, 'Digital': 12000000 }, investments: { TV: 28000000, 'Retail Media': 9000000, Social: 4500000, 'Digital': 4000000 } },
-    },
-    simulation: {
+
+const consolidateMediaData = (country: 'France' | 'USA' | 'Japan') => {
+    const brandCampaigns = campaignDataByCountry[country];
+    // This is async now, but for simplicity in this synchronous function, we'll assume it's pre-fetched.
+    // In a real app, `getMmmData` would need to be async and await this.
+    const retailCampaigns = (generateRetailMediaCampaignData as any)()[country] || [];
+
+    const consolidated = {
+        investments: {} as Record<string, number>,
+        contributions: {} as Record<string, number>,
+    };
+
+    const processCampaigns = (campaigns: any[], contributionKey: string) => {
+        campaigns.forEach((c: any) => {
+            if (c.status.toLowerCase() !== 'planifiée' && c.spend && c[contributionKey]) {
+                const lever = c.lever;
+                consolidated.investments[lever] = (consolidated.investments[lever] || 0) + c.spend;
+                consolidated.contributions[lever] = (consolidated.contributions[lever] || 0) + c[contributionKey];
+            }
+        });
+    };
+
+    processCampaigns(brandCampaigns, 'ca_add');
+    processCampaigns(retailCampaigns, 'sales_attributed');
+    
+    // Rename 'Sponsored Products' etc. to 'Retail Media'
+    const retailLevers = ['sponsored products', 'display on-site', 'audience extension', 'animation magasin', 'coupons', 'sponsored brands', 'display off-site'];
+    const retailInvestment = Object.entries(consolidated.investments).reduce((sum, [lever, value]) => retailLevers.includes(lever.toLowerCase()) ? sum + value : sum, 0);
+    const retailContribution = Object.entries(consolidated.contributions).reduce((sum, [lever, value]) => retailLevers.includes(lever.toLowerCase()) ? sum + value : sum, 0);
+
+    retailLevers.forEach(lever => {
+      const formattedLever = lever.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      delete consolidated.investments[formattedLever];
+      delete consolidated.contributions[formattedLever];
+    });
+
+    if (retailInvestment > 0) {
+      consolidated.investments['Retail Media'] = retailInvestment;
+      consolidated.contributions['Retail Media'] = retailContribution;
+    }
+    
+    return consolidated;
+};
+
+
+const generateMmmData = () => {
+    const countries = ['France', 'USA', 'Japan'] as const;
+    const mmm: any = {};
+
+    countries.forEach(country => {
+        const consolidated = consolidateMediaData(country);
+        mmm[country] = {
+             's1-2025': {
+                baseline: 1350000,
+                contributions: consolidated.contributions,
+                investments: consolidated.investments,
+            },
+            's2-2024': { // Fallback static data
+                baseline: 1200000,
+                contributions: { 'Retail Media': 300000, Social: 250000, TV: 150000, SEA: 100000, Presse: 80000 },
+                investments: { 'Retail Media': 75000, Social: 60000, TV: 50000, SEA: 35000, Presse: 40000 },
+            },
+        };
+    });
+    
+    mmm.simulation = {
         labels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
         datasets: [
             { id: 'tv', name: 'TV', color: '#0ea5e9', maxBudget: 100, initialBudget: 50, values: [0, 15, 28, 38, 45, 50, 53, 55, 56, 57, 57.5] },
@@ -216,7 +268,17 @@ export const mmmData = {
             { id: 'retail_media', name: 'Retail Media', color: '#f59e0b', maxBudget: 120, initialBudget: 40, values: [0, 22, 40, 55, 65, 72, 77, 80, 82, 83, 83.5] },
             { id: 'presse', name: 'Presse', color: '#ef4444', maxBudget: 50, initialBudget: 10, values: [0, 8, 15, 21, 26, 30, 33, 35, 36, 36.5, 37] },
         ]
-    }
+    };
+
+    return mmm;
+}
+
+export const mmmData = generateMmmData();
+
+export const countryData: Record<string, { flag: string, lastUpdate: string }> = {
+    'France': { flag: '🇫🇷', lastUpdate: '01/07/2025' },
+    'USA': { flag: '🇺🇸', lastUpdate: '15/07/2025' },
+    'Japan': { flag: '🇯🇵', lastUpdate: '20/06/2025' }
 };
 
 
