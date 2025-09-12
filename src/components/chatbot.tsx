@@ -17,7 +17,7 @@ type Message = {
 function ChatWindow({ isOpen, onToggle, messages, isLoading, input, setInput, handleSendMessage, messagesEndRef }: any) {
     return (
         <div className={cn(
-          "fixed bottom-6 right-6 z-50 transition-all sm:w-96 w-80",
+          "fixed bottom-20 left-4 z-50 transition-all sm:w-96 w-80",
           isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         )}>
           <Card className="flex h-[70vh] max-h-[600px] flex-col shadow-2xl">

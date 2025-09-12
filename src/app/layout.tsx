@@ -3,8 +3,8 @@ import {Toaster} from '@/components/ui/toaster';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'AdForge AI',
-  description: 'AI-Powered Creative Studio',
+  title: 'ConvertIQ',
+  description: 'AI-Powered Marketing Intelligence Platform',
 };
 
 export default function RootLayout({

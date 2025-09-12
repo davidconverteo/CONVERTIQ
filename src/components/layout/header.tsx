@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, BrainCircuit } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Sidebar from './sidebar';
+import Link from 'next/link';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Cockpit Marketing', subtitle: "Vue d'ensemble de votre performance." },
@@ -22,11 +23,11 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
 
 export default function Header() {
   const pathname = usePathname();
-  const { title, subtitle } = pageTitles[pathname] ?? { title: 'AdForge AI', subtitle: 'Bienvenue' };
+  const { title, subtitle } = pageTitles[pathname] ?? { title: 'ConvertIQ', subtitle: 'Bienvenue' };
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar');
 
   return (
-    <header className="sticky top-0 z-10 flex h-20 w-full items-center justify-between border-b bg-background/80 px-4 backdrop-blur-lg sm:px-6 md:px-8">
+    <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b bg-background/80 px-4 backdrop-blur-lg sm:px-6 md:px-8">
        <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
@@ -38,12 +39,9 @@ export default function Header() {
             {/* We need to re-create the sidebar here for mobile, but as a standard div not aside */}
             <div className="flex h-full flex-col text-sidebar-foreground">
                 <div className="flex h-20 items-center gap-3 px-6">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-foreground/10">
-                    <BrainCircuit className="h-6 w-6 text-primary" />
-                    </div>
-                    <span className="font-headline text-2xl font-bold text-sidebar-foreground">
-                    AdForge AI
-                    </span>
+                  <Link href="/dashboard" className="flex items-center gap-3">
+                     <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
+                  </Link>
                 </div>
                 <Sidebar />
             </div>
@@ -56,7 +54,6 @@ export default function Header() {
         <p className="text-sm text-muted-foreground">{subtitle}</p>
       </div>
       <div className="flex items-center gap-4">
-        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="Logo ConvertIQ" width={120} height={32} className="hidden h-8 w-auto object-contain sm:block" />
         <Avatar>
           {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt="User Avatar" />}
           <AvatarFallback>U</AvatarFallback>

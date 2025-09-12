@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import {
-  BrainCircuit,
   Home,
   Megaphone,
   ShoppingCart,
@@ -13,6 +13,7 @@ import {
   Store,
   Users,
   Settings,
+  BrainCircuit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
@@ -34,12 +35,9 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-64 flex-col bg-sidebar text-sidebar-foreground md:flex">
       <div className="flex h-20 items-center gap-3 px-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-foreground/10">
-          <BrainCircuit className="h-6 w-6 text-primary" />
-        </div>
-        <span className="font-headline text-2xl font-bold text-sidebar-foreground">
-          AdForge AI
-        </span>
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
+        </Link>
       </div>
       <nav className="flex-1 space-y-2 px-4">
         {navItems.map((item) => (
