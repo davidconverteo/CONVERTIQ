@@ -39,16 +39,6 @@ const AdaptCreativeContentForPlatformOutputSchema = z.object({
 });
 export type AdaptCreativeContentForPlatformOutput = z.infer<typeof AdaptCreativeContentForPlatformOutputSchema>;
 
-
-const getDimensions = (platform: string): { width: number; height: number } | null => {
-    const match = platform.match(/\((\d+)x(\d+)\)/);
-    if (!match) return null;
-    const width = parseInt(match[1], 10);
-    const height = parseInt(match[2], 10);
-    return { width, height };
-}
-
-
 const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   {
     name: 'adaptCreativeContentForPlatformFlow',
@@ -56,9 +46,8 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     outputSchema: AdaptCreativeContentForPlatformOutputSchema,
   },
   async (input) => {
-    const dimensions = getDimensions(input.targetPlatform);
-
-    let textPrompt = `Expand this image to perfectly fit the target dimensions. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style.`;
+    
+    let textPrompt = `Expand this image to perfectly fit the target format of ${input.targetPlatform}. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style and quality.`;
     
     const imagePromptParts: (object)[] = [
       { text: textPrompt },
@@ -76,8 +65,6 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
       prompt: imagePromptParts,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
-        outputHeight: dimensions?.height,
-        outputWidth: dimensions?.width,
       },
     });
 
