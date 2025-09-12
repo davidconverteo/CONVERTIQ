@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/generate-marketing-image-from-prompt.ts';
+import '@/ai/flows/create-prompt-from-file-upload.ts';
+import '@/ai/flows/adapt-creative-content-for-platform.ts';
