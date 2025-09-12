@@ -9,7 +9,7 @@ import {
   ShoppingCart,
   Sparkles,
   PieChart,
-  TrendingUp,
+  BarChart2,
   Store,
   Users,
   Settings,
@@ -24,7 +24,7 @@ const navItems = [
   { href: '/retail-media', icon: ShoppingCart, label: 'Retail Media' },
   { href: '/creative-studio', icon: Sparkles, label: 'Studio Créatif' },
   { href: '/mmm', icon: PieChart, label: 'MMM' },
-  { href: '/performances', icon: TrendingUp, label: 'Performances' },
+  { href: '/performances', icon: BarChart2, label: 'Performances' },
   { href: '/digital-shelf', icon: Store, label: 'Digital Shelf' },
   { href: '/donnees-consommateurs', icon: Users, label: 'Données Conso.' },
 ];
