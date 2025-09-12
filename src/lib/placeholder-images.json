@@ -1,10 +1,17 @@
+
 {
   "placeholderImages": [
     {
       "id": "user-avatar",
       "description": "User avatar in header",
-      "imageUrl": "https://picsum.photos/seed/user-avatar/40/40",
+      "imageUrl": "https://picsum.photos/seed/user-avatar/80/80",
       "imageHint": "person portrait"
+    },
+    {
+      "id": "creative-example",
+      "description": "Example of a generated creative in dashboard",
+      "imageUrl": "https://picsum.photos/seed/creative-example/200/200",
+      "imageHint": "yogurt product shot"
     }
   ]
 }
