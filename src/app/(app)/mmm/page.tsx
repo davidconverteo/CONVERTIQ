@@ -28,34 +28,37 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
     }, [contributions]);
 
     const contributionChartData = useMemo(() => {
-        const totalSales = baseline + totalContribution;
         const contributionEntries = Object.entries(contributions);
+        const totalSales = baseline + totalContribution;
+        let cumulative = 0;
 
-        let cumulative = baseline;
-        const waterfallData = [
+        const chartData = [
             {
                 name: 'Baseline',
                 value: baseline,
-                range: [0, baseline],
+                phantom: 0,
+                color: '#e2e8f0', // Muted color for baseline
             },
-            ...contributionEntries.map(([name, value]) => {
-                const start = cumulative;
-                cumulative += value;
-                return {
+            ...contributionEntries.map(([name, value], index) => {
+                const item = {
                     name,
                     value,
-                    range: [start, start + value],
+                    phantom: cumulative + baseline,
+                    color: COLORS[index % COLORS.length],
                 };
+                cumulative += value;
+                return item;
             }),
             {
                 name: 'Ventes Totales',
                 value: totalSales,
-                range: [0, totalSales],
+                phantom: 0,
+                color: '#10b981', // Green for total sales
             },
         ];
-
-        return waterfallData;
+        return chartData;
     }, [contributions, baseline, totalContribution]);
+
 
     const roasTableData = useMemo(() => {
         return Object.entries(investments).map(([lever, investment]) => {
@@ -116,23 +119,12 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis type="number" tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M €`} />
                                         <YAxis dataKey="name" type="category" width={80} />
-                                        <Tooltip formatter={(value, name, props) => [`${props.payload.value.toLocaleString('fr-FR')} €`, props.payload.name]} />
-                                        <Bar dataKey="range" stackId="a">
-                                          {contributionChartData.map((entry, index) => {
-                                             let color = 'transparent';
-                                             if (entry.name === 'Baseline') color = '#e2e8f0';
-                                             else if (entry.name === 'Ventes Totales') color = '#10b981';
-                                             return <Cell key={`cell-${index}`} fill={color} />;
-                                          })}
-                                        </Bar>
+                                        <Tooltip formatter={(value, name, props) => [`${props.payload.value.toLocaleString('fr-FR')} €`, props.payload.name]} cursor={{fill: 'transparent'}}/>
+                                        <Bar dataKey="phantom" stackId="a" fill="transparent" />
                                         <Bar dataKey="value" stackId="a">
-                                            {contributionChartData.map((entry, index) => {
-                                                let color = 'transparent';
-                                                if (index > 0 && index < contributionChartData.length - 1) {
-                                                    color = COLORS[index % COLORS.length];
-                                                }
-                                                return <Cell key={`cell-value-${index}`} fill={color} />;
-                                            })}
+                                            {contributionChartData.map((entry) => (
+                                                <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                                            ))}
                                         </Bar>
                                       </BarChart>
                                 </ResponsiveContainer>
