@@ -39,6 +39,32 @@ const AdaptCreativeContentForPlatformOutputSchema = z.object({
 });
 export type AdaptCreativeContentForPlatformOutput = z.infer<typeof AdaptCreativeContentForPlatformOutputSchema>;
 
+// Function to map a platform label to a supported aspect ratio.
+function getSupportedAspectRatio(platform: string): '1:1' | '3:4' | '4:3' | '16:9' | '9:16' {
+    const platformLower = platform.toLowerCase();
+    
+    // Exact matches for social media
+    if (platformLower.includes('1080x1080') || platformLower.includes('carré')) {
+        return '1:1';
+    }
+    if (platformLower.includes('1080x1920') || platformLower.includes('story')) {
+        return '9:16';
+    }
+    
+    // Approximations for web banners
+    if (platformLower.includes('728x90') || platformLower.includes('970x90') || platformLower.includes('1200x628')) {
+        return '16:9';
+    }
+    if (platformLower.includes('300x250') || platformLower.includes('336x280')) {
+        return '4:3';
+    }
+    if (platformLower.includes('160x600') || platformLower.includes('120x600') || platformLower.includes('300x600')) {
+        return '9:16';
+    }
+
+    return '1:1'; // Default to square if no match
+}
+
 const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   {
     name: 'adaptCreativeContentForPlatformFlow',
@@ -47,7 +73,9 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   },
   async (input) => {
     
-    let textPrompt = `Expand this image to perfectly fit the target format of ${input.targetPlatform}. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style and quality.`;
+    const aspectRatio = getSupportedAspectRatio(input.targetPlatform);
+
+    let textPrompt = `Expand this image to perfectly fit the target format. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style and quality.`;
     
     const imagePromptParts: (object)[] = [
       { text: textPrompt },
@@ -64,7 +92,8 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
       model: 'googleai/gemini-2.5-flash-image-preview',
       prompt: imagePromptParts,
       config: {
-        responseModalities: ['TEXT', 'IMAGE'],
+        responseModalities: ['IMAGE'],
+        aspectRatio: aspectRatio,
       },
     });
 
