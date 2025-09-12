@@ -40,16 +40,12 @@ const AdaptCreativeContentForPlatformOutputSchema = z.object({
 export type AdaptCreativeContentForPlatformOutput = z.infer<typeof AdaptCreativeContentForPlatformOutputSchema>;
 
 
-const getAspectRatio = (platform: string): string | undefined => {
+const getDimensions = (platform: string): { width: number; height: number } | null => {
     const match = platform.match(/\((\d+)x(\d+)\)/);
-    if (!match) return undefined;
-    const w = parseInt(match[1], 10);
-    const h = parseInt(match[2], 10);
-
-    const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
-    const divisor = gcd(w, h);
-    
-    return `${w / divisor}:${h / divisor}`;
+    if (!match) return null;
+    const width = parseInt(match[1], 10);
+    const height = parseInt(match[2], 10);
+    return { width, height };
 }
 
 
@@ -60,9 +56,9 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     outputSchema: AdaptCreativeContentForPlatformOutputSchema,
   },
   async (input) => {
-    const aspectRatio = getAspectRatio(input.targetPlatform);
+    const dimensions = getDimensions(input.targetPlatform);
 
-    let textPrompt = `Expand this image to perfectly fit the target aspect ratio of ${aspectRatio || 'the target platform'}. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style.`;
+    let textPrompt = `Expand this image to perfectly fit the target dimensions. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style.`;
     
     const imagePromptParts: (object)[] = [
       { text: textPrompt },
@@ -80,6 +76,8 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
       prompt: imagePromptParts,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
+        outputHeight: dimensions?.height,
+        outputWidth: dimensions?.width,
       },
     });
 
