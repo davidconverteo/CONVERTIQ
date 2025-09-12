@@ -87,9 +87,11 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
       throw new Error('Image adaptation failed to return an image.');
     }
     
+    // Remove text generation as it's not needed for this flow.
+    // The focus is on correctly resized images.
     return {
       adaptedImageUrl: media.url,
-      adaptedText: "", // Text generation is removed as per user request.
+      adaptedText: "",
     };
   }
 );
