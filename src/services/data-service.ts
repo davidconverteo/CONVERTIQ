@@ -1,3 +1,4 @@
+'use server';
 
 import { z } from 'zod';
 
@@ -15,6 +16,11 @@ export const campaignDataByCountry = {
     { id: 'C008', brand: 'Gamme Bio', product: 'Nouveau Yaourt Bio', start: new Date('2024-11-01'), end: new Date('2024-11-30'), lever: 'Digital', channel: 'Youtube', objective: 'Lancement', status: 'Planifiée', roas: null, ca_add: null, spend: 50000, reach: 2000000, clicks: 40000 },
     { id: 'C009', brand: 'Gamme Végétale', product: 'Dessert Amande', start: new Date('2024-06-15'), end: new Date('2024-07-15'), lever: 'Affichage', channel: 'Metrobus', objective: 'Notoriété', status: 'Terminée', roas: 1.5, ca_add: 45000, spend: 30000, reach: 4000000, clicks: 0 },
     { id: 'C010', brand: 'La Prairie Gourmande', product: 'Yaourt à boire', start: new Date('2024-08-01'), end: new Date('2024-08-31'), lever: 'Radio', channel: 'Fun Radio', objective: 'Promotion', status: 'En cours', roas: 2.8, ca_add: 56000, spend: 20000, reach: 2500000, clicks: 0 },
+    { id: 'C011', brand: 'Gamme Bio', product: 'Yaourt à boire Bio', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'Social', channel: 'Pinterest', objective: 'Conversion', status: 'Planifiée', roas: null, ca_add: null, spend: 15000, reach: 600000, clicks: 10000 },
+    { id: 'C012', brand: 'Gamme Skyr', product: 'Skyr Vanille', start: new Date('2024-07-10'), end: new Date('2024-08-10'), lever: 'Presse', channel: 'L\'Equipe Magazine', objective: 'Notoriété', status: 'Terminée', roas: 1.2, ca_add: 18000, spend: 15000, reach: 1000000, clicks: 0 },
+    { id: 'C013', brand: 'La Prairie Gourmande', product: 'Crème Dessert Chocolat', start: new Date('2024-10-15'), end: new Date('2024-11-15'), lever: 'TV', channel: 'France 2', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 280000, reach: 12000000, clicks: 0 },
+    { id: 'C014', brand: 'Gamme Végétale', product: 'Yaourt Coco', start: new Date('2024-08-01'), end: new Date('2024-08-31'), lever: 'Digital', channel: 'TikTok', objective: 'Engagement', status: 'En cours', roas: 4.5, ca_add: 90000, spend: 20000, reach: 2200000, clicks: 50000 },
+    { id: 'C015', brand: 'La Prairie Gourmande', product: 'Toute la gamme', start: new Date('2024-12-01'), end: new Date('2024-12-24'), lever: 'Radio', channel: 'RTL', objective: 'Promotion Noël', status: 'Planifiée', roas: null, ca_add: null, spend: 75000, reach: 5000000, clicks: 0 },
   ],
   USA: [
     { id: 'CUSA1', brand: 'La Prairie Gourmande', product: 'Grand Pot 450g', start: new Date('2024-07-15'), end: new Date('2024-08-15'), lever: 'Social', channel: 'TikTok', objective: 'Engagement', status: 'En cours', roas: 3.1, ca_add: 120500, spend: 38871, reach: 2800000, clicks: 25000 },
@@ -27,6 +33,8 @@ export const campaignDataByCountry = {
     { id: 'CUSA8', brand: 'Gamme Skyr', product: 'Gamme Skyr', start: new Date('2024-10-01'), end: new Date('2024-10-31'), lever: 'Radio', channel: 'iHeartRadio', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 150000, reach: 25000000, clicks: 0 },
     { id: 'CUSA9', brand: 'La Prairie Gourmande', product: 'Yaourt Grec', start: new Date('2024-03-01'), end: new Date('2024-03-31'), lever: 'TV', channel: 'NBC', objective: 'Notoriété', status: 'Terminée', roas: 3.9, ca_add: 975000, spend: 250000, reach: 35000000, clicks: 0 },
     { id: 'CUSA10', brand: 'Gamme Végétale', product: 'Dessert Coco', start: new Date('2024-12-01'), end: new Date('2024-12-24'), lever: 'Social', channel: 'Facebook', objective: 'Promotion', status: 'Planifiée', roas: null, ca_add: null, spend: 75000, reach: 10000000, clicks: 150000 },
+    { id: 'CUSA11', brand: 'Gamme Bio', product: 'Yaourt Bio Myrtille', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'Digital', channel: 'Youtube', objective: 'Conversion', status: 'Planifiée', roas: null, ca_add: null, spend: 80000, reach: 7000000, clicks: 110000 },
+    { id: 'CUSA12', brand: 'La Prairie Gourmande', product: 'Pack Famille', start: new Date('2024-06-01'), end: new Date('2024-06-30'), lever: 'TV', channel: 'FOX', objective: 'Notoriété', status: 'Terminée', roas: 3.2, ca_add: 800000, spend: 250000, reach: 30000000, clicks: 0 },
   ],
   Japan: [
      { id: 'CJAP1', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'TV', channel: 'Fuji TV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 660000, reach: 24000000, clicks: 0 },
@@ -39,6 +47,8 @@ export const campaignDataByCountry = {
      { id: 'CJAP8', brand: 'Gamme Skyr', product: 'Gamme Skyr', start: new Date('2024-11-05'), end: new Date('2024-12-05'), lever: 'Digital', channel: 'AbemaTV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 60000, reach: 8000000, clicks: 0 },
      { id: 'CJAP9', brand: 'Gamme Bio', product: 'Yaourt Bio Nature', start: new Date('2024-01-10'), end: new Date('2024-02-10'), lever: 'Presse', channel: 'Asahi Shimbun', objective: 'Considération', status: 'Terminée', roas: 1.8, ca_add: 25000, spend: 13888, reach: 5000000, clicks: 0 },
      { id: 'CJAP10', brand: 'La Prairie Gourmande', product: 'Gamme complète', start: new Date('2025-01-01'), end: new Date('2025-01-31'), lever: 'TV', channel: 'TV Asahi', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 750000, reach: 25000000, clicks: 0 },
+     { id: 'CJAP11', brand: 'Gamme Skyr', product: 'Skyr Pêche', start: new Date('2024-05-01'), end: new Date('2024-05-31'), lever: 'Social', channel: 'Facebook', objective: 'Conversion', status: 'Terminée', roas: 3.9, ca_add: 62000, spend: 15897, reach: 4000000, clicks: 75000 },
+     { id: 'CJAP12', brand: 'Gamme Végétale', product: 'Dessert Amande', start: new Date('2024-12-01'), end: new Date('2024-12-31'), lever: 'Affichage', channel: 'Shibuya Crossing', objective: 'Lancement', status: 'Planifiée', roas: null, ca_add: null, spend: 150000, reach: 50000000, clicks: 0 },
   ]
 };
 
@@ -196,7 +206,18 @@ export const mmmData = {
     },
     Japan: {
         's1-2025': { baseline: 180000000, contributions: { TV: 90000000, 'Retail Media': 40000000, Social: 20000000 }, investments: { TV: 30000000, 'Retail Media': 10000000, Social: 5000000 } },
+        's2-2024': { baseline: 170000000, contributions: { TV: 85000000, 'Retail Media': 35000000, Social: 18000000, 'Digital': 12000000 }, investments: { TV: 28000000, 'Retail Media': 9000000, Social: 4500000, 'Digital': 4000000 } },
     },
+    simulation: {
+        labels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        datasets: [
+            { id: 'tv', name: 'TV', color: '#0ea5e9', maxBudget: 100, initialBudget: 50, values: [0, 15, 28, 38, 45, 50, 53, 55, 56, 57, 57.5] },
+            { id: 'social', name: 'Social', color: '#334155', maxBudget: 150, initialBudget: 75, values: [0, 20, 35, 48, 58, 65, 70, 73, 75, 76, 76.5] },
+            { id: 'sea', name: 'SEA', color: '#22c55e', maxBudget: 100, initialBudget: 25, values: [0, 25, 45, 60, 70, 75, 78, 80, 81, 81.5, 82] },
+            { id: 'retail_media', name: 'Retail Media', color: '#f59e0b', maxBudget: 120, initialBudget: 40, values: [0, 22, 40, 55, 65, 72, 77, 80, 82, 83, 83.5] },
+            { id: 'presse', name: 'Presse', color: '#ef4444', maxBudget: 50, initialBudget: 10, values: [0, 8, 15, 21, 26, 30, 33, 35, 36, 36.5, 37] },
+        ]
+    }
 };
 
 
@@ -234,7 +255,7 @@ export function getDataSummary(category: DataCategory) {
         return summary;
     }
      if (category === 'mmm') {
-        const summary = Object.entries(mmmData).map(([country, periods]) => {
+        const summary = Object.entries(mmmData).filter(([key])=>key !== 'simulation').map(([country, periods]) => {
             const latestPeriod = Object.keys(periods).sort().reverse()[0];
             const data = periods[latestPeriod as keyof typeof periods];
             const totalInvestment = Object.values(data.investments).reduce((a, b) => a + b, 0);
