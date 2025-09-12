@@ -15,53 +15,66 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, Palette, Loader2, UploadCloud, FileImage, Wand2 } from "lucide-react";
 
-const platforms = ["Facebook", "Instagram", "Google Ads", "TikTok", "LinkedIn"];
-const formats = ["PNG", "JPEG", "SVG"];
+// Helper for client-side FileList schema
+const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional();
 
-// Conditionally define schema for client-side FileList
-const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList);
+const promptExamples = [
+    "Photo réaliste d'un yaourt aux fruits rouges sur une table en bois rustique, baigné d'une douce lumière matinale.",
+    "Visuel de yaourt Skyr sur fond uni et moderne, mettant en avant la texture épaisse et riche, style épuré.",
+    "Image publicitaire dynamique d'une famille heureuse partageant un petit-déjeuner sain avec des yaourts bio.",
+    "Composition artistique et colorée avec des fruits frais et des pots de yaourt, vue de dessus (flat lay)."
+];
 
-const generationSchema = z.object({
+const targetChannels = [
+    { id: 'instagram_post', label: 'Post Instagram (Carré)' },
+    { id: 'facebook_story', label: 'Story Facebook (Vertical)' },
+    { id: 'web_banner', label: 'Bannière Web (Large)' },
+];
+
+const briefSchema = z.object({
   prompt: z.string().min(10, { message: "Veuillez entrer une description d'au moins 10 caractères." }),
-  inspirationFile: fileListSchema.optional(),
+  inspirationFile: fileListSchema,
+  logoFile: fileListSchema,
+  guidelinesFile: fileListSchema,
 });
 
-const adaptationSchema = z.object({
-    logoFile: fileListSchema.optional(),
-    outputFormat: z.enum(["PNG", "JPEG", "SVG"]),
-    targetPlatform: z.string().min(1, { message: "Veuillez choisir une plateforme."}),
-});
-
-type GenerationFormValues = z.infer<typeof generationSchema>;
-type AdaptationFormValues = z.infer<typeof adaptationSchema>;
-
+type BriefFormValues = z.infer<typeof briefSchema>;
 
 export default function CreativeStudio() {
   const { toast } = useToast();
-  const [generationState, setGenerationState] = useState({
-    isLoading: false,
-    imageUrl: "",
-    adaptedContent: "",
-  });
-  const [adaptationLoading, setAdaptationLoading] = useState(false);
-  const [inspirationFilePreview, setInspirationFilePreview] = useState<string | null>(null);
-  const [logoFilePreview, setLogoFilePreview] = useState<string | null>(null);
+  const [baseImage, setBaseImage] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [adaptations, setAdaptations] = useState<Record<string, { imageUrl: string; text: string; isLoading: boolean }>>({});
+  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
+  const [previews, setPreviews] = useState({ inspiration: null, logo: null, guidelines: null });
 
-  const generationForm = useForm<GenerationFormValues>({
-    resolver: zodResolver(generationSchema),
+  const briefForm = useForm<BriefFormValues>({
+    resolver: zodResolver(briefSchema),
     defaultValues: { prompt: "" },
   });
 
-  const adaptationForm = useForm<AdaptationFormValues>({
-    resolver: zodResolver(adaptationSchema),
-    defaultValues: { outputFormat: "PNG" },
-  });
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews, formField: any) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPreviews(p => ({ ...p, [fieldName]: event.target?.result as any }));
+      };
+      reader.readAsDataURL(file);
+      formField.onChange(e.target.files);
+    } else {
+      setPreviews(p => ({ ...p, [fieldName]: null }));
+      formField.onChange(null);
+    }
+  };
 
-  const handleGeneration: SubmitHandler<GenerationFormValues> = async (data) => {
-    setGenerationState({ isLoading: true, imageUrl: "", adaptedContent: "" });
+  const handleBriefSubmit: SubmitHandler<BriefFormValues> = async (data) => {
+    setIsGenerating(true);
+    setBaseImage(null);
+    setAdaptations({});
     try {
       let finalPrompt = data.prompt;
       const file = data.inspirationFile?.[0];
@@ -76,258 +89,174 @@ export default function CreativeStudio() {
       }
 
       const imageResponse = await generateMarketingImage({ prompt: finalPrompt });
-      setGenerationState((s) => ({ ...s, imageUrl: imageResponse.imageUrl }));
+      setBaseImage(imageResponse.imageUrl);
+      toast({ title: "Image de base générée !", description: "Vous pouvez maintenant l'adapter aux différents canaux." });
     } catch (error) {
       console.error("Image generation error:", error);
       toast({ variant: "destructive", title: "Erreur de Génération", description: "Impossible de générer l'image. Veuillez réessayer." });
     } finally {
-      setGenerationState((s) => ({ ...s, isLoading: false }));
+      setIsGenerating(false);
     }
   };
-  
-  const handleAdaptation: SubmitHandler<AdaptationFormValues> = async (data) => {
-    if (!generationState.imageUrl) {
-        toast({ variant: "destructive", title: "Erreur", description: "Veuillez d'abord générer une image." });
+
+  const handleAdaptation = async () => {
+    const logoFile = briefForm.getValues("logoFile")?.[0];
+    if (!baseImage || !logoFile) {
+        toast({ variant: "destructive", title: "Éléments manquants", description: "Veuillez générer une image de base et fournir un logo." });
         return;
     }
-    setAdaptationLoading(true);
-    try {
-        const logoFile = data.logoFile?.[0];
-        let logoDataUri = "";
-        if (logoFile) {
-            logoDataUri = await fileToDataUri(logoFile);
-        } else {
-             toast({ variant: "destructive", title: "Logo manquant", description: "Veuillez fournir un logo pour l'adaptation." });
-             setAdaptationLoading(false);
-             return;
-        }
-
-        const response = await adaptCreativeContentForPlatform({
-            creativeContent: generationState.imageUrl,
-            targetPlatform: data.targetPlatform,
-            logoDataUri: logoDataUri,
-            outputFormat: data.outputFormat,
-        });
-        setGenerationState(s => ({ ...s, adaptedContent: response.adaptedContent }));
-
-    } catch (error) {
-        console.error("Content adaptation error:", error);
-        toast({ variant: "destructive", title: "Erreur d'Adaptation", description: "Impossible d'adapter le contenu. Veuillez réessayer." });
-    } finally {
-        setAdaptationLoading(false);
+    if(selectedChannels.length === 0) {
+        toast({ variant: "destructive", title: "Aucun canal sélectionné", description: "Veuillez choisir au moins un format à générer." });
+        return;
     }
-  }
+
+    const logoDataUri = await fileToDataUri(logoFile);
+    const guidelinesFile = briefForm.getValues("guidelinesFile")?.[0];
+    let brandGuidelinesDataUri: string | undefined = undefined;
+    if (guidelinesFile) {
+        brandGuidelinesDataUri = await fileToDataUri(guidelinesFile);
+    }
+
+    // Set loading state for selected channels
+    const initialAdaptations: Record<string, { imageUrl: string; text: string; isLoading: boolean }> = {};
+    selectedChannels.forEach(channelId => {
+        initialAdaptations[channelId] = { imageUrl: "", text: "", isLoading: true };
+    });
+    setAdaptations(initialAdaptations);
+
+    // Trigger all adaptations in parallel
+    selectedChannels.forEach(async (channelId) => {
+        const channelLabel = targetChannels.find(c => c.id === channelId)?.label || channelId;
+        try {
+            const response = await adaptCreativeContentForPlatform({
+                baseImage,
+                logoDataUri,
+                brandGuidelinesDataUri,
+                targetPlatform: channelLabel,
+            });
+            setAdaptations(prev => ({
+                ...prev,
+                [channelId]: { imageUrl: response.adaptedImageUrl, text: response.adaptedText, isLoading: false }
+            }));
+        } catch (error) {
+            console.error(`Adaptation error for ${channelLabel}:`, error);
+            toast({ variant: "destructive", title: `Erreur d'adaptation pour ${channelLabel}`, description: "Veuillez réessayer." });
+            setAdaptations(prev => ({ ...prev, [channelId]: { ...prev[channelId], isLoading: false } }));
+        }
+    });
+  };
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-5">
       <div className="space-y-8 xl:col-span-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2 text-2xl">
-              <Sparkles className="h-6 w-6 text-accent" />
-              1. Générer une Image
-            </CardTitle>
-            <CardDescription>
-              Décrivez l'image que vous souhaitez créer ou inspirez l'IA avec un fichier.
-            </CardDescription>
+            <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Sparkles className="h-6 w-6 text-accent" />1. Brief Créatif</CardTitle>
+            <CardDescription>Définissez le visuel, l'inspiration et les ressources de votre marque.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...generationForm}>
-              <form onSubmit={generationForm.handleSubmit(handleGeneration)} className="space-y-6">
+            <Form {...briefForm}>
+              <form onSubmit={briefForm.handleSubmit(handleBriefSubmit)} className="space-y-6">
                 <FormField
-                  control={generationForm.control}
+                  control={briefForm.control}
                   name="prompt"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description (Prompt)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={5}
-                          placeholder="Ex: Photo réaliste d'un yaourt aux fruits rouges sur une table en bois, avec une lumière matinale douce..."
-                        />
-                      </FormControl>
+                      <FormLabel>Décrivez l'image souhaitée</FormLabel>
+                      <FormControl><Textarea {...field} rows={4} placeholder="Ex: Photo réaliste d'un yaourt aux fruits rouges sur une table en bois..." /></FormControl>
                       <FormMessage />
+                      <div className="text-xs text-muted-foreground pt-2">Exemples:
+                        <ul className="list-disc pl-5">
+                           {promptExamples.slice(0,2).map(ex => <li key={ex}>{ex}</li>)}
+                        </ul>
+                      </div>
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={generationForm.control}
-                  name="inspirationFile"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fichier d'inspiration (optionnel)</FormLabel>
-                      <FormControl>
-                        <div className="relative mt-2 flex justify-center rounded-lg border-2 border-dashed border-border px-6 py-10 hover:border-primary">
-                          <div className="text-center">
-                            {inspirationFilePreview ? (
-                                <Image src={inspirationFilePreview} alt="Preview" width={80} height={80} className="mx-auto h-20 w-20 rounded-md object-cover" />
-                            ) : (
-                                <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-                            )}
-                            <div className="mt-4 flex text-sm leading-6 text-muted-foreground">
-                              <label htmlFor="inspiration-file-upload" className="relative cursor-pointer rounded-md font-semibold text-accent focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:text-accent/80">
-                                <span>Chargez un fichier</span>
-                                <Input {...field} id="inspiration-file-upload" type="file" className="sr-only" value={undefined} onChange={e => {
-                                    field.onChange(e.target.files);
-                                    if(e.target.files?.[0]) {
-                                        setInspirationFilePreview(URL.createObjectURL(e.target.files[0]));
-                                    } else {
-                                        setInspirationFilePreview(null);
-                                    }
-                                }} />
-                              </label>
-                              <p className="pl-1">ou glissez-déposez</p>
-                            </div>
-                            <p className="text-xs leading-5 text-muted-foreground">PNG, JPG, GIF jusqu'à 10Mo</p>
-                          </div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={generationState.isLoading}>
-                  {generationState.isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                  Générer l'image
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField control={briefForm.control} name="inspirationFile" render={({ field }) => ( <FormItem><FormLabel>Inspiration</FormLabel><FormControl><Input type="file" onChange={e => handleFileChange(e, 'inspiration', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="logoFile" render={({ field }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" onChange={e => handleFileChange(e, 'logo', field)}/></FormControl></FormItem> )} />
+                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field }) => ( <FormItem><FormLabel>Charte</FormLabel><FormControl><Input type="file" onChange={e => handleFileChange(e, 'guidelines', field)}/></FormControl></FormItem> )} />
+                </div>
+                 <div className="flex justify-center gap-4">
+                    {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                    {previews.logo && <Image src={previews.logo} alt="Logo" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                    {previews.guidelines && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isGenerating}>
+                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                  Générer l'Image de Base
                 </Button>
               </form>
             </Form>
           </CardContent>
-        </Card>
-
-        <Card className={!generationState.imageUrl ? 'opacity-50' : ''}>
-            <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2 text-2xl">
-                    <Wand2 className="h-6 w-6 text-accent" />
-                    2. Adapter le Contenu
-                </CardTitle>
-                <CardDescription>
-                    Optimisez votre visuel pour une plateforme spécifique et ajoutez votre logo.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...adaptationForm}>
-                    <form onSubmit={adaptationForm.handleSubmit(handleAdaptation)} className="space-y-6">
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <FormField
-                            control={adaptationForm.control}
-                            name="targetPlatform"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Plateforme</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!generationState.imageUrl}>
-                                    <FormControl>
-                                    <SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {platforms.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={adaptationForm.control}
-                            name="outputFormat"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Format</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!generationState.imageUrl}>
-                                    <FormControl>
-                                    <SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {formats.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        </div>
-                        <FormField
-                            control={adaptationForm.control}
-                            name="logoFile"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Importer un logo</FormLabel>
-                                <FormControl>
-                                    <div className={`mt-2 flex items-center gap-4 rounded-lg border-2 border-dashed p-4 ${!generationState.imageUrl ? 'cursor-not-allowed' : 'hover:border-primary'}`}>
-                                        {logoFilePreview ? (
-                                            <Image src={logoFilePreview} alt="Logo Preview" width={40} height={40} className="h-10 w-10 rounded-md object-contain" />
-                                        ) : (
-                                            <FileImage className="h-10 w-10 text-muted-foreground" />
-                                        )}
-                                        <div className="text-sm text-muted-foreground">
-                                            <label htmlFor="logo-file-upload" className={`relative font-semibold ${!generationState.imageUrl ? 'text-muted-foreground' : 'cursor-pointer text-accent hover:text-accent/80'}`}>
-                                                <span>{logoFilePreview ? 'Changer le logo' : 'Choisir un fichier'}</span>
-                                                <Input {...field} id="logo-file-upload" type="file" className="sr-only" value={undefined} disabled={!generationState.imageUrl} onChange={e => {
-                                                    field.onChange(e.target.files);
-                                                    if(e.target.files?.[0]) {
-                                                        setLogoFilePreview(URL.createObjectURL(e.target.files[0]));
-                                                    } else {
-                                                        setLogoFilePreview(null);
-                                                    }
-                                                }}/>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full" disabled={!generationState.imageUrl || adaptationLoading}>
-                           {adaptationLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                           Adapter le contenu
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
         </Card>
       </div>
 
       <div className="xl:col-span-3">
         <Card className="sticky top-24">
           <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2 text-2xl">
-              <Palette className="h-6 w-6 text-accent" />
-              Résultat
-            </CardTitle>
-            <CardDescription>
-                Votre création générée par l'IA apparaîtra ici.
-            </CardDescription>
+            <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Palette className="h-6 w-6 text-accent" />2. Adaptation & Finalisation</CardTitle>
+            <CardDescription>Générez les déclinaisons pour vos canaux de diffusion.</CardDescription>
           </CardHeader>
           <CardContent className="min-h-[400px] lg:min-h-[600px]">
-            <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-background/50 p-4">
-              {generationState.isLoading ? (
-                <div className="flex flex-col items-center gap-4 text-center text-muted-foreground">
-                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                  <p className="font-semibold">L'artiste IA dessine votre image...</p>
-                  <p className="text-sm">Ce processus peut prendre quelques instants.</p>
+            {isGenerating ? (
+                <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" /><p className="mt-4 font-semibold">Génération de l'image de base...</p>
                 </div>
-              ) : generationState.imageUrl ? (
-                <div className="flex w-full flex-col gap-6">
-                    <div className="relative aspect-square w-full">
-                        <Image src={generationState.imageUrl} alt="Generated creative" fill className="rounded-lg object-cover shadow-lg" />
-                    </div>
-                    {generationState.adaptedContent && (
-                        <div className="rounded-lg border bg-background p-4">
-                            <h4 className="font-headline text-lg font-semibold">Contenu Adapté :</h4>
-                            <p className="mt-2 text-sm text-foreground/80">{generationState.adaptedContent}</p>
+            ) : !baseImage ? (
+                <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-center text-muted-foreground">
+                    <Palette className="mx-auto h-12 w-12" /><p className="mt-4 font-semibold">En attente du brief créatif</p><p className="text-sm">L'image de base générée apparaîtra ici.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <h3 className="font-semibold">Image de Base</h3>
+                        <Image src={baseImage} alt="Image de base générée" width={400} height={400} className="rounded-lg object-cover shadow-lg" />
+                        
+                        <h3 className="font-semibold pt-4">Choisir les canaux</h3>
+                        <div className="space-y-2">
+                            {targetChannels.map((channel) => (
+                                <div key={channel.id} className="flex items-center space-x-2">
+                                    <Checkbox 
+                                        id={channel.id} 
+                                        onCheckedChange={(checked) => {
+                                            setSelectedChannels(prev => checked ? [...prev, channel.id] : prev.filter(id => id !== channel.id));
+                                        }}
+                                    />
+                                    <label htmlFor={channel.id} className="text-sm font-medium leading-none">{channel.label}</label>
+                                </div>
+                            ))}
                         </div>
-                    )}
+                        <Button onClick={handleAdaptation} className="w-full" disabled={Object.values(adaptations).some(a => a.isLoading)}>
+                            <Wand2 className="mr-2 h-4 w-4" /> Générer les Déclinaisons
+                        </Button>
+                    </div>
+                    <div className="space-y-4">
+                         <h3 className="font-semibold">Déclinaisons</h3>
+                         <div className="space-y-6">
+                            {Object.keys(adaptations).length === 0 && <p className="text-sm text-muted-foreground">Les déclinaisons apparaîtront ici.</p>}
+                            {targetChannels.filter(c => adaptations[c.id]).map(channel => {
+                                const adaptation = adaptations[channel.id];
+                                return (
+                                    <div key={channel.id} className="space-y-2">
+                                        <h4 className="font-medium text-sm">{channel.label}</h4>
+                                        {adaptation.isLoading ? (
+                                            <div className="flex items-center justify-center aspect-square w-full rounded-lg bg-muted"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                                        ) : adaptation.imageUrl ? (
+                                            <>
+                                                <Image src={adaptation.imageUrl} alt={`Adaptation pour ${channel.label}`} width={300} height={300} className="rounded-lg object-contain border" />
+                                                <p className="text-xs text-muted-foreground p-2 bg-muted rounded-md">{adaptation.text}</p>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                )
+                            })}
+                         </div>
+                    </div>
                 </div>
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <Palette className="mx-auto h-12 w-12" />
-                  <p className="mt-4 font-semibold">En attente d'une description</p>
-                  <p className="text-sm">Le résultat de votre création apparaîtra ici.</p>
-                </div>
-              )}
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
