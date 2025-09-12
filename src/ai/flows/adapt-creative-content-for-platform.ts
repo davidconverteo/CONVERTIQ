@@ -53,12 +53,27 @@ const adaptationPrompt = ai.definePrompt({
     `,
 });
 
-const getAspectRatio = (platform: string) => {
-    if (platform.includes('Carré')) return '1:1';
-    if (platform.includes('Vertical')) return '9:16';
-    if (platform.includes('Large')) return '16:9';
-    return '1:1';
+const getAspectRatioPrompt = (platform: string): string => {
+    // Regex to find dimensions like (1080x1920) or (Carré) or (Large)
+    const dimensionRegex = /\((\d{2,}x\d{2,})\)/;
+    const formatRegex = /\(([^)]+)\)/;
+    
+    const dimensionMatch = platform.match(dimensionRegex);
+    if (dimensionMatch && dimensionMatch[1]) {
+        return `Recrop the image to a ${dimensionMatch[1]} aspect ratio.`;
+    }
+
+    const formatMatch = platform.match(formatRegex);
+    if (formatMatch && formatMatch[1]) {
+        const format = formatMatch[1].toLowerCase();
+        if (format.includes('carré') || format.includes('square')) return 'Recrop the image to a 1:1 aspect ratio.';
+        if (format.includes('vertical') || format.includes('story')) return 'Recrop the image to a 9:16 aspect ratio.';
+        if (format.includes('large') || format.includes('leaderboard')) return 'Recrop the image to a 16:9 aspect ratio.';
+    }
+
+    return ''; // No specific aspect ratio found
 };
+
 
 const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   {
@@ -72,7 +87,7 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
 
     // Step 2: Generate the adapted image.
     const imagePromptParts: (object)[] = [
-      { text: `Adapt this image for ${input.targetPlatform}. Recrop it to a ${getAspectRatio(input.targetPlatform)} aspect ratio.`},
+      { text: `Adapt this image for ${input.targetPlatform}. ${getAspectRatioPrompt(input.targetPlatform)}`},
       { media: { url: input.baseImage } },
     ];
     
@@ -112,5 +127,3 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
 export async function adaptCreativeContentForPlatform(input: AdaptCreativeContentForPlatformInput): Promise<AdaptCreativeContentForPlatformOutput> {
   return adaptCreativeContentForPlatformFlow(input);
 }
-
-    
