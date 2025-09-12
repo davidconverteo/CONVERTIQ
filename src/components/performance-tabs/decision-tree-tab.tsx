@@ -101,7 +101,7 @@ const CustomTreemapContent = (props: any) => {
           }}
         />
         {
-          width > 100 && height > 40 ? 
+          width > 50 && height > 25 ? 
           <text x={x + width / 2} y={y + height / 2 + 7} textAnchor="middle" fill="#fff" fontSize={14} className="font-semibold">
             {name}
           </text>
