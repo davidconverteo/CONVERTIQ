@@ -84,8 +84,8 @@ const generateTreeData = (filters: Filters) => {
 const COLORS = ['#8889DD', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D'];
 
 const CustomTreemapContent = (props: any) => {
-    const { root, depth, x, y, width, height, index, payload, rank, name } = props;
-  
+    const { root, depth, x, y, width, height, index, name } = props;
+    
     return (
       <g>
         <rect
@@ -100,13 +100,18 @@ const CustomTreemapContent = (props: any) => {
             strokeOpacity: 1 / (depth + 1e-10),
           }}
         />
-        {
-          width > 50 && height > 25 ? 
-          <text x={x + width / 2} y={y + height / 2 + 7} textAnchor="middle" fill="#fff" fontSize={14} className="font-semibold">
+        {depth === 1 && width > 30 && height > 30 ? (
+          <foreignObject x={x + 4} y={y + 4} width={width - 8} height={height - 8}>
+            <div className="w-full h-full text-white font-semibold text-xs flex items-center justify-center text-center overflow-hidden">
+                {name}
+            </div>
+          </foreignObject>
+        ) : null}
+         {depth > 1 && width > 50 && height > 25 ? (
+          <text x={x + width / 2} y={y + height / 2 + 5} textAnchor="middle" fill="#fff" fontSize={12} className="font-medium">
             {name}
           </text>
-          : null
-        }
+        ) : null}
       </g>
     );
 };
@@ -144,6 +149,7 @@ export default function DecisionTreeTab({ filters }: DecisionTreeTabProps) {
                         fill="hsl(var(--primary))"
                         aspectRatio={4 / 3}
                         content={<CustomTreemapContent />}
+                        isAnimationActive={false}
                     >
                       <Tooltip content={<CustomTooltipContent />} />
                     </Treemap>
