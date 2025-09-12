@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BrainCircuit, Send, X, Loader2 } from "lucide-react";
+import { Send, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { askChatbot } from "@/ai/flows/chatbot-flow";
 import Image from "next/image";
@@ -24,7 +24,8 @@ function ChatWindow({ isOpen, onToggle, messages, isLoading, input, setInput, ha
           <Card className="flex h-[70vh] max-h-[600px] flex-col shadow-2xl">
             <CardHeader className="flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <BrainCircuit className="h-5 w-5 text-primary" /> Assistant ConvertIQ
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain" />
+                Assistant ConvertIQ
               </CardTitle>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onToggle}>
                 <X className="h-4 w-4" />
@@ -94,7 +95,7 @@ export default function ChatbotTrigger() {
   const addWelcomeMessage = useCallback(() => {
     setMessages([
       {
-        text: "Bonjour ! Je suis l'assistant ConvertIQ. Comment puis-je vous aider ?",
+        text: "Bonjour ! Je suis l'assistant ConvertIQ. Posez-moi une question sur vos données (ex: 'Donne-moi un résumé des performances retail media').",
         sender: "ai",
       },
     ]);
@@ -125,7 +126,9 @@ export default function ChatbotTrigger() {
 
     try {
       const response = await askChatbot({ prompt: input });
-      const aiMessage: Message = { text: response.response, sender: "ai" };
+      // Handle cases where the tool returns structured data
+      const responseText = typeof response.response === 'object' ? JSON.stringify(response.response, null, 2) : response.response;
+      const aiMessage: Message = { text: responseText, sender: "ai" };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error("Chatbot error:", error);
@@ -148,7 +151,7 @@ export default function ChatbotTrigger() {
           'hover:bg-sidebar-accent/50'
         )}
       >
-        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain brightness-[10] contrast-[1.2]" />
+        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain brightness-0 invert" />
         <span>Assistant IA</span>
       </button>
       <ChatWindow 

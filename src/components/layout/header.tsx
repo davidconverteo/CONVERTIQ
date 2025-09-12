@@ -13,7 +13,7 @@ import ChatbotTrigger from '@/components/chatbot';
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Cockpit Marketing', subtitle: "Vue d'ensemble de votre performance." },
   '/creative-studio': { title: 'Studio Créatif IA', subtitle: "Générez et adaptez vos visuels de campagne." },
-  '/media-brand': { title: 'Media Brand', subtitle: "Analyse de la performance de vos campagnes." },
+  '/brand-media': { title: 'Brand Media', subtitle: "Analyse de la performance de vos campagnes." },
   '/retail-media': { title: 'Retail Media', subtitle: "Performance de vos activations e-commerce." },
   '/mmm': { title: 'Marketing Mix Modeling', subtitle: "Analysez la contribution de vos leviers." },
   '/performances': { title: 'Performances Commerciales', subtitle: "Analysez vos ventes sur tous les canaux." },
