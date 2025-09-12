@@ -62,7 +62,6 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   async (input) => {
     const aspectRatio = getAspectRatio(input.targetPlatform);
 
-    // Build the prompt for the image generation model.
     let textPrompt = `Expand this image to perfectly fit the target aspect ratio of ${aspectRatio || 'the target platform'}. Generate new, coherent content at the edges to fill the space. Do not crop, distort, or letterbox the original image. Maintain the original style.`;
     
     const imagePromptParts: (object)[] = [
@@ -77,10 +76,10 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     }
 
     const { media } = await ai.generate({
-      model: 'googleai/imagen-4.0-fast-generate-001',
+      model: 'googleai/gemini-2.5-flash-image-preview',
       prompt: imagePromptParts,
       config: {
-        aspectRatio: aspectRatio,
+        responseModalities: ['TEXT', 'IMAGE'],
       },
     });
 
@@ -90,7 +89,7 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     
     return {
       adaptedImageUrl: media.url,
-      adaptedText: "", // Text generation is removed to focus on resizing.
+      adaptedText: "Déclinaison générée avec succès.",
     };
   }
 );
