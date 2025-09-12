@@ -235,7 +235,7 @@ export default function CreativeStudio() {
                          <div className="space-y-6">
                             {Object.keys(adaptations).length === 0 && <p className="text-sm text-muted-foreground">Les déclinaisons apparaîtront ici.</p>}
                             {targetChannels.filter(c => adaptations[c.id]).map(channel => {
-                                const adaptation = adaptations[channel.id];
+                                const adaptation = adaptations[c.id];
                                 return (
                                     <div key={channel.id} className="space-y-2">
                                         <h4 className="font-medium text-sm">{channel.label}</h4>
@@ -260,5 +260,3 @@ export default function CreativeStudio() {
     </div>
   );
 }
-
-    
