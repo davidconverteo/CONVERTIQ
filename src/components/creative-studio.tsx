@@ -21,6 +21,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, Palette, Loader2, Wand2, UploadCloud } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
 
 const fileListSchema = typeof window === 'undefined' ? z.any() : z.instanceof(FileList).optional();
 
@@ -31,11 +33,39 @@ const promptExamples = [
     "Composition artistique et colorée avec des fruits frais et des pots de yaourt, vue de dessus (flat lay)."
 ];
 
-const targetChannels = [
-    { id: 'instagram_post', label: 'Post Instagram (Carré)' },
-    { id: 'facebook_story', label: 'Story Facebook (Vertical)' },
-    { id: 'web_banner', label: 'Bannière Web (Large)' },
+const targetChannelsByCategory = [
+    {
+        category: "Formats les plus courants",
+        channels: [
+            { id: 'rect_medium_300x250', label: 'Rectangle moyen (300x250)' },
+            { id: 'leaderboard_728x90', label: 'Classement (728x90)' },
+            { id: 'rect_large_336x280', label: 'Grand rectangle (336x280)' },
+            { id: 'skyscraper_wide_160x600', label: 'Large gratte-ciel (160x600)' },
+            { id: 'mobile_leaderboard_320x50', label: 'Classement mobile (320x50)' },
+        ]
+    },
+    {
+        category: "Bannières Google Ads",
+        channels: [
+            { id: 'square_250x250', label: 'Carré (250x250)' },
+            { id: 'leaderboard_large_970x90', label: 'Grand classement (970x90)' },
+            { id: 'half_page_300x600', label: 'Demi-page (300x600)' },
+            { id: 'skyscraper_120x600', label: 'Gratte-ciel (120x600)' },
+            { id: 'small_square_200x200', label: 'Petit carré (200x200)' },
+        ]
+    },
+    {
+        category: "Réseaux Sociaux",
+        channels: [
+            { id: 'instagram_square_1080x1080', label: 'Post Instagram/Facebook (1080x1080)' },
+            { id: 'instagram_story_1080x1920', label: 'Story Instagram/Facebook (1080x1920)' },
+            { id: 'facebook_feed_1200x628', label: 'Image de flux Facebook (1200x628)' },
+        ]
+    },
 ];
+
+const allChannels = targetChannelsByCategory.flatMap(c => c.channels);
+
 
 const briefSchema = z.object({
   prompt: z.string().optional(),
@@ -68,10 +98,10 @@ export default function CreativeStudio() {
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews, fieldOnChange: (files: FileList | null) => void) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews) => {
     const file = e.target.files?.[0];
-    fieldOnChange(e.target.files);
     if (file) {
+      briefForm.setValue(fieldName === 'inspiration' ? 'inspirationFile' : fieldName === 'logo' ? 'logoFile' : fieldName === 'guidelines' ? 'guidelinesFile' : 'baseImageFile', e.target.files);
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result as string;
@@ -82,10 +112,11 @@ export default function CreativeStudio() {
       };
       reader.readAsDataURL(file);
     } else {
+      briefForm.setValue(fieldName === 'inspiration' ? 'inspirationFile' : fieldName === 'logo' ? 'logoFile' : fieldName === 'guidelines' ? 'guidelinesFile' : 'baseImageFile', undefined);
       setPreviews(p => ({ ...p, [fieldName]: null }));
     }
   };
-
+  
   const handleBriefSubmit: SubmitHandler<BriefFormValues> = async (data) => {
     setIsGenerating(true);
     setBaseImage(null);
@@ -118,8 +149,8 @@ export default function CreativeStudio() {
             }
 
         } else { // "generate" mode
-            if (!finalPrompt) {
-                 toast({ variant: "destructive", title: "Aucun prompt", description: "Veuillez décrire l'image que vous souhaitez générer." });
+            if (!finalPrompt && !data.inspirationFile?.[0]) {
+                 toast({ variant: "destructive", title: "Aucun prompt ou inspiration", description: "Veuillez décrire l'image ou fournir une inspiration." });
                  setIsGenerating(false);
                  return;
             }
@@ -134,6 +165,7 @@ export default function CreativeStudio() {
                 });
                 finalPrompt = promptResponse.prompt;
                 briefForm.setValue('prompt', finalPrompt);
+                toast({ title: "Prompt amélioré", description: "Le nouveau prompt est prêt pour la génération." });
             }
 
             toast({ title: "Génération en cours...", description: "Création de l'image de base, veuillez patienter." });
@@ -172,7 +204,7 @@ export default function CreativeStudio() {
     setAdaptations(initialAdaptations);
 
     selectedChannels.forEach(async (channelId) => {
-        const channelLabel = targetChannels.find(c => c.id === channelId)?.label || channelId;
+        const channelLabel = allChannels.find(c => c.id === channelId)?.label || channelId;
         try {
             const response = await adaptCreativeContentForPlatform({
                 baseImage,
@@ -235,10 +267,9 @@ export default function CreativeStudio() {
                                 <FormLabel>Uploader votre image</FormLabel>
                                 <FormControl>
                                     <Input
-                                        {...fieldProps}
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => handleFileChange(e, 'baseImage', onChange)}
+                                        onChange={(e) => handleFileChange(e, 'baseImage')}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -265,15 +296,14 @@ export default function CreativeStudio() {
                          <FormField
                           control={briefForm.control}
                           name="inspirationFile"
-                          render={({ field: { onChange, value, ...rest } }) => (
+                          render={() => (
                               <FormItem>
                                   <FormLabel>Inspiration (Optionnel)</FormLabel>
                                   <FormControl>
                                       <Input
                                           type="file"
                                           accept="image/*"
-                                          onChange={(e) => handleFileChange(e, 'inspiration', onChange)}
-                                          {...rest}
+                                          onChange={(e) => handleFileChange(e, 'inspiration')}
                                       />
                                   </FormControl>
                                   <FormMessage />
@@ -285,15 +315,14 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="logoFile"
-                      render={({ field: { onChange, value, ...rest } }) => (
+                      render={() => (
                         <FormItem>
                           <FormLabel>Logo (Optionnel)</FormLabel>
                           <FormControl>
                             <Input
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) => handleFileChange(e, 'logo', onChange)}
-                                {...rest}
+                                onChange={(e) => handleFileChange(e, 'logo')}
                             />
                           </FormControl>
                           <FormMessage />
@@ -303,15 +332,14 @@ export default function CreativeStudio() {
                     <FormField
                       control={briefForm.control}
                       name="guidelinesFile"
-                      render={({ field: { onChange, value, ...rest } }) => (
+                      render={() => (
                         <FormItem>
                           <FormLabel>Charte Graphique (Optionnel)</FormLabel>
                           <FormControl>
                             <Input
                                 type="file"
                                 accept="image/*,application/pdf"
-                                onChange={(e) => handleFileChange(e, 'guidelines', onChange)}
-                                {...rest}
+                                onChange={(e) => handleFileChange(e, 'guidelines')}
                             />
                           </FormControl>
                           <FormMessage />
@@ -340,7 +368,7 @@ export default function CreativeStudio() {
         <Card className="sticky top-24">
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Palette className="h-6 w-6 text-accent" />2. Adaptation &amp; Finalisation</CardTitle>
-            <CardDescription>Générez les déclinaisons pour vos canaux de diffusion.</CardDescription>
+            <CardDescription>Générez les déclinaisons pour vos canaux de diffusion. C'est ici que vous pouvez éditer et valider vos visuels.</CardDescription>
           </CardHeader>
           <CardContent className="min-h-[400px] lg:min-h-[600px]">
             {isGenerating ? (
@@ -357,20 +385,31 @@ export default function CreativeStudio() {
                         <h3 className="font-semibold">Image Principale</h3>
                         <Image src={baseImage} alt="Image de base générée ou modifiée" width={400} height={400} className="rounded-lg object-cover shadow-lg" />
                         
-                        <h3 className="font-semibold pt-4">Choisir les canaux</h3>
-                        <div className="space-y-2">
-                            {targetChannels.map((channel) => (
-                                <div key={channel.id} className="flex items-center space-x-2">
-                                    <Checkbox 
-                                        id={channel.id} 
-                                        onCheckedChange={(checked) => {
-                                            setSelectedChannels(prev => checked ? [...prev, channel.id] : prev.filter(id => id !== channel.id));
-                                        }}
-                                    />
-                                    <label htmlFor={channel.id} className="text-sm font-medium leading-none">{channel.label}</label>
+                        <h3 className="font-semibold pt-4">Choisir les formats</h3>
+                        <Accordion type="multiple" className="w-full">
+                          {targetChannelsByCategory.map(category => (
+                            <AccordionItem value={category.category} key={category.category}>
+                              <AccordionTrigger>{category.category}</AccordionTrigger>
+                              <AccordionContent>
+                                <div className="space-y-2 pl-2">
+                                  {category.channels.map(channel => (
+                                    <div key={channel.id} className="flex items-center space-x-2">
+                                        <Checkbox 
+                                            id={channel.id} 
+                                            checked={selectedChannels.includes(channel.id)}
+                                            onCheckedChange={(checked) => {
+                                                setSelectedChannels(prev => checked ? [...prev, channel.id] : prev.filter(id => id !== channel.id));
+                                            }}
+                                        />
+                                        <label htmlFor={channel.id} className="text-sm font-medium leading-none">{channel.label}</label>
+                                    </div>
+                                  ))}
                                 </div>
-                            ))}
-                        </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+
                         <Button onClick={handleAdaptation} className="w-full" disabled={Object.values(adaptations).some(a => a.isLoading)}>
                             <Wand2 className="mr-2 h-4 w-4" /> Générer les Déclinaisons
                         </Button>
@@ -379,7 +418,7 @@ export default function CreativeStudio() {
                          <h3 className="font-semibold">Déclinaisons</h3>
                          <div className="space-y-6">
                             {Object.keys(adaptations).length === 0 && <p className="text-sm text-muted-foreground">Les déclinaisons apparaîtront ici.</p>}
-                            {targetChannels.filter(channel => adaptations[channel.id]).map(channel => {
+                            {allChannels.filter(channel => adaptations[channel.id]).map(channel => {
                                 const adaptation = adaptations[channel.id];
                                 return (
                                     <div key={channel.id} className="space-y-2">
@@ -405,5 +444,3 @@ export default function CreativeStudio() {
     </div>
   );
 }
-
-    
