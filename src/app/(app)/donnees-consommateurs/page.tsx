@@ -9,6 +9,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { Sparkles, TrendingUp, TrendingDown, Users, Repeat, HandCoins, Cake, Heart, Rocket, UserCheck, ShoppingBasket, Soup, Sun, Milk, Briefcase } from 'lucide-react';
 import { retailerOptions, brandOptions } from '@/services/filters-data';
+import { cn } from '@/lib/utils';
 
 type Filters = {
     retailer: string;
@@ -57,9 +58,27 @@ const generateDataForFilters = (filters: Filters) => {
     const cspData = [{ name: 'CSP+', value: random(40, 50, 'c1') }, { name: 'CSP-', value: random(25, 35, 'c2') }, { name: 'Inactifs', value: random(20, 30, 'c3') }];
     const foyerData = [{ name: 'Familles', value: random(50, 60, 'f1') }, { name: 'Couples', value: random(20, 25, 'f2') }, { name: 'Célibataires', value: random(15, 20, 'f3') }];
 
-    // --- Fidélité Data ---
+    // --- Fidélité & Mixité Data ---
     const loyaltyData = [{ name: 'Acheteurs Exclusifs', value: random(15, 20, 'l1') }, { name: 'Acheteurs Réguliers', value: random(30, 40, 'l2') }, { name: 'Acheteurs Occasionnels', value: random(45, 55, 'l3') }];
-    const mixityData = [{ name: 'Salades Traiteur', value: random(35, 45, 'm1') }, { name: 'Charcuterie', value: random(30, 40, 'm2') }, { name: 'Jus de Fruits Frais', value: random(25, 35, 'm3') }, { name: 'Viennoiserie', value: random(20, 30, 'm4') }];
+    const proximityCategories = ['Yaourt LPG', 'Salades Traiteur', 'Charcuterie', 'Jus Frais', 'Viennoiserie'];
+    const proximityMatrix = proximityCategories.map((cat1, i) => {
+        const row: { [key: string]: number | string } = { category: cat1 };
+        proximityCategories.forEach((cat2, j) => {
+            if (i === j) {
+                row[cat2] = 100;
+            } else {
+                const salt = `${cat1}-${cat2}`;
+                if (j < i) { // Ensure symmetry
+                    const reverseSalt = `${cat2}-${cat1}`;
+                    row[cat2] = random(10, 80, reverseSalt);
+                } else {
+                    row[cat2] = random(10, 80, salt);
+                }
+            }
+        });
+        return row;
+    });
+
 
     // --- Usages & Habitudes Data ---
     const momentData = [{ name: 'Petit-déjeuner', value: random(30, 40, 'u1') }, { name: 'Déjeuner (sur le pouce)', value: random(15, 20, 'u2') }, { name: 'Goûter', value: random(10, 15, 'u3') }, { name: 'Fin de repas (dessert)', value: random(40, 50, 'u4') }];
@@ -69,7 +88,7 @@ const generateDataForFilters = (filters: Filters) => {
         salesTree, kpis,
         gains, pertes, totalGains, totalPertes, dynamicsChartData,
         ageData, cspData, foyerData,
-        loyaltyData, mixityData,
+        loyaltyData, proximityMatrix,
         momentData, benefitData
     };
 };
@@ -137,18 +156,52 @@ const ProfileTab = ({ data }: { data: any }) => {
 };
 
 const LoyaltyTab = ({ data }: { data: any }) => {
-    const { loyaltyData, mixityData } = data;
+    const { loyaltyData, proximityMatrix } = data;
+    const proximityCategories = proximityMatrix.map((p: any) => p.category);
+
+    const getBgColor = (value: number) => {
+        if (value === 100) return 'bg-primary/80 text-primary-foreground';
+        const opacity = Math.max(10, Math.floor(value / 10) * 10);
+        return `bg-green-600/${opacity}`;
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><UserCheck />Matrice de Fidélité</CardTitle></CardHeader>
                 <CardContent><ResponsiveContainer width="100%" height={300}><BarChart data={loyaltyData} layout="vertical"><XAxis type="number" unit="%" /><YAxis type="category" dataKey="name" width={150} /><Tooltip formatter={(v: number) => `${v.toFixed(1)}%`} /><Bar dataKey="value" fill="hsl(var(--primary))" /></BarChart></ResponsiveContainer></CardContent>
             </Card>
-             <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingBasket />Top Catégories Co-achetées</CardTitle></CardHeader>
-                <Table><TableHeader><TableRow><TableHead>Catégorie</TableHead><TableHead className="text-right">% de paniers communs</TableHead></TableRow></TableHeader><TableBody>{mixityData.map((d: any) => <TableRow key={d.name}><TableCell>{d.name}</TableCell><TableCell className="text-right font-bold">{d.value.toFixed(1)}%</TableCell></TableRow>)}</TableBody></Table>
+             <Card className="lg:col-span-2">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><ShoppingBasket />Matrice de Proximité (Co-achat)</CardTitle>
+                    <CardDescription>Indice de 100 = corrélation parfaite. Plus la couleur est foncée, plus l'affinité est forte.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Catégorie</TableHead>
+                                {proximityCategories.map((cat: string) => <TableHead key={cat} className="text-center">{cat}</TableHead>)}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {proximityMatrix.map((row: any) => (
+                                <TableRow key={row.category}>
+                                    <TableCell className="font-bold">{row.category}</TableCell>
+                                    {proximityCategories.map((cat: string) => (
+                                        <TableCell key={`${row.category}-${cat}`} className="text-center p-0">
+                                             <div className={cn("m-1 rounded-md p-2 font-bold text-center", getBgColor(row[cat]))}>
+                                                {Math.round(row[cat])}
+                                            </div>
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
             </Card>
-            <Card><CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Synthèse & Recommandations IA</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">La part d'acheteurs **exclusifs est de {(loyaltyData.find((l: any) => l.name.includes('Exclusifs')).value).toFixed(0)}%**, ce qui est un bon signe de fidélité. Cependant, une grande partie de votre base est **occasionnelle**.</p><p className="text-sm text-muted-foreground mt-2">L'achat de **salades traiteur** est fortement corrélé à l'achat de vos produits. Cela indique un usage "repas rapide et sain".</p><p className="text-sm text-muted-foreground mt-2"><strong>Recommandation :</strong> Créez des offres promotionnelles croisées (cross-selling) avec le rayon traiteur pour renforcer l'association et augmenter la fréquence d'achat. Ciblez les acheteurs occasionnels avec des campagnes de fidélisation.</p></CardContent></Card>
+            <Card className="lg:col-span-3"><CardHeader className="flex-row items-center gap-2"><Sparkles className="h-5 w-5 text-accent" /><CardTitle>Synthèse & Recommandations IA</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">La part d'acheteurs **exclusifs est de {(loyaltyData.find((l: any) => l.name.includes('Exclusifs')).value).toFixed(0)}%**, ce qui est un bon signe de fidélité. Cependant, une grande partie de votre base est **occasionnelle**.</p><p className="text-sm text-muted-foreground mt-2">La matrice de proximité met en évidence une très forte affinité entre l'achat de vos **Yaourts LPG** et les **Salades Traiteur**. Cela indique un usage "repas rapide et sain". L'affinité avec les **Jus Frais** est également notable.</p><p className="text-sm text-muted-foreground mt-2"><strong>Recommandation :</strong> Créez des offres promotionnelles croisées (cross-selling) avec le rayon traiteur pour renforcer cette association et augmenter la fréquence d'achat. Ciblez les acheteurs occasionnels avec des campagnes de fidélisation basées sur ces affinités.</p></CardContent></Card>
         </div>
     );
 }
@@ -299,5 +352,3 @@ export default function ConsumerDataPage() {
         </div>
     );
 }
-
-    
