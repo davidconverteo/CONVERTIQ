@@ -17,7 +17,7 @@ const AdaptCreativeContentForPlatformInputSchema = z.object({
     .describe(
       "The base creative image to adapt, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
-  targetPlatform: z.string().describe('The target activation platform (e.g., "Post Instagram (Carré)", "Story Facebook (Vertical)", "Bannière Web (Large)").'),
+  targetPlatform: z.string().describe('The target activation platform (e.g., "Post Instagram (1080x1080)", "Story Facebook (1080x1920)", "Bannière Web (728x90)").'),
   logoDataUri: z
     .string()
     .optional()
@@ -40,38 +40,26 @@ const AdaptCreativeContentForPlatformOutputSchema = z.object({
 export type AdaptCreativeContentForPlatformOutput = z.infer<typeof AdaptCreativeContentForPlatformOutputSchema>;
 
 
-const adaptationPrompt = ai.definePrompt({
-    name: 'adaptationPrompt',
-    input: { schema: z.object({ platform: z.string() }) },
-    output: { schema: z.object({ text: z.string() }) },
-    prompt: `You are an expert social media marketer.
-    Generate a short, engaging marketing text to accompany the provided visual.
-    The post must be optimized for the specific target platform, adhering to its character limits and best practices.
-    The output must be ONLY the text for the post, nothing else.
-    
-    Target Platform: {{{platform}}}
-    `,
-});
+/**
+ * Generates an SVG shape mask as a data URI based on target dimensions.
+ * @param platform The target platform string, e.g., "Post Instagram (1080x1080)".
+ * @returns A data URI for the SVG mask, or null if no dimensions are found.
+ */
+const generateShapeMask = (platform: string): string | null => {
+    const dimensionRegex = /(\d{2,})x(\d{2,})/;
+    const match = platform.match(dimensionRegex);
 
-const getAspectRatioPrompt = (platform: string): string => {
-    // Regex to find dimensions like (1080x1920) or (Carré) or (Large)
-    const dimensionRegex = /\((\d{2,}x\d{2,})\)/;
-    const formatRegex = /\(([^)]+)\)/;
-    
-    const dimensionMatch = platform.match(dimensionRegex);
-    if (dimensionMatch && dimensionMatch[1]) {
-        return `Recrop the image to a ${dimensionMatch[1]} aspect ratio.`;
+    if (match && match[1] && match[2]) {
+        const width = parseInt(match[1], 10);
+        const height = parseInt(match[2], 10);
+
+        // Create a simple SVG rectangle with the target dimensions.
+        // Using a viewBox allows us to define the aspect ratio clearly.
+        const svg = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg"><rect width="${width}" height="${height}" fill="white"/></svg>`;
+        const base64Svg = Buffer.from(svg).toString('base64');
+        return `data:image/svg+xml;base64,${base64Svg}`;
     }
-
-    const formatMatch = platform.match(formatRegex);
-    if (formatMatch && formatMatch[1]) {
-        const format = formatMatch[1].toLowerCase();
-        if (format.includes('carré') || format.includes('square')) return 'Recrop the image to a 1:1 aspect ratio.';
-        if (format.includes('vertical') || format.includes('story')) return 'Recrop the image to a 9:16 aspect ratio.';
-        if (format.includes('large') || format.includes('leaderboard')) return 'Recrop the image to a 16:9 aspect ratio.';
-    }
-
-    return ''; // No specific aspect ratio found
+    return null;
 };
 
 
@@ -82,14 +70,18 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     outputSchema: AdaptCreativeContentForPlatformOutputSchema,
   },
   async (input) => {
-    // Step 1: Generate the adapted marketing text in parallel.
-    const textGenerationPromise = adaptationPrompt({ platform: input.targetPlatform });
+    // Generate the shape mask based on the target platform.
+    const shapeMaskDataUri = generateShapeMask(input.targetPlatform);
 
-    // Step 2: Generate the adapted image.
+    // Build the prompt for the image generation model.
     const imagePromptParts: (object)[] = [
-      { text: `Adapt this image for ${input.targetPlatform}. ${getAspectRatioPrompt(input.targetPlatform)}`},
+      { text: `Adapt this image for the target platform: ${input.targetPlatform}. Use the provided image and shape mask to influence the output's aspect ratio.` },
       { media: { url: input.baseImage } },
     ];
+
+    if (shapeMaskDataUri) {
+        imagePromptParts.push({ media: { url: shapeMaskDataUri } });
+    }
     
     if (input.logoDataUri) {
         imagePromptParts[0].text += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`
@@ -112,13 +104,10 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     if (!media || !media.url) {
       throw new Error('Image adaptation failed to return an image.');
     }
-
-    // Step 3: Wait for the text generation and combine results.
-    const textResponse = await textGenerationPromise;
     
     return {
       adaptedImageUrl: media.url,
-      adaptedText: textResponse.output?.text || '',
+      adaptedText: "", // Text generation is removed as per user request.
     };
   }
 );
