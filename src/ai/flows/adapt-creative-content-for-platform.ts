@@ -40,29 +40,6 @@ const AdaptCreativeContentForPlatformOutputSchema = z.object({
 export type AdaptCreativeContentForPlatformOutput = z.infer<typeof AdaptCreativeContentForPlatformOutputSchema>;
 
 
-/**
- * Generates an SVG shape mask as a data URI based on target dimensions.
- * @param platform The target platform string, e.g., "Post Instagram (1080x1080)".
- * @returns A data URI for the SVG mask, or null if no dimensions are found.
- */
-const generateShapeMask = (platform: string): string | null => {
-    const dimensionRegex = /(\d{2,})x(\d{2,})/;
-    const match = platform.match(dimensionRegex);
-
-    if (match && match[1] && match[2]) {
-        const width = parseInt(match[1], 10);
-        const height = parseInt(match[2], 10);
-
-        // Create a simple SVG rectangle with the target dimensions.
-        // Using a viewBox allows us to define the aspect ratio clearly.
-        const svg = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg"><rect width="${width}" height="${height}" fill="white"/></svg>`;
-        const base64Svg = Buffer.from(svg).toString('base64');
-        return `data:image/svg+xml;base64,${base64Svg}`;
-    }
-    return null;
-};
-
-
 const adaptCreativeContentForPlatformFlow = ai.defineFlow(
   {
     name: 'adaptCreativeContentForPlatformFlow',
@@ -70,26 +47,31 @@ const adaptCreativeContentForPlatformFlow = ai.defineFlow(
     outputSchema: AdaptCreativeContentForPlatformOutputSchema,
   },
   async (input) => {
-    // Generate the shape mask based on the target platform.
-    const shapeMaskDataUri = generateShapeMask(input.targetPlatform);
+    // Extract dimensions from the platform string, e.g., "Post Instagram (1080x1080)"
+    const dimensionRegex = /(\d{2,})x(\d{2,})/;
+    const match = input.targetPlatform.match(dimensionRegex);
+    let dimensionInstruction = `Adapt this image for the target platform: ${input.targetPlatform}.`;
+    
+    if (match && match[1] && match[2]) {
+        const width = parseInt(match[1], 10);
+        const height = parseInt(match[2], 10);
+        const orientation = width > height ? "paysage" : width < height ? "portrait" : "carré";
+        dimensionInstruction = `Crucially, you MUST regenerate and crop the provided image to a strict ${width}x${height} pixel aspect ratio (${orientation}). Do not distort the image, crop it intelligently. The output must have these exact dimensions.`;
+    }
 
     // Build the prompt for the image generation model.
     const imagePromptParts: (object)[] = [
-      { text: `Adapt this image for the target platform: ${input.targetPlatform}. Use the provided image and shape mask to influence the output's aspect ratio.` },
+      { text: dimensionInstruction },
       { media: { url: input.baseImage } },
     ];
-
-    if (shapeMaskDataUri) {
-        imagePromptParts.push({ media: { url: shapeMaskDataUri } });
-    }
     
     if (input.logoDataUri) {
-        imagePromptParts[0].text += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`
+        (imagePromptParts[0] as {text: string}).text += ` Intelligently incorporate the provided logo onto the image, ensuring it is visible but not obtrusive.`;
         imagePromptParts.push({ media: { url: input.logoDataUri } });
     }
 
     if (input.brandGuidelinesDataUri) {
-      imagePromptParts[0].text += ` If brand guidelines are provided, use them to influence the style, color palette, and typography.`
+      (imagePromptParts[0] as {text: string}).text += ` If brand guidelines are provided, use them to influence the style, color palette, and typography.`;
       imagePromptParts.push({ media: { url: input.brandGuidelinesDataUri } });
     }
 
