@@ -7,71 +7,195 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieC
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin, Sparkles, Tv, Newspaper, Radio, CalendarDays, ExternalLink, Presentation, ChevronRight } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-// --- Données initiales restaurées ---
-
-const kpiDataByCountry = {
-  France: { spend: 28500, reach: 1200000, clicks: 74700, roi: 4.8 },
-  USA: { spend: 75000, reach: 3500000, clicks: 210000, roi: 5.5 },
-  Japan: { spend: 0, reach: 0, clicks: 0, roi: 0 }, // Ajout du Japon pour la cohérence
-};
+// --- Données enrichies ---
 
 const campaignDataByCountry = {
   France: [
-    { id: 'C001', brand: 'La Prairie Gourmande', product: 'Pack de 4 Fraise', start: '01/07/24', end: '31/07/24', lever: 'Social', channel: 'Meta', objective: 'Conversion', status: 'Terminée', roas: 4.2, ca_add: 85200, spend: 20286, reach: 750000, clicks: 15000 },
-    { id: 'C003', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: '01/09/24', end: '30/09/24', lever: 'TV', channel: 'TF1', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 450000, reach: 15000000, clicks: 0 },
-    { id: 'C011', brand: 'Gamme Bio', product: 'Gamme Bio', start: '10/05/25', end: '10/06/25', lever: 'Affichage', channel: 'JCDecaux', objective: 'Notoriété', status: 'Terminée', roas: 1.8, ca_add: 92000, spend: 51111, reach: 5000000, clicks: 0 },
+    { id: 'C001', brand: 'La Prairie Gourmande', product: 'Pack de 4 Fraise', start: new Date('2024-07-01'), end: new Date('2024-07-31'), lever: 'Social', channel: 'Meta', objective: 'Conversion', status: 'Terminée', roas: 4.2, ca_add: 85200, spend: 20286, reach: 750000, clicks: 15000 },
+    { id: 'C003', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'TV', channel: 'TF1', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 450000, reach: 15000000, clicks: 0 },
+    { id: 'C011', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-05-10'), end: new Date('2024-06-10'), lever: 'Affichage', channel: 'JCDecaux', objective: 'Notoriété', status: 'Terminée', roas: 1.8, ca_add: 92000, spend: 51111, reach: 5000000, clicks: 0 },
+    { id: 'C012', brand: 'Gamme Skyr', product: 'Skyr Nature 450g', start: new Date('2024-08-15'), end: new Date('2024-09-15'), lever: 'Radio', channel: 'NRJ', objective: 'Drive-to-store', status: 'En cours', roas: 2.5, ca_add: 75000, spend: 30000, reach: 3000000, clicks: 0 },
+    { id: 'C013', brand: 'Gamme Bio', product: 'Gamme Bio', start: new Date('2024-10-01'), end: new Date('2024-10-31'), lever: 'Presse', channel: 'Le Figaro', objective: 'Considération', status: 'Planifiée', roas: null, ca_add: null, spend: 25000, reach: 1200000, clicks: 0 },
   ],
   USA: [
-    { id: 'CUSA1', brand: 'La Prairie Gourmande', product: 'Grand Pot 450g', start: '15/07/24', end: '15/08/24', lever: 'Social', channel: 'TikTok', objective: 'Engagement', status: 'En cours', roas: 3.1, ca_add: 120500, spend: 38871, reach: 2800000, clicks: 25000 },
-    { id: 'CUSA2', brand: 'Gamme Bio', product: 'Yaourt Bio Fraise', start: '01/08/24', end: '31/08/24', lever: 'Presse', channel: 'NY Times', objective: 'Considération', status: 'Terminée', roas: 1.5, ca_add: 45000, spend: 30000, reach: 1500000, clicks: 0 },
+    { id: 'CUSA1', brand: 'La Prairie Gourmande', product: 'Grand Pot 450g', start: new Date('2024-07-15'), end: new Date('2024-08-15'), lever: 'Social', channel: 'TikTok', objective: 'Engagement', status: 'En cours', roas: 3.1, ca_add: 120500, spend: 38871, reach: 2800000, clicks: 25000 },
+    { id: 'CUSA2', brand: 'Gamme Bio', product: 'Yaourt Bio Fraise', start: new Date('2024-08-01'), end: new Date('2024-08-31'), lever: 'Presse', channel: 'NY Times', objective: 'Considération', status: 'Terminée', roas: 1.5, ca_add: 45000, spend: 30000, reach: 1500000, clicks: 0 },
+    { id: 'CUSA3', brand: 'La Prairie Gourmande', product: 'Toute la marque', start: new Date('2024-11-01'), end: new Date('2024-11-28'), lever: 'TV', channel: 'ABC', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 1200000, reach: 45000000, clicks: 0 },
   ],
   Japan: [
-     { id: 'CJAP1', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: '01/09/24', end: '30/09/24', lever: 'TV', channel: 'Fuji TV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 660000, reach: 24000000, clicks: 0 },
+     { id: 'CJAP1', brand: 'La Prairie Gourmande', product: 'Pot Ind. Vanille', start: new Date('2024-09-01'), end: new Date('2024-09-30'), lever: 'TV', channel: 'Fuji TV', objective: 'Notoriété', status: 'Planifiée', roas: null, ca_add: null, spend: 660000, reach: 24000000, clicks: 0 },
+     { id: 'CJAP2', brand: 'Gamme Végétale', product: 'Dessert Soja', start: new Date('2024-06-01'), end: new Date('2024-06-30'), lever: 'Social', channel: 'Line', objective: 'Essai', status: 'Terminée', roas: 3.8, ca_add: 55000, spend: 14474, reach: 5000000, clicks: 80000 },
   ]
 };
 
 const performanceByPlatform = {
   France: [
-    { platform: 'Meta', ROI: 4.2, CPA: 1.35 }, { platform: 'TF1', ROI: 3.8, CPA: 2.5 }, { platform: 'JCDecaux', ROI: 1.8, CPA: 5.0 },
+    { platform: 'Meta', ROI: 4.2, CPA: 1.35 }, { platform: 'TF1', ROI: 3.8, CPA: 2.5 }, { platform: 'JCDecaux', ROI: 1.8, CPA: 5.0 }, { platform: 'NRJ', ROI: 2.5, CPA: 3.1 }, { platform: 'Le Figaro', ROI: 1.2, CPA: 6.2 }
   ],
   USA: [
-    { platform: 'TikTok', ROI: 3.1, CPA: 0.95 }, { platform: 'NY Times', ROI: 1.5, CPA: 4.0 },
+    { platform: 'TikTok', ROI: 3.1, CPA: 0.95 }, { platform: 'NY Times', ROI: 1.5, CPA: 4.0 }, { platform: 'ABC', ROI: 4.5, CPA: 2.8 }
   ],
   Japan: [
-     { platform: 'Fuji TV', ROI: 4.0, CPA: 2.8 },
+     { platform: 'Fuji TV', ROI: 4.0, CPA: 2.8 }, { platform: 'Line', ROI: 3.8, CPA: 1.2 }
   ]
 };
 
 const budgetAllocation = {
-    France: [{name: 'Social', value: 30}, {name: 'TV', value: 50}, {name: 'Affichage', value: 20}],
-    USA: [{name: 'Social', value: 60}, {name: 'Presse', value: 40}],
-    Japan: [{name: 'TV', value: 100}],
+    France: [{name: 'Social', value: 20286}, {name: 'TV', value: 450000}, {name: 'Affichage', value: 51111}, {name: 'Radio', value: 30000}, {name: 'Presse', value: 25000}],
+    USA: [{name: 'Social', value: 38871}, {name: 'Presse', value: 30000}, {name: 'TV', value: 1200000}],
+    Japan: [{name: 'TV', value: 660000}, {name: 'Social', value: 14474}],
 }
-const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280'];
+const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280', '#06B6D4', '#8B5CF6'];
 
 // --- Components ---
 
-const PlatformIcon = ({ platform }: { platform: string }) => {
-    switch (platform.toLowerCase()) {
-        case 'meta': return <Facebook className="h-5 w-5 text-blue-600" />;
-        case 'tiktok': return <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.02 3.07.02 4.6 0 1.8.01 3.59-.01 5.39-.01 1.25-.08 2.5-.23 3.74-.22 1.7-.63 3.36-1.34 4.94-.84 1.87-2.09 3.4-3.79 4.62-1.25.9-2.72 1.48-4.25 1.76-.9.17-1.8.27-2.71.33-1.89.12-3.79.02-5.68-.08-1.3-.07-2.6-.2-3.88-.42-.8-.15-1.58-.36-2.34-.62-.25-.09-.48-.2-.7-.34.02-2.12.01-4.24.01-6.36 1.1.42 2.22.75 3.36.98.59.12 1.19.2 1.78.26 1.15.11 2.3.13 3.45.11.95-.03 1.9-.11 2.84-.25.86-.12 1.7-.32 2.52-.59.98-.31 1.91-.73 2.77-1.25.6-.37 1.16-.8 1.68-1.28.42-.39.81-.83 1.16-1.3.28-.37.53-.77.75-1.19.42-.8.74-1.66.97-2.55.12-.47.22-.95.3-1.43.08-.5.13-1 .18-1.5.02-.2.03-.4.04-.6.01-1.14.01-2.28.01-3.43.01-.63.01-1.27.02-1.9.01-.2 0-.39-.01-.59Z"/></svg>;
-        case 'tf1':
-        case 'fuji tv': 
-            return <Youtube className="h-5 w-5 text-red-600" />; // Placeholder
-        default: return null;
+const PlatformIcon = ({ lever }: { lever: string }) => {
+    switch (lever.toLowerCase()) {
+        case 'social': return <Facebook className="h-5 w-5 text-blue-600" />;
+        case 'tv': return <Tv className="h-5 w-5 text-red-600" />;
+        case 'presse': return <Newspaper className="h-5 w-5 text-gray-700" />;
+        case 'radio': return <Radio className="h-5 w-5 text-orange-500" />;
+        case 'affichage': return <Presentation className="h-5 w-5 text-purple-500" />;
+        default: return <Megaphone className="h-5 w-5 text-muted-foreground" />;
     }
 };
+
 const StatusBadge = ({ status }: { status: string }) => {
     switch(status.toLowerCase()) {
-        case 'en cours':
-        case 'active': return <Badge className="bg-green-500 hover:bg-green-600">Active</Badge>;
-        case 'planifiée': return <Badge variant="secondary" className="bg-yellow-500 hover:bg-yellow-600">Planifiée</Badge>;
-        case 'terminée':
-        case 'completed': return <Badge variant="outline">Terminée</Badge>;
+        case 'en cours': return <Badge className="bg-blue-100 text-blue-800 border-blue-300">En cours</Badge>;
+        case 'planifiée': return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">Planifiée</Badge>;
+        case 'terminée': return <Badge className="bg-green-100 text-green-800 border-green-300">Terminée</Badge>;
         default: return null;
     }
+}
+
+const CampaignModal = ({ campaign }: { campaign: any }) => {
+    if (!campaign) return null;
+    
+    const renderKpi = (label: string, value: string | number | null, unit: string = '') => {
+        if (value === null || value === undefined) return null;
+        return (
+            <div className="rounded-lg bg-muted/50 p-3 text-center">
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <p className="text-xl font-bold text-foreground">{value.toLocaleString('fr-FR')}{unit}</p>
+            </div>
+        );
+    };
+
+    return (
+        <DialogContent className="max-w-3xl">
+            <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                    <PlatformIcon lever={campaign.lever} />
+                    {campaign.product} - {campaign.channel}
+                </DialogTitle>
+                <DialogDescription>
+                    {campaign.objective} | {new Date(campaign.start).toLocaleDateString()} - {new Date(campaign.end).toLocaleDateString()}
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+                <div>
+                    <h4 className="font-semibold text-foreground mb-2">Performance Business</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {renderKpi('Dépense', campaign.spend, '€')}
+                        {renderKpi('CA Incrémental', campaign.ca_add, '€')}
+                        {renderKpi('ROAS', campaign.roas, 'x')}
+                    </div>
+                </div>
+                 <div>
+                    <h4 className="font-semibold text-foreground mb-2">Performance Média</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {renderKpi('Portée (Reach)', campaign.reach)}
+                        {renderKpi('Clics', campaign.clicks)}
+                    </div>
+                </div>
+                 <Card className="bg-background">
+                    <CardHeader className="flex-row items-center gap-2 space-y-0">
+                        <Sparkles className="h-5 w-5 text-accent" />
+                        <CardTitle className="text-lg">Recommandation IA</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                            {campaign.lever === 'TV' ? 'Le plan GRP est aligné avec les objectifs de notoriété pour le lancement. Suivre l\'impact post-campagne sur les ventes et la notoriété spontanée.' : 'Cette campagne a montré un excellent ROAS. Pour la prochaine vague, envisagez de tester un ciblage sur l\'audience "Jeunes Parents" qui a montré un fort taux d\'engagement.'}
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        </DialogContent>
+    )
+}
+
+const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
+    const year = 2024;
+    const months = Array.from({length: 12}, (_, i) => new Date(year, i, 1).toLocaleString('fr-FR', { month: 'short' }));
+
+    const getPosition = (date: Date) => ((date.getMonth() * 30 + date.getDate()) / 365) * 100;
+    const getWidth = (start: Date, end: Date) => {
+        const duration = (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
+        return (duration / 365) * 100;
+    };
+
+    const campaignsByProduct = campaigns.reduce((acc, campaign) => {
+        (acc[campaign.product] = acc[campaign.product] || []).push(campaign);
+        return acc;
+    }, {});
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><CalendarDays /> Planning Annuel des Campagnes {year}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 overflow-x-auto p-4">
+                <div className="relative" style={{minWidth: '800px'}}>
+                    {/* Grid des mois */}
+                    <div className="relative grid h-10 grid-cols-12 border-b">
+                        {months.map(month => (
+                            <div key={month} className="text-center text-xs font-semibold text-muted-foreground">{month.toUpperCase()}</div>
+                        ))}
+                    </div>
+
+                    {/* Lignes de produits */}
+                    <div className="mt-4 space-y-4">
+                        {Object.entries(campaignsByProduct).map(([product, productCampaigns]: [string, any[]]) => (
+                             <div key={product} className="relative h-12">
+                                 <div className="absolute top-0 flex h-full w-full items-center border-b border-dashed">
+                                    <p className="w-40 shrink-0 pr-4 text-right text-sm font-medium text-foreground">{product}</p>
+                                 </div>
+                                {productCampaigns.map(campaign => {
+                                    const left = getPosition(campaign.start);
+                                    const width = getWidth(campaign.start, campaign.end);
+                                    const isTooSmall = width < 5;
+                                    return (
+                                        <Tooltip key={campaign.id}>
+                                            <TooltipTrigger asChild>
+                                                <div 
+                                                    className="absolute top-0 flex h-10 items-center justify-start rounded-lg bg-primary/80 px-2 text-primary-foreground shadow transition-all hover:bg-primary"
+                                                    style={{ left: `${left}%`, width: `${width}%`, marginLeft: '10rem' /* 160px for product name */ }}
+                                                >
+                                                    <PlatformIcon lever={campaign.lever} />
+                                                    {!isTooSmall && <span className="ml-2 truncate text-xs">{campaign.channel}</span>}
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="font-bold">{campaign.lever} - {campaign.channel}</p>
+                                                <p>{new Date(campaign.start).toLocaleDateString()} - {new Date(campaign.end).toLocaleDateString()}</p>
+                                                <p>Budget: {campaign.spend.toLocaleString('fr-FR')}€</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )
+                                })}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
 }
 
 // --- Main Page Component ---
@@ -80,7 +204,6 @@ export default function MediaBrandPage() {
   const [country, setCountry] = useState<'France' | 'USA' | 'Japan'>('France');
   const [brand, setBrand] = useState('all');
 
-  const currentKpis = kpiDataByCountry[country];
   const currentCampaigns = campaignDataByCountry[country]
       .filter(c => brand === 'all' || c.brand === brand);
 
@@ -136,16 +259,18 @@ export default function MediaBrandPage() {
         </Card>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="campaigns">Détail des Campagnes</TabsTrigger>
+          <TabsTrigger value="planning">Planning Média</TabsTrigger>
         </TabsList>
+
         <TabsContent value="overview" className="mt-6 space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Dépenses Totales</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <DollarSign />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">€{aggregatedKpis.spend.toLocaleString()}</div>
@@ -155,7 +280,7 @@ export default function MediaBrandPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Portée Totale (Reach)</CardTitle>
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{aggregatedKpis.reach.toLocaleString()}</div>
@@ -165,7 +290,7 @@ export default function MediaBrandPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Clics Totaux</CardTitle>
-                        <MousePointerClick className="h-4 w-4 text-muted-foreground" />
+                        <MousePointerClick />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{aggregatedKpis.clicks.toLocaleString()}</div>
@@ -175,7 +300,7 @@ export default function MediaBrandPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">ROI Global</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <TrendingUp />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{globalRoi.toFixed(2)}x</div>
@@ -217,56 +342,78 @@ export default function MediaBrandPage() {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip formatter={(value: number, name: string) => [`${value.toLocaleString('fr-FR')}€`, name]}/>
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
                 </Card>
             </div>
         </TabsContent>
+
         <TabsContent value="campaigns" className="mt-6">
             <Card>
                 <CardHeader>
                 <CardTitle>Détail des Campagnes pour: {country}</CardTitle>
-                <CardDescription>Analysez la performance de chaque campagne individuellement.</CardDescription>
+                <CardDescription>Cliquez sur une campagne pour voir ses performances détaillées.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4">
-                        {currentCampaigns.length > 0 ? currentCampaigns.map(campaign => (
-                            <div key={campaign.id} className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex items-center gap-4">
-                                    <PlatformIcon platform={campaign.channel} />
-                                    <div>
-                                        <p className="font-semibold">{campaign.product}</p>
-                                        <p className="text-sm text-muted-foreground">{campaign.brand} | {campaign.channel}</p>
-                                    </div>
-                                </div>
-                                <div className="grid flex-1 grid-cols-2 gap-4 text-sm sm:grid-cols-4 sm:text-center">
-                                    <div>
-                                        <p className="font-medium">€{(campaign.spend || 0).toLocaleString()}</p>
-                                        <p className="text-muted-foreground">Dépensé</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-medium">{(campaign.reach || 0).toLocaleString()}</p>
-                                        <p className="text-muted-foreground">Portée</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-medium">{(campaign.clicks || 0).toLocaleString()}</p>
-                                        <p className="text-muted-foreground">Clics</p>
-                                    </div>
-                                    <div className="flex items-center justify-end sm:justify-center">
-                                        <StatusBadge status={campaign.status} />
-                                    </div>
-                                </div>
-                            </div>
-                        )) : (
-                            <div className="text-center py-12 text-muted-foreground">
-                                <p>Aucune donnée de campagne disponible pour cette sélection.</p>
-                            </div>
-                        )}
-                    </div>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Campagne</TableHead>
+                                <TableHead>Période</TableHead>
+                                <TableHead>Levier</TableHead>
+                                <TableHead className="text-right">Dépense</TableHead>
+                                <TableHead className="text-right">ROAS</TableHead>
+                                <TableHead className="text-center">Statut</TableHead>
+                                <TableHead className="text-right">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                         <TableBody>
+                            {currentCampaigns.length > 0 ? currentCampaigns.map(campaign => (
+                                <Dialog key={campaign.id}>
+                                    <TableRow>
+                                        <TableCell>
+                                            <div className="font-medium">{campaign.product}</div>
+                                            <div className="text-sm text-muted-foreground">{campaign.brand}</div>
+                                        </TableCell>
+                                        <TableCell>{new Date(campaign.start).toLocaleDateString()} - {new Date(campaign.end).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <PlatformIcon lever={campaign.lever} />
+                                                {campaign.lever}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right">€{(campaign.spend || 0).toLocaleString()}</TableCell>
+                                        <TableCell className={`text-right font-bold ${campaign.roas && campaign.roas > 3 ? 'text-green-600' : 'text-amber-600'}`}>
+                                            {campaign.roas ? `${campaign.roas.toFixed(1)}x` : 'N/A'}
+                                        </TableCell>
+                                        <TableCell className="text-center"><StatusBadge status={campaign.status} /></TableCell>
+                                        <TableCell className="text-right">
+                                            <DialogTrigger asChild>
+                                                <Button variant="ghost" size="sm">
+                                                    Détails <ChevronRight className="ml-1 h-4 w-4" />
+                                                </Button>
+                                            </DialogTrigger>
+                                        </TableCell>
+                                    </TableRow>
+                                    <CampaignModal campaign={campaign} />
+                                </Dialog>
+                            )) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                                        Aucune donnée de campagne disponible pour cette sélection.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
+        </TabsContent>
+
+        <TabsContent value="planning" className="mt-6">
+            <MediaPlanner campaigns={currentCampaigns} />
         </TabsContent>
       </Tabs>
     </div>
