@@ -4,15 +4,18 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, Treemap, PieChart, Pie, Cell } from 'recharts';
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Percent, Download, BrainCircuit } from 'lucide-react';
+import { TrendingUp, Percent, Download, BrainCircuit, Sparkles } from 'lucide-react';
+import { mmmData } from '@/services/data-service';
 
-const contributionData = [
-  { channel: 'TV', contribution: 40, roi: 3.5 },
-  { channel: 'Digital', contribution: 35, roi: 5.2 },
-  { channel: 'Presse', contribution: 10, roi: 2.1 },
-  { channel: 'Affichage', contribution: 8, roi: 1.8 },
-  { channel: 'Radio', contribution: 7, roi: 2.5 },
-];
+const contributionData = mmmData.France['s1-2025'].contributions;
+const investmentData = mmmData.France['s1-2025'].investments;
+
+const chartData = Object.keys(contributionData).map(channel => ({
+    channel: channel,
+    contribution: (contributionData[channel as keyof typeof contributionData] / (mmmData.France['s1-2025'].baseline + Object.values(contributionData).reduce((a,b) => a+b, 0))) * 100,
+    roi: investmentData[channel as keyof typeof investmentData] > 0 ? contributionData[channel as keyof typeof contributionData] / investmentData[channel as keyof typeof investmentData] : 0
+}));
+
 
 const digitalBreakdown = [
   { name: 'SEA', size: 45 },
@@ -21,11 +24,6 @@ const digitalBreakdown = [
   { name: 'Affiliation', size: 10 },
 ];
 
-const haloEffectData = [
-    { name: "TV -> Digital", value: 15 },
-    { name: "Digital -> Magasin", value: 25 },
-    { name: "Presse -> Digital", value: 8 },
-]
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658'];
 
 export default function MMMPage() {
@@ -48,10 +46,10 @@ export default function MMMPage() {
                 </CardHeader>
                 <CardContent>
                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={contributionData} layout="vertical">
+                        <BarChart data={chartData} layout="vertical">
                             <XAxis type="number" unit="%" />
                             <YAxis type="category" dataKey="channel" width={80} />
-                            <Tooltip formatter={(value) => `${value}%`} />
+                            <Tooltip formatter={(value) => `${(value as number).toFixed(1)}%`} />
                             <Bar dataKey="contribution" fill="hsl(var(--primary))" name="Contribution" />
                         </BarChart>
                     </ResponsiveContainer>
@@ -63,31 +61,26 @@ export default function MMMPage() {
                 </CardHeader>
                 <CardContent>
                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={contributionData}>
+                        <BarChart data={chartData}>
                             <XAxis dataKey="channel" />
                             <YAxis />
-                            <Tooltip formatter={(value) => `x${value}`} />
+                            <Tooltip formatter={(value) => `x${(value as number).toFixed(1)}`} />
                             <Bar dataKey="roi" fill="hsl(var(--accent))" name="ROI" />
                         </BarChart>
                     </ResponsiveContainer>
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><BrainCircuit /> Effets de Halo</CardTitle>
-                    <CardDescription>Influence indirecte entre les canaux.</CardDescription>
+                <CardHeader className="flex-row items-center gap-2 space-y-0">
+                    <Sparkles className="h-5 w-5 text-accent" />
+                    <CardTitle className="text-lg">Recommandation IA</CardTitle>
                 </CardHeader>
                 <CardContent>
-                     <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie data={haloEffectData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                                {haloEffectData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip formatter={(value) => `${value}% de l'effet total`} />
-                        </PieChart>
-                    </ResponsiveContainer>
+                    <p className="text-sm text-muted-foreground">
+                        Le modèle MMM indique que le **Retail Media** et le **Social** sont vos leviers les plus rentables (ROAS &gt; 4.0). En revanche, la **Presse** et l'**Affichage** ont une contribution et un ROAS plus faibles.
+                        <br/><br/>
+                        <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget Affichage et Presse (-20%) vers le Retail Media et le Social Media pour maximiser le retour sur investissement global sur le prochain semestre.
+                    </p>
                 </CardContent>
             </Card>
        </div>
@@ -118,7 +111,7 @@ export default function MMMPage() {
 }
 
 const CustomTreemapContent = ({ root, depth, x, y, width, height, index, payload, rank, name }: any) => {
-    if (!payload) return null;
+    if (!payload || !payload.size) return null;
     return (
       <g>
         <rect

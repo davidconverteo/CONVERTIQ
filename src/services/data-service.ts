@@ -185,8 +185,22 @@ export const retailMediaBudgetAllocation = {
     Japan: [{name: 'Sponsored Products', value: 69909}, {name: 'Coupons', value: 14000}],
 };
 
+export const mmmData = {
+    France: {
+        's1-2025': { baseline: 1350000, contributions: { TV: 400000, Social: 280000, 'Retail Media': 200000, SEA: 120000, Affichage: 100000, Presse: 50000 }, investments: { TV: 100000, Social: 70000, 'Retail Media': 50000, SEA: 40000, Affichage: 50000, Presse: 25000 } },
+        's2-2024': { baseline: 1200000, contributions: { 'Retail Media': 300000, Social: 250000, TV: 150000, SEA: 100000, Presse: 80000 }, investments: { 'Retail Media': 75000, Social: 60000, TV: 50000, SEA: 35000, Presse: 40000 } },
+    },
+    USA: {
+        's1-2025': { baseline: 2500000, contributions: { 'Retail Media': 800000, Social: 600000, TV: 300000, 'OOH': 200000 }, investments: { 'Retail Media': 200000, Social: 150000, TV: 100000, 'OOH': 80000 } },
+        's2-2024': { baseline: 2200000, contributions: { 'Retail Media': 700000, Social: 550000, TV: 250000, 'OOH': 150000 }, investments: { 'Retail Media': 180000, Social: 130000, TV: 90000, 'OOH': 70000 } },
+    },
+    Japan: {
+        's1-2025': { baseline: 180000000, contributions: { TV: 90000000, 'Retail Media': 40000000, Social: 20000000 }, investments: { TV: 30000000, 'Retail Media': 10000000, Social: 5000000 } },
+    },
+};
 
-export const DataCategorySchema = z.enum(['mediaBrand', 'retailMedia']);
+
+export const DataCategorySchema = z.enum(['mediaBrand', 'retailMedia', 'mmm']);
 export type DataCategory = z.infer<typeof DataCategorySchema>;
 
 export function getDataSummary(category: DataCategory) {
@@ -216,6 +230,33 @@ export function getDataSummary(category: DataCategory) {
             }, { spend: 0, sales_attributed: 0 });
             const roas = spend > 0 ? sales_attributed / spend : 0;
             return { country, totalSpend: spend, totalSalesAttributed: sales_attributed, globalRoas: roas, campaignCount: campaigns.length };
+        });
+        return summary;
+    }
+     if (category === 'mmm') {
+        const summary = Object.entries(mmmData).map(([country, periods]) => {
+            const latestPeriod = Object.keys(periods).sort().reverse()[0];
+            const data = periods[latestPeriod as keyof typeof periods];
+            const totalInvestment = Object.values(data.investments).reduce((a, b) => a + b, 0);
+            const totalContribution = Object.values(data.contributions).reduce((a, b) => a + b, 0);
+            const globalRoas = totalInvestment > 0 ? totalContribution / totalInvestment : 0;
+            const mostProfitableLever = Object.entries(data.contributions).reduce((best, [lever, contribution]) => {
+                const investment = data.investments[lever as keyof typeof data.investments] || 0;
+                const roas = investment > 0 ? contribution / investment : 0;
+                if (roas > best.roas) {
+                    return { lever, roas };
+                }
+                return best;
+            }, { lever: '', roas: 0});
+
+            return {
+                country,
+                period: latestPeriod,
+                totalInvestment,
+                totalContribution,
+                globalRoas,
+                mostProfitableLever
+            };
         });
         return summary;
     }

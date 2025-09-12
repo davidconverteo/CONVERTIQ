@@ -28,7 +28,7 @@ export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
 const getDataSummaryTool = ai.defineTool(
     {
         name: 'getDataSummary',
-        description: 'Get a summary of data for a specific category (e.g., mediaBrand, retailMedia).',
+        description: 'Get a summary of data for a specific category (e.g., mediaBrand, retailMedia, mmm).',
         inputSchema: z.object({
             category: DataCategorySchema,
         }),
@@ -47,7 +47,7 @@ const prompt = ai.definePrompt({
   tools: [getDataSummaryTool],
   prompt: `Tu es un expert en analyse de données marketing pour la plateforme "ConvertIQ" qui aide la marque de yaourts "La Prairie Gourmande".
   Tu réponds à des questions basées sur les données affichées dans les différents tableaux de bord.
-  Utilise l'outil 'getDataSummary' si nécessaire pour répondre à la question de l'utilisateur sur les données de performance.
+  Utilise l'outil 'getDataSummary' si nécessaire pour répondre à la question de l'utilisateur sur les données de performance. Les catégories disponibles sont 'mediaBrand', 'retailMedia', et 'mmm'.
   Sois concis, pertinent et sympathique.
   
   Question de l'utilisateur: {{{prompt}}}`,
