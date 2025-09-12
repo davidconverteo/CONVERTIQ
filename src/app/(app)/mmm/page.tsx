@@ -28,34 +28,34 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
     }, [contributions]);
 
     const contributionChartData = useMemo(() => {
-    const totalSales = baseline + totalContribution;
-    const contributionEntries = Object.entries(contributions);
+        const totalSales = baseline + totalContribution;
+        const contributionEntries = Object.entries(contributions);
 
-    let cumulative = 0;
-    const waterfallData = [
-      {
-        name: 'Baseline',
-        value: baseline,
-        range: [0, baseline],
-      },
-      ...contributionEntries.map(([name, value]) => {
-        const start = cumulative + baseline;
-        cumulative += value;
-        return {
-          name,
-          value,
-          range: [start, start + value],
-        };
-      }),
-      {
-        name: 'Ventes Totales',
-        value: totalSales,
-        range: [0, totalSales],
-      },
-    ];
+        let cumulative = baseline;
+        const waterfallData = [
+            {
+                name: 'Baseline',
+                value: baseline,
+                range: [0, baseline],
+            },
+            ...contributionEntries.map(([name, value]) => {
+                const start = cumulative;
+                cumulative += value;
+                return {
+                    name,
+                    value,
+                    range: [start, start + value],
+                };
+            }),
+            {
+                name: 'Ventes Totales',
+                value: totalSales,
+                range: [0, totalSales],
+            },
+        ];
 
-    return waterfallData;
-  }, [contributions, baseline, totalContribution]);
+        return waterfallData;
+    }, [contributions, baseline, totalContribution]);
 
     const roasTableData = useMemo(() => {
         return Object.entries(investments).map(([lever, investment]) => {
@@ -116,19 +116,12 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis type="number" tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M €`} />
                                         <YAxis dataKey="name" type="category" width={80} />
-                                        <Tooltip formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`} />
+                                        <Tooltip formatter={(value, name, props) => [`${props.payload.value.toLocaleString('fr-FR')} €`, props.payload.name]} />
                                         <Bar dataKey="range" stackId="a">
                                           {contributionChartData.map((entry, index) => {
                                              let color = 'transparent';
                                              if (entry.name === 'Baseline') color = '#e2e8f0';
                                              else if (entry.name === 'Ventes Totales') color = '#10b981';
-                                             else color = COLORS[index % COLORS.length];
-
-                                             // Transparent bar for positioning
-                                             if (index > 0 && index < contributionChartData.length -1) {
-                                                color = 'transparent'
-                                             }
-
                                              return <Cell key={`cell-${index}`} fill={color} />;
                                           })}
                                         </Bar>
@@ -175,7 +168,7 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                         <CardContent>
                             <p className="text-sm text-muted-foreground">
                                 Le modèle MMM pour la période <strong>{selectedPeriod.replace('-', ' ')}</strong> en <strong>{country}</strong> montre que <strong>{roasTableData[0]?.lever}</strong> est le levier le plus performant avec un ROAS de <strong>{roasTableData[0]?.roi.toFixed(2)}x</strong>. 
-                                La baseline représente <strong>{((baseline / (baseline + totalContribution)) * 100).toFixed(0)}%</strong> des ventes. 
+                                La baseline représente <strong>{(baseline / (baseline + totalContribution) * 100).toFixed(0)}%</strong> des ventes. 
                                 <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget de <strong>{roasTableData[roasTableData.length-1]?.lever}</strong> (ROAS: {roasTableData[roasTableData.length-1]?.roi.toFixed(2)}x) vers <strong>{roasTableData[0]?.lever}</strong> pour maximiser le retour sur investissement global. Utilisez le simulateur pour tester ce scénario.
                             </p>
                         </CardContent>
@@ -340,3 +333,5 @@ export default function MMMPage() {
 
   return <MmmCountryView country={selectedCountry} onBack={() => setSelectedCountry(null)} />;
 }
+
+    
