@@ -56,10 +56,12 @@ export default function CreativeStudio() {
     defaultValues: { 
         prompt: "",
         logoFile: undefined,
+        inspirationFile: undefined,
+        guidelinesFile: undefined,
      },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews, formField: any) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: keyof typeof previews, fieldOnChange: (files: FileList | null) => void) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -67,10 +69,10 @@ export default function CreativeStudio() {
         setPreviews(p => ({ ...p, [fieldName]: event.target?.result as any }));
       };
       reader.readAsDataURL(file);
-      formField.onChange(e.target.files);
+      fieldOnChange(e.target.files);
     } else {
       setPreviews(p => ({ ...p, [fieldName]: null }));
-      formField.onChange(null);
+      fieldOnChange(null);
     }
   };
 
@@ -178,9 +180,9 @@ export default function CreativeStudio() {
                   )}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField control={briefForm.control} name="inspirationFile" render={({ field: { onChange, ...fieldProps } }) => ( <FormItem><FormLabel>Inspiration (Optionnel)</FormLabel><FormControl><Input {...fieldProps} type="file" accept="image/*" onChange={e => handleFileChange(e, 'inspiration', { onChange })}/></FormControl><FormMessage /></FormItem> )} />
-                    <FormField control={briefForm.control} name="logoFile" render={({ field: { onChange, ...fieldProps } }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input {...fieldProps} type="file" accept="image/*" onChange={e => handleFileChange(e, 'logo', { onChange })}/></FormControl><FormMessage /></FormItem> )} />
-                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field: { onChange, ...fieldProps } }) => ( <FormItem><FormLabel>Charte Graphique</FormLabel><FormControl><Input {...fieldProps} type="file" accept="image/*,application/pdf" onChange={e => handleFileChange(e, 'guidelines', { onChange })}/></FormControl><FormMessage /></FormItem> )} />
+                    <FormField control={briefForm.control} name="inspirationFile" render={({ field: { onChange, onBlur, name, ref } }) => ( <FormItem><FormLabel>Inspiration (Optionnel)</FormLabel><FormControl><Input type="file" accept="image/*" ref={ref} name={name} onBlur={onBlur} onChange={e => handleFileChange(e, 'inspiration', onChange)}/></FormControl><FormMessage /></FormItem> )} />
+                    <FormField control={briefForm.control} name="logoFile" render={({ field: { onChange, onBlur, name, ref } }) => ( <FormItem><FormLabel>Logo</FormLabel><FormControl><Input type="file" accept="image/*" ref={ref} name={name} onBlur={onBlur} onChange={e => handleFileChange(e, 'logo', onChange)}/></FormControl><FormMessage /></FormItem> )} />
+                    <FormField control={briefForm.control} name="guidelinesFile" render={({ field: { onChange, onBlur, name, ref } }) => ( <FormItem><FormLabel>Charte Graphique</FormLabel><FormControl><Input type="file" accept="image/*,application/pdf" ref={ref} name={name} onBlur={onBlur} onChange={e => handleFileChange(e, 'guidelines', onChange)}/></FormControl><FormMessage /></FormItem> )} />
                 </div>
                  <div className="flex justify-center gap-4 min-h-[68px]">
                     {previews.inspiration && <Image src={previews.inspiration} alt="Inspiration" width={60} height={60} className="object-contain rounded-md border p-1" />}
@@ -267,3 +269,6 @@ export default function CreativeStudio() {
     </div>
   );
 }
+
+
+    
