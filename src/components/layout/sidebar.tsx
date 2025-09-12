@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
+import ChatbotTrigger from '../chatbot';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Accueil' },
@@ -68,7 +69,7 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
           <Settings className="h-5 w-5" />
           <span>Paramètres</span>
         </Link>
-        {children}
+        <ChatbotTrigger />
       </div>
     </aside>
   );

@@ -8,7 +8,6 @@ import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Sidebar from './sidebar';
 import Link from 'next/link';
-import ChatbotTrigger from '@/components/chatbot';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Cockpit Marketing', subtitle: "Vue d'ensemble de votre performance." },
@@ -44,9 +43,7 @@ export default function Header() {
                      <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain brightness-[10] contrast-[1.2]" />
                   </Link>
                 </div>
-                <Sidebar>
-                  <ChatbotTrigger />
-                </Sidebar>
+                <Sidebar />
             </div>
           </SheetContent>
         </Sheet>
