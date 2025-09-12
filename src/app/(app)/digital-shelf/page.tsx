@@ -37,12 +37,15 @@ const generateDigitalShelfData = (filters: Filters) => {
         'Skyr Nature 150g', 'Yaourt à la Grecque Miel 2x150g', 'Gourde Fraise-Banane 4x90g', 'Dessert Végétal Amande 2x100g'
     ];
 
-    const retailers = ['Carrefour Drive', 'E.Leclerc DRIVE', 'Auchan Drive', 'Courses U'];
+    const allRetailers = retailerOptions.filter(r => r.value !== 'all').map(r => r.label);
+    const selectedRetailerLabel = retailerOptions.find(r => r.value === filters.retailer)?.label;
+    
+    const activeRetailers = (filters.retailer === 'all' || !selectedRetailerLabel) ? allRetailers : [selectedRetailerLabel];
 
     // Availability Data
     const availabilityMatrix = products.map(product => {
         const statuses: { [key: string]: 'in_stock' | 'low_stock' | 'out_of_stock' } = {};
-        retailers.forEach(retailer => {
+        activeRetailers.forEach(retailer => {
             const rand = seededRandom(0, 1, product + retailer);
             if (rand < 0.8) statuses[retailer] = 'in_stock';
             else if (rand < 0.95) statuses[retailer] = 'low_stock';
@@ -63,7 +66,7 @@ const generateDigitalShelfData = (filters: Filters) => {
     );
     
     const oosCount = alerts.filter(a => a.statut === 'out_of_stock').length;
-    const availabilityRate = (1 - (oosCount / (products.length * retailers.length))) * 100;
+    const availabilityRate = (1 - (oosCount / (products.length * activeRetailers.length))) * 100;
     const notReferencedCount = Math.floor(seededRandom(0, 3, "non-ref"));
 
     // Search Data
@@ -435,5 +438,7 @@ export default function DigitalShelfPage() {
     </div>
   );
 }
+
+    
 
     
