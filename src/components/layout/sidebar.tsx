@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -13,6 +14,7 @@ import {
   Store,
   Users,
   Settings,
+  FlaskConical,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
@@ -27,6 +29,7 @@ const navItems = [
   { href: '/performances', icon: BarChart2, label: 'Performances' },
   { href: '/digital-shelf', icon: Store, label: 'Digital Shelf' },
   { href: '/donnees-consommateurs', icon: Users, label: 'Données Conso.' },
+  { href: '/labo-insights', icon: FlaskConical, label: "Labo d'Insights" },
 ];
 
 export default function Sidebar({ children }: { children?: ReactNode }) {

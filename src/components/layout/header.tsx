@@ -1,3 +1,4 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -18,6 +19,7 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/performances': { title: 'Analyse des Performances', subtitle: "Analysez vos ventes et données sur tous les canaux." },
   '/digital-shelf': { title: 'Digital Shelf', subtitle: "Monitorez votre présence en ligne." },
   '/donnees-consommateurs': { title: 'Données Consommateurs', subtitle: "Comprenez le profil de vos acheteurs." },
+  '/labo-insights': { title: "Labo d'Insights", subtitle: "Simulez vos études consommateurs avec l'IA." },
   '/settings': { title: 'Paramètres', subtitle: "Gérez les préférences de votre compte." },
 };
 
