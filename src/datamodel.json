@@ -1,0 +1,147 @@
+
+{
+  "ai_flows": {
+    "adaptCreativeContentForPlatform": {
+      "input": {
+        "baseImage": "string (data URI)",
+        "targetPlatform": "string (e.g., 'Post Instagram (1080x1080)')",
+        "logoDataUri": "string (data URI, optional)",
+        "brandGuidelinesDataUri": "string (data URI, optional)"
+      },
+      "output": {
+        "adaptedImageUrl": "string (data URI)",
+        "adaptedText": "string"
+      }
+    },
+    "chatbotFlow": {
+      "input": {
+        "prompt": "string"
+      },
+      "output": {
+        "response": "string"
+      }
+    },
+    "createPromptFromFileUpload": {
+      "input": {
+        "fileDataUri": "string (data URI)",
+        "userPrompt": "string"
+      },
+      "output": {
+        "prompt": "string"
+      }
+    },
+    "editMarketingImage": {
+      "input": {
+        "baseImage": "string (data URI)",
+        "editInstruction": "string"
+      },
+      "output": {
+        "editedImageUrl": "string (data URI)"
+      }
+    },
+    "generateMarketingImage": {
+      "input": {
+        "prompt": "string"
+      },
+      "output": {
+        "imageUrl": "string (data URI)"
+      }
+    },
+    "simulateConsumerTest": {
+      "input": {
+        "testTitle": "string",
+        "testObjective": "string",
+        "targetPanel": "string",
+        "script": "string (optional)",
+        "fileDataUri": "string (data URI, optional)",
+        "fileType": "string (optional)"
+      },
+      "output": {
+        "attractionScore": "number",
+        "keyStrengths": "string",
+        "keyWeaknesses": "string",
+        "consumerVerbatims": [
+          {
+            "profile": "string",
+            "quote": "string"
+          }
+        ],
+        "recommendation": "string"
+      }
+    }
+  },
+  "dashboard_data": {
+    "brandMediaCampaign": {
+      "id": "string",
+      "brand": "string",
+      "product": "string",
+      "start": "Date",
+      "end": "Date",
+      "lever": "string",
+      "channel": "string",
+      "objective": "string",
+      "status": "string ('Terminée', 'En cours', 'Planifiée')",
+      "roas": "number | null",
+      "ca_add": "number | null",
+      "spend": "number",
+      "reach": "number",
+      "clicks": "number"
+    },
+    "mediaBrandPerformance": {
+      "platform": "string",
+      "ROI": "number",
+      "CPA": "number"
+    },
+    "mediaBrandBudgetAllocation": {
+      "name": "string",
+      "value": "number"
+    },
+    "retailMediaCampaign": {
+      "id": "string",
+      "brand": "string",
+      "product": "string",
+      "start": "Date",
+      "end": "Date",
+      "retailer": "string",
+      "lever": "string",
+      "objective": "string",
+      "status": "string ('Terminée', 'En cours', 'Planifiée')",
+      "roas": "number | null",
+      "sales_attributed": "number | null",
+      "spend": "number",
+      "details": "object (varies by lever)"
+    },
+    "retailMediaPerformance": {
+      "retailer": "string",
+      "ROI": "number",
+      "CPA": "number"
+    },
+    "mmmContribution": {
+      "baseline": "number",
+      "contributions": {
+        "[leverName]": "number"
+      },
+      "investments": {
+        "[leverName]": "number"
+      }
+    },
+    "digitalShelf": {
+      "availabilityRate": "number",
+      "oosCount": "number",
+      "notReferencedCount": "number",
+      "searchShare": "number",
+      "avgRank": "number",
+      "contentScore": "number",
+      "avgRating": "number",
+      "reviewCount": "number"
+    },
+    "consumerData": {
+      "salesTree": "object",
+      "kpis": "object",
+      "dynamics": "object",
+      "profile": "object",
+      "loyalty": "object",
+      "habits": "object"
+    }
+  }
+}
