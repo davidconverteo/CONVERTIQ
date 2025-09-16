@@ -266,5 +266,3 @@ export default function LaboInsightsPage() {
         </Tabs>
     );
 }
-
-    
