@@ -14,7 +14,7 @@ import { getDataSummary, DataCategorySchema } from '@/services/data-service';
 
 // --- Input and Output Schemas ---
 
-export const CreateReportFromPromptInputSchema = z.object({
+const CreateReportFromPromptInputSchema = z.object({
   prompt: z.string().describe("The user's question or request for a report."),
 });
 export type CreateReportFromPromptInput = z.infer<typeof CreateReportFromPromptInputSchema>;
@@ -60,7 +60,7 @@ const ReportWidgetSchema = z.union([
 export type ReportWidget = z.infer<typeof ReportWidgetSchema>;
 
 
-export const CreateReportFromPromptOutputSchema = z.object({
+const CreateReportFromPromptOutputSchema = z.object({
     title: z.string().describe('A clear and concise title for the generated report.'),
     widgets: z.array(ReportWidgetSchema).describe('An array of widget objects that make up the report.'),
 });
