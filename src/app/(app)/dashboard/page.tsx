@@ -250,10 +250,8 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className="text-center">
-                        <div className="flex justify-center mb-2">
-                           <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
-                        </div>
+                    <CardHeader className="flex-row items-center gap-2">
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
                         <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm min-h-[170px]">
@@ -374,3 +372,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
