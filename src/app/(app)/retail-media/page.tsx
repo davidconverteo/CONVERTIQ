@@ -82,7 +82,7 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                 </div>
                  <Card className="bg-background">
                     <CardHeader className="flex-row items-center gap-2 space-y-0">
-                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                        <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
                         <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 text-sm">
@@ -372,7 +372,7 @@ export default function RetailMediaPage() {
             </div>
              <Card>
                 <CardHeader className="flex-row items-center gap-2 space-y-0">
-                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
                     <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
@@ -472,6 +472,8 @@ export default function RetailMediaPage() {
 }
 
     
+    
+
     
 
     

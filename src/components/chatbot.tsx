@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -24,7 +25,7 @@ function ChatWindow({ isOpen, onToggle, messages, isLoading, input, setInput, ha
           <Card className="flex h-[70vh] max-h-[600px] flex-col shadow-2xl">
             <CardHeader className="flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain" />
+                <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain" />
                 Assistant ConvertIQ
               </CardTitle>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onToggle}>
@@ -151,7 +152,7 @@ export default function ChatbotTrigger() {
           'hover:bg-sidebar-accent/50'
         )}
       >
-        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain brightness-0 invert" />
+        <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain brightness-0 invert" />
         <span>Assistant IA</span>
       </button>
       <ChatWindow 
@@ -167,3 +168,5 @@ export default function ChatbotTrigger() {
     </>
   );
 }
+
+    
