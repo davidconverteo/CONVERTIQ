@@ -31,14 +31,14 @@ const generateData = (filters: any) => {
         customersTrend: random(1, 8, 'custTrend'),
     };
     
-    const evolutionData = Array.from({length: 12}, (_, i) => {
-        const week = 12-i;
+    const evolutionData = Array.from({length: 52}, (_, i) => {
+        const week = 52-i;
         return {
             name: `S-${week}`,
-            "Chiffre d'Affaires": kpiData.ca / 12 * (1 + random(-0.1, 0.1, `ca_w${week}`)),
-            "Volumes": kpiData.volumes / 12 * (1 + random(-0.1, 0.1, `vol_w${week}`)),
-            "Transactions": kpiData.transactions / 12 * (1 + random(-0.1, 0.1, `trans_w${week}`)),
-            "Clients": kpiData.customers / 12 * (1 + random(-0.1, 0.1, `cust_w${week}`)),
+            "Chiffre d'Affaires": random(kpiData.caTrend - 5, kpiData.caTrend + 5, `ca_w${week}`),
+            "Volumes": random(kpiData.volumesTrend - 4, kpiData.volumesTrend + 4, `vol_w${week}`),
+            "Transactions": random(kpiData.transactionsTrend - 3, kpiData.transactionsTrend + 3, `trans_w${week}`),
+            "Clients": random(kpiData.customersTrend - 2, kpiData.customersTrend + 2, `cust_w${week}`),
         }
     });
 
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         <Card>
             <CardHeader>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <CardTitle>Évolution Hebdomadaire des KPIs</CardTitle>
+                    <CardTitle>Évolution Hebdomadaire des KPIs (vs N-1)</CardTitle>
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                         {chartKpis.map(kpi => (
                             <div key={kpi} className="flex items-center space-x-2">
@@ -173,15 +173,10 @@ export default function DashboardPage() {
                     <LineChart data={evolutionData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
-                        <YAxis yAxisId="left" stroke="hsl(var(--primary))" tickFormatter={(value) => `€${(value/1000).toLocaleString('fr-FR')}k`} />
-                        <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" tickFormatter={(value) => (value/1000).toLocaleString('fr-FR')+'k'} />
+                        <YAxis yAxisId="left" stroke="hsl(var(--primary))" tickFormatter={(value) => `${value.toFixed(0)}%`} />
+                        <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" tickFormatter={(value) => `${value.toFixed(0)}%`} />
                         <Tooltip
-                          formatter={(value: number, name: string) => {
-                            if (name === "Chiffre d'Affaires") {
-                                return [`${value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}`, name];
-                            }
-                            return [`${value.toLocaleString('fr-FR', {maximumFractionDigits: 0})}`, name];
-                          }}
+                          formatter={(value: number) => [`${value.toFixed(2)}%`, `vs N-1`]}
                         />
                         <Legend />
                         {visibleKpis.includes("Chiffre d'Affaires") && <Line yAxisId="left" type="monotone" dataKey="Chiffre d'Affaires" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />}
