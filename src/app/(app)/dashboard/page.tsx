@@ -6,28 +6,43 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
 import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Checkbox } from '@/components/ui/checkbox';
 
-const generateKpiData = (filters: any) => {
+const generateData = (filters: any) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
     const seed = hashCode(JSON.stringify(filters));
-    const random = (min: number, max: number) => {
-        let t = seed + 0x6D2B79F5;
+    const random = (min: number, max: number, salt: string = "") => {
+        let t = seed + hashCode(salt) + 0x6D2B79F5;
         t = Math.imul(t ^ t >>> 15, t | 1);
         t ^= t + Math.imul(t ^ t >>> 7, t | 61);
         const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
         return result * (max-min) + min;
     };
     
-    return {
-        ca: random(1800000, 2500000),
-        caTrend: random(5, 15),
-        volumes: random(800000, 1200000),
-        volumesTrend: random(2, 10),
-        transactions: random(400000, 600000),
-        transactionsTrend: random(-5, 5),
-        customers: random(250000, 350000),
-        customersTrend: random(1, 8),
+    const kpiData = {
+        ca: random(1800000, 2500000, 'ca'),
+        caTrend: random(5, 15, 'caTrend'),
+        volumes: random(800000, 1200000, 'vol'),
+        volumesTrend: random(2, 10, 'volTrend'),
+        transactions: random(400000, 600000, 'trans'),
+        transactionsTrend: random(-5, 5, 'transTrend'),
+        customers: random(250000, 350000, 'cust'),
+        customersTrend: random(1, 8, 'custTrend'),
     };
+    
+    const evolutionData = Array.from({length: 12}, (_, i) => {
+        const week = 12-i;
+        return {
+            name: `S-${week}`,
+            "Chiffre d'Affaires": kpiData.ca / 12 * (1 + random(-0.1, 0.1, `ca_w${week}`)),
+            "Volumes": kpiData.volumes / 12 * (1 + random(-0.1, 0.1, `vol_w${week}`)),
+            "Transactions": kpiData.transactions / 12 * (1 + random(-0.1, 0.1, `trans_w${week}`)),
+            "Clients": kpiData.customers / 12 * (1 + random(-0.1, 0.1, `cust_w${week}`)),
+        }
+    });
+
+    return { kpiData, evolutionData };
 };
 
 
@@ -39,12 +54,21 @@ export default function DashboardPage() {
         gamme: 'all',
         period: 'mat',
     });
+    
+    const [visibleKpis, setVisibleKpis] = useState<string[]>(["Chiffre d'Affaires"]);
 
     const handleFilterChange = (filterName: keyof typeof filters, value: string) => {
         setFilters(prev => ({ ...prev, [filterName]: value }));
     };
+    
+    const handleKpiToggle = (kpi: string) => {
+        setVisibleKpis(prev => prev.includes(kpi) ? prev.filter(item => item !== kpi) : [...prev, kpi]);
+    }
 
-    const kpiData = useMemo(() => generateKpiData(filters), [filters]);
+    const { kpiData, evolutionData } = useMemo(() => generateData(filters), [filters]);
+    
+    const chartKpis = Object.keys(evolutionData[0]).filter(k => k !== 'name');
+
 
   return (
     <div className="space-y-6">
@@ -129,6 +153,45 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         </div>
+
+        <Card>
+            <CardHeader>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <CardTitle>Évolution Hebdomadaire des KPIs</CardTitle>
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                        {chartKpis.map(kpi => (
+                            <div key={kpi} className="flex items-center space-x-2">
+                                <Checkbox id={`cb-${kpi}`} checked={visibleKpis.includes(kpi)} onCheckedChange={() => handleKpiToggle(kpi)} />
+                                <label htmlFor={`cb-${kpi}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{kpi}</label>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <ResponsiveContainer width="100%" height={350}>
+                    <LineChart data={evolutionData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                        <YAxis yAxisId="left" stroke="hsl(var(--primary))" tickFormatter={(value) => `€${(value/1000).toLocaleString('fr-FR')}k`} />
+                        <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" tickFormatter={(value) => (value/1000).toLocaleString('fr-FR')+'k'} />
+                        <Tooltip
+                          formatter={(value: number, name: string) => {
+                            if (name === "Chiffre d'Affaires") {
+                                return [`${value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}`, name];
+                            }
+                            return [`${value.toLocaleString('fr-FR', {maximumFractionDigits: 0})}`, name];
+                          }}
+                        />
+                        <Legend />
+                        {visibleKpis.includes("Chiffre d'Affaires") && <Line yAxisId="left" type="monotone" dataKey="Chiffre d'Affaires" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />}
+                        {visibleKpis.includes("Volumes") && <Line yAxisId="right" type="monotone" dataKey="Volumes" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} />}
+                        {visibleKpis.includes("Transactions") && <Line yAxisId="right" type="monotone" dataKey="Transactions" stroke="hsl(var(--chart-3))" strokeWidth={2} dot={false} />}
+                        {visibleKpis.includes("Clients") && <Line yAxisId="right" type="monotone" dataKey="Clients" stroke="hsl(var(--chart-4))" strokeWidth={2} dot={false} />}
+                    </LineChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
 
     </div>
   );
