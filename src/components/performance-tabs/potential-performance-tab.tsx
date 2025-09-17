@@ -5,8 +5,11 @@ import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Legend, ZAxis, Cell } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles } from "lucide-react";
+import { Sparkles, MoveRight } from "lucide-react";
 import ExportDialog from './export-dialog';
+import Image from 'next/image';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 type Filters = {
     country: string;
@@ -143,16 +146,35 @@ export default function PotentialPerformanceTab({ filters }: PotentialPerformanc
             </CardContent>
         </Card>
         <Card>
-            <CardHeader className="flex-row items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>Synthèse & Recommandations IA</CardTitle>
+            <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">La matrice montre un <strong>fort potentiel de croissance chez Auchan</strong>, où la catégorie performe bien (indice {data['all'].find(d => d.retailer === 'Auchan')?.perf.toFixed(0)}) mais notre part de marché est faible ({data['all'].find(d => d.retailer === 'Auchan')?.pdm.toFixed(1)}%).</p>
-                <p className="text-sm text-muted-foreground mt-4">À l'inverse, notre position chez Casino est une <strong>zone de risque</strong> : notre PDM est forte ({data['all'].find(d => d.retailer === 'Casino')?.pdm.toFixed(1)}%) mais la catégorie y sous-performe (indice {data['all'].find(d => d.retailer === 'Casino')?.perf.toFixed(0)}).</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Lancer un plan de développement de la part de marché chez Auchan (négociation assortiment, trade marketing). Analyser les causes de la sous-performance de la catégorie chez Casino pour défendre notre position.</p>
+            <CardContent className="space-y-4 text-sm">
+                <div>
+                    <h4 className="font-semibold mb-1">À retenir</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Fort potentiel</strong> de croissance chez <strong>Auchan</strong>: la catégorie y performe bien (indice {data['all'].find(d => d.retailer === 'Auchan')?.perf.toFixed(0)}) mais votre PDM y est faible ({data['all'].find(d => d.retailer === 'Auchan')?.pdm.toFixed(1)}%).</li>
+                        <li><strong>Zone de risque</strong> chez <strong>Casino</strong>: votre PDM y est forte ({data['all'].find(d => d.retailer === 'Casino')?.pdm.toFixed(1)}%) mais la catégorie y sous-performe.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Attaquer :</strong> Lancer un plan de développement de part de marché chez Auchan (négociation assortiment, trade marketing).</li>
+                        <li><strong>Défendre :</strong> Analyser les causes de la sous-performance de la catégorie chez Casino pour protéger votre position.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                    <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/performances?tab=offer&subtab=retailer">Analyser l'assortiment par enseigne <MoveRight className="ml-1" /></Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     </div>
   );
 }
+
+    

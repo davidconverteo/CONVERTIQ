@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type Filters = {
     country: string;
@@ -172,27 +173,34 @@ export default function DecisionTreeTab({ filters }: DecisionTreeTabProps) {
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader className="flex-row items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-accent" />
-                    <CardTitle>Synthèse & Recommandations IA</CardTitle>
+                <CardHeader className="flex-row items-center gap-2 space-y-0">
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm text-muted-foreground">
-                     <p>
-                        L'arbre de décision montre que le <strong>"Dessert Plaisir"</strong> est le principal besoin (45% des occasions d'achat). Au sein de ce segment, votre marque est bien positionnée sur les pots individuels mais a une part plus faible sur les packs.
-                    </p>
-                    <p>
-                        Le besoin <strong>"Snack Sain"</strong> (30%) est une autre opportunité majeure. Votre gamme Skyr capte bien ce besoin sur les pots individuels, mais vous êtes quasi-absent du format "à boire", dominé par Yoplait et Danone.
-                    </p>
+                <CardContent className="space-y-4 text-sm">
                     <div>
-                        <strong>Recommandation Stratégique :</strong>
-                        <ol className="mt-2 list-decimal pl-5 space-y-1">
-                            <li><strong>Défendre :</strong> Protéger votre position sur les pots individuels "plaisir" et "sain".</li>
-                            <li><strong>Attaquer :</strong> Envisager le lancement d'un produit "à boire" sous la gamme Skyr pour concurrencer directement Yop et Actimel sur le segment "Snack Sain".</li>
-                            <li><strong>Développer :</strong> Augmenter la part de voix sur les formats "Pack Plaisir" via des offres promotionnelles ciblées pour contester la dominance de la MDD.</li>
-                        </ol>
+                        <h4 className="font-semibold mb-1">À retenir</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li>Le <strong>"Dessert Plaisir"</strong> est le principal besoin (45% des occasions d'achat).</li>
+                            <li>Sur le besoin "Snack Sain", votre gamme <strong>Skyr</strong> est forte en pot, mais absente du format "à boire".</li>
+                            <li>La <strong>MDD</strong> est un concurrent majeur sur les formats pack économiques.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li><strong>Attaquer :</strong> Lancer un produit "à boire" (type Yop) sous la gamme Skyr pour capter le besoin "Snack Sain" nomade.</li>
+                            <li><strong>Défendre :</strong> Lancer une campagne promotionnelle sur les packs "Dessert Plaisir" pour contrer la MDD.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                        <p className="text-muted-foreground">Simuler un test de concept pour le nouveau produit "Skyr à boire" dans le Labo d'Insights.</p>
                     </div>
                 </CardContent>
             </Card>
         </div>
     );
 }
+
+    

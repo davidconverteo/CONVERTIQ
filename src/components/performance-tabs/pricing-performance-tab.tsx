@@ -5,8 +5,11 @@ import { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
-import { Sparkles } from "lucide-react";
+import { Sparkles, MoveRight } from "lucide-react";
 import ExportDialog from './export-dialog';
+import Image from 'next/image';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 type Filters = {
     country: string;
@@ -142,16 +145,37 @@ export default function PricingPerformanceTab({ filters }: PricingPerformanceTab
         </Table>
       </Card>
        <Card>
-            <CardHeader className="flex-row items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>Synthèse & Recommandations IA</CardTitle>
+            <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">La croissance du CA est principalement portée par l'effet <strong>volume</strong> et l'effet <strong>prix</strong>. L'effet promotionnel est négatif, suggérant des promotions trop coûteuses ou inefficaces.</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Revoir la stratégie promotionnelle chez E.Leclerc où le poids promo est le plus élevé mais l'évolution du prix est négative. Optimiser la mécanique ou la générosité des offres.</p>
+            <CardContent className="space-y-4 text-sm">
+                 <div>
+                    <h4 className="font-semibold mb-1">À retenir</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li>La croissance du CA est saine, tirée par les effets <strong>volume</strong> et <strong>prix</strong>.</li>
+                        <li>L'effet promotionnel est négatif (<strong>{growthData[3].value.toLocaleString('fr-FR')}€</strong>), suggérant des promotions trop coûteuses ou inefficaces.</li>
+                        <li><strong>E.Leclerc</strong> a le poids promo le plus élevé ({priceEvoData.find(d=>d.retailer==='E.Leclerc')?.promoWeight.toFixed(0)}%) et une évolution de prix négative.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Analyser :</strong> Examiner en détail le retour sur investissement des promotions chez E.Leclerc.</li>
+                        <li><strong>Optimiser :</strong> Tester des mécaniques promotionnelles moins coûteuses (ex: 2+1 au lieu de -50% sur le 2ème) chez les enseignes où la pression promo est forte.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                    <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/retail-media">Consulter les détails des campagnes Retail Media <MoveRight className="ml-1" /></Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
       </div>
     </div>
   );
 }
+
+    

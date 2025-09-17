@@ -6,8 +6,11 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
-import { DollarSign, Package, Home, Percent, Sparkles } from "lucide-react";
+import { DollarSign, Package, Home, Percent, Sparkles, MoveRight } from "lucide-react";
 import ExportDialog from './export-dialog';
+import Image from 'next/image';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 type Filters = {
     country: string;
@@ -259,16 +262,37 @@ export default function OfflinePerformanceTab({ filters }: OfflinePerformanceTab
             </Table>
         </Card>
         <Card>
-             <CardHeader className="flex-row items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>Synthèse & Recommandations IA</CardTitle>
+            <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">La croissance est saine, principalement portée par la hausse du nombre de transactions. La part de marché gagne 1.2 point.</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Consolider la croissance chez Carrefour où la DN est excellente. Lancer un plan d'action spécifique pour Intermarché où la DN est plus faible.</p>
+            <CardContent className="space-y-4 text-sm">
+                <div>
+                    <h4 className="font-semibold mb-1">À retenir</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li>La croissance du CA ({treeData.ca.trend}) est saine, principalement portée par la hausse du <strong>nombre de transactions</strong> ({treeData.transactions.trend}).</li>
+                        <li>Votre part de marché gagne <strong>{kpis.marketShareChange.split(' ')[0]}</strong> points.</li>
+                        <li>Le produit <strong>Skyr Nature</strong> connaît une croissance explosive (+{topProducts.find(p=>p.name.includes('Skyr'))?.evolution.toFixed(0)}%).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Consolider :</strong> Maintenir une pression promotionnelle sur le Skyr Nature pour soutenir la croissance.</li>
+                        <li><strong>Développer :</strong> Lancer un plan d'action spécifique pour Intermarché où la DN (95%) est en retrait par rapport aux autres enseignes.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                    <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/performances?tab=potential">Identifier le potentiel de développement par enseigne <MoveRight className="ml-1" /></Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     </div>
     </div>
   );
 }
+
+    

@@ -6,11 +6,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from 'recharts';
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Percent, Download, BrainCircuit, Sparkles, SlidersHorizontal, BarChart2 } from 'lucide-react';
+import { TrendingUp, Percent, Download, BrainCircuit, Sparkles, SlidersHorizontal, BarChart2, MoveRight } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { mmmData, countryData } from '@/services/data-service';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const COLORS = ['#1e293b', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -154,15 +156,29 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                     </div>
                      <Card>
                         <CardHeader className="flex-row items-center gap-2 space-y-0">
-                            <Sparkles className="h-5 w-5 text-accent" />
-                            <CardTitle className="text-lg">Synthèse et Recommandation IA</CardTitle>
+                            <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                            <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                                Le modèle MMM pour la période <strong>{selectedPeriod.replace('-', ' ')}</strong> en <strong>{country}</strong> montre que <strong>{roasTableData[0]?.lever}</strong> est le levier le plus performant avec un ROAS de <strong>{roasTableData[0]?.roi.toFixed(2)}x</strong>. 
-                                La baseline représente <strong>{(baseline / (baseline + totalContribution) * 100).toFixed(0)}%</strong> des ventes. 
-                                <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget de <strong>{roasTableData[roasTableData.length-1]?.lever}</strong> (ROAS: {roasTableData[roasTableData.length-1]?.roi.toFixed(2)}x) vers <strong>{roasTableData[0]?.lever}</strong> pour maximiser le retour sur investissement global. Utilisez le simulateur pour tester ce scénario.
-                            </p>
+                        <CardContent className="space-y-4 text-sm">
+                            <div>
+                                <h4 className="font-semibold mb-1">À retenir</h4>
+                                <ul className="list-disc pl-5 text-muted-foreground">
+                                    <li>Le levier <strong>{roasTableData[0]?.lever}</strong> est le plus performant avec un ROAS de <strong>{roasTableData[0]?.roi.toFixed(2)}x</strong>.</li>
+                                    <li>La baseline (ventes non-dépendantes du marketing) représente <strong>{(baseline / (baseline + totalContribution) * 100).toFixed(0)}%</strong> des ventes totales.</li>
+                                    <li>Le levier <strong>{roasTableData[roasTableData.length-1]?.lever}</strong> a le ROAS le plus faible ({roasTableData[roasTableData.length-1]?.roi.toFixed(2)}x).</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                                <ul className="list-disc pl-5 text-muted-foreground">
+                                    <li><strong>Optimiser :</strong> Envisagez de réallouer 15% du budget de <strong>{roasTableData[roasTableData.length-1]?.lever}</strong> vers <strong>{roasTableData[0]?.lever}</strong> pour maximiser le retour sur investissement.</li>
+                                    <li><strong>Simuler :</strong> Utilisez le simulateur pour tester ce scénario et visualiser l'impact sur le CA total avant de prendre une décision.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                                <p className="text-muted-foreground">Utilisez l'onglet "Simulation Budgétaire" pour appliquer ces recommandations et voir l'impact en temps réel.</p>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -325,5 +341,7 @@ export default function MMMPage() {
 
   return <MmmCountryView country={selectedCountry} onBack={() => setSelectedCountry(null)} />;
 }
+
+    
 
     

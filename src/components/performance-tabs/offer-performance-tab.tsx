@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OfferByRetailerTab from './offer-by-retailer-tab';
 import DecisionTreeTab from './decision-tree-tab';
 import ExportDialog from './export-dialog';
+import Image from 'next/image';
 
 type Filters = {
     country: string;
@@ -117,14 +118,30 @@ const AssortmentAnalysisTab = ({ filters }: { filters: Filters }) => {
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader className="flex-row items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-accent" />
-                    <CardTitle>Synthèse & Recommandations IA</CardTitle>
+                <CardHeader className="flex-row items-center gap-2 space-y-0">
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">Votre produit <strong>Skyr Nature</strong> est un "Dilemme" : forte rentabilité mais faible performance commerciale. Il nécessite un plan d'action pour le faire passer en "Étoile".</p>
-                    <p className="text-sm text-muted-foreground mt-4">Le <strong>Grand Pot Nature Bio</strong> est un produit clé, avec un fort taux d'acheteurs exclusifs ({rankingData.find(p => p.name.includes('Bio'))?.exclusifs.toFixed(0)}%). Il est crucial pour la fidélisation.</p>
-                    <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Investir en promotion ou en visibilité sur le Skyr Nature pour augmenter ses ventes (VMH). Protéger la position du Grand Pot Bio en assurant une disponibilité parfaite.</p>
+                <CardContent className="space-y-4 text-sm">
+                    <div>
+                        <h4 className="font-semibold mb-1">À retenir</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li>Le produit <strong>Skyr Nature</strong> est un "Dilemme" : forte rentabilité mais faibles ventes. C'est une étoile en devenir.</li>
+                            <li>Le <strong>Grand Pot Nature Bio</strong> est un produit clé avec un fort taux d'acheteurs exclusifs ({rankingData.find(p => p.name.includes('Bio'))?.exclusifs.toFixed(0)}%), crucial pour la fidélisation.</li>
+                            <li>Le <strong>Yaourt Végétal</strong> est un "Poids Mort" et pourrait être délisté s'il n'est pas stratégique.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li><strong>Développer :</strong> Investir en promotion ou en visibilité sur le <strong>Skyr Nature</strong> pour augmenter ses ventes (VMH) et le transformer en "Étoile".</li>
+                            <li><strong>Protéger :</strong> Assurer une disponibilité parfaite et un bon positionnement en rayon pour le <strong>Grand Pot Bio</strong>.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                        <p className="text-muted-foreground">Analysez l'arbre de décision pour comprendre les alternatives que les clients choisissent face au Yaourt Végétal.</p>
+                    </div>
                 </CardContent>
             </Card>
             </div>
@@ -152,3 +169,5 @@ export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProp
     </Tabs>
   );
 }
+
+    

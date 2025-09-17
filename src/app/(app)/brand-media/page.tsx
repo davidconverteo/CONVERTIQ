@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin, Sparkles, Tv, Newspaper, Radio, CalendarDays, ExternalLink, Presentation, ChevronRight, Megaphone } from "lucide-react";
+import { Facebook, Instagram, Youtube, DollarSign, Eye, MousePointerClick, TrendingUp, Filter, MapPin, Sparkles, Tv, Newspaper, Radio, CalendarDays, ExternalLink, Presentation, ChevronRight, Megaphone, MoveRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { campaignDataByCountry, mediaBrandPerformanceByPlatform, mediaBrandBudgetAllocation } from '@/services/data-service';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import Image from 'next/image';
+import Link from 'next/link';
 
 
 const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280', '#06B6D4', '#8B5CF6'];
@@ -82,13 +84,30 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                 </div>
                  <Card className="bg-background">
                     <CardHeader className="flex-row items-center gap-2 space-y-0">
-                        <Sparkles className="h-5 w-5 text-accent" />
-                        <CardTitle className="text-lg">Recommandation IA</CardTitle>
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                        <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">
-                            {campaign.lever === 'TV' ? 'Le plan GRP est aligné avec les objectifs de notoriété pour le lancement. Suivre l\'impact post-campagne sur les ventes et la notoriété spontanée.' : 'Cette campagne a montré un excellent ROAS. Pour la prochaine vague, envisagez de tester un ciblage sur l\'audience "Jeunes Parents" qui a montré un fort taux d\'engagement.'}
-                        </p>
+                    <CardContent className="space-y-4 text-sm">
+                        <div>
+                            <h4 className="font-semibold mb-1">À retenir</h4>
+                             <ul className="list-disc pl-5 text-muted-foreground">
+                                <li>Cette campagne a montré un excellent ROAS de <strong>{campaign.roas}x</strong>.</li>
+                                <li>Le ciblage a permis de toucher <strong>{campaign.reach.toLocaleString('fr-FR')}</strong> personnes.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                             <ul className="list-disc pl-5 text-muted-foreground">
+                                <li>Envisager de tester un ciblage sur l'audience "Jeunes Parents" qui a montré un fort taux d'engagement.</li>
+                                <li>Augmenter le budget de 15% pour la prochaine vague afin de maximiser la portée.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                             <Button variant="link" asChild className="p-0 h-auto">
+                                <Link href="/mmm">Consulter le Marketing Mix Model <MoveRight className="ml-1" /></Link>
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -327,14 +346,31 @@ export default function BrandMediaPage() {
             </div>
              <Card>
                 <CardHeader className="flex-row items-center gap-2 space-y-0">
-                    <Sparkles className="h-5 w-5 text-accent" />
-                    <CardTitle className="text-lg">Synthèse et Recommandation IA</CardTitle>
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                        En {country}, le ROAS global de {globalRoi.toFixed(2)} est solide, principalement tiré par les campagnes digitales ({mediaBrandPerformanceByPlatform[country].find(p => p.platform.toLowerCase().includes('meta'))?.ROI || 4}x). La TV maintient une forte contribution à la notoriété malgré un ROAS plus faible. 
-                        <strong>Recommandation :</strong> Envisagez de réallouer une partie du budget Affichage, dont le ROAS est faible, vers le Social Media pour maximiser la conversion à court terme. Lancez une analyse post-campagne pour la TV afin de quantifier son impact sur les ventes indirectes.
-                    </p>
+                <CardContent className="space-y-4 text-sm">
+                    <div>
+                        <h4 className="font-semibold mb-1">À retenir</h4>
+                         <ul className="list-disc pl-5 text-muted-foreground">
+                            <li>Le ROAS global de <strong>{globalRoi.toFixed(2)}x</strong> est solide, principalement tiré par les campagnes digitales (Social Media, Youtube).</li>
+                            <li>La TV maintient une forte contribution à la notoriété malgré un ROAS plus faible.</li>
+                            <li>L'Affichage et la Presse montrent un retour sur investissement plus limité.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                         <ul className="list-disc pl-5 text-muted-foreground">
+                            <li><strong>Optimiser :</strong> Réallouer 10% du budget Affichage, dont le ROAS est faible, vers le Social Media pour maximiser la conversion.</li>
+                            <li><strong>Analyser :</strong> Lancer une analyse post-campagne pour la TV afin de quantifier son impact sur les ventes indirectes et la notoriété de marque.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                        <Button variant="link" asChild className="p-0 h-auto">
+                            <Link href="/mmm">Lancer une simulation budgétaire dans le MMM <MoveRight className="ml-1" /></Link>
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
         </TabsContent>
@@ -408,6 +444,8 @@ export default function BrandMediaPage() {
     </div>
   );
 }
+
+    
 
     
 

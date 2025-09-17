@@ -4,8 +4,11 @@
 import { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Sparkles } from "lucide-react";
+import { Sparkles, MoveRight } from "lucide-react";
 import ExportDialog from './export-dialog';
+import Image from 'next/image';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 type Filters = {
     country: string;
@@ -122,16 +125,37 @@ export default function OnlinePerformanceTab({ filters }: OnlinePerformanceTabPr
           </Table>
       </Card>
        <Card>
-             <CardHeader className="flex-row items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>Synthèse & Recommandations IA</CardTitle>
+            <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">Le canal Drive montre un <strong>panier moyen supérieur de {comparisonData[0].diff.toFixed(0)}%</strong> à l'offline, tiré par un nombre d'articles par panier plus élevé. La sensibilité à la promotion y est également plus forte.</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Le taux de rupture chez Courses U ({scorecardData.find(d => d.retailer === 'Courses U')?.oos.toFixed(1)}%) est un point d'attention. Coordonnez-vous avec l'enseigne pour optimiser les stocks sur vos références clés. </p>
+            <CardContent className="space-y-4 text-sm">
+                <div>
+                    <h4 className="font-semibold mb-1">À retenir</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li>Le panier moyen en Drive est <strong>supérieur de {comparisonData[0].diff.toFixed(0)}%</strong> à celui en magasin physique.</li>
+                        <li>La sensibilité à la promotion est plus forte en Drive (<strong>{comparisonData.find(d => d.indicator === 'Poids Ventes Promo')?.drive.toFixed(0)}%</strong> des ventes).</li>
+                        <li>Le taux de rupture chez <strong>Courses U ({scorecardData.find(d => d.retailer === 'Courses U')?.oos.toFixed(1)}%)</strong> est un point d'attention.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Optimiser :</strong> Coordonner avec Courses U pour optimiser les stocks sur vos références clés et réduire le taux de rupture.</li>
+                        <li><strong>Cibler :</strong> Mettre en place des promotions exclusives au Drive pour maximiser le panier moyen.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                    <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/digital-shelf">Explorer les détails du Digital Shelf <MoveRight className="ml-1" /></Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
       </div>
     </div>
   );
 }
+
+    

@@ -6,12 +6,14 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileDown, Search, Filter, AlertTriangle, CheckCircle2, XCircle, FileWarning, Lightbulb, MapPin, Building, Package, Layers, Star, MessageSquare, Image as ImageIcon, Heading1 } from "lucide-react";
+import { FileDown, Search, Filter, AlertTriangle, CheckCircle2, XCircle, FileWarning, Lightbulb, MapPin, Building, Package, Layers, Star, MessageSquare, Image as ImageIcon, Heading1, MoveRight } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { countryOptions, retailerOptions, brandOptions, gammeOptions } from "@/services/filters-data";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type Filters = {
     country: string;
@@ -283,14 +285,34 @@ export default function DigitalShelfPage() {
                     </CardContent>
                 </Card>
             </div>
-            <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
-                <CardHeader className="flex flex-row items-start gap-3 space-y-0">
-                    <Lightbulb className="h-5 w-5 text-blue-500 mt-1" />
-                    <div>
-                        <CardTitle className="text-blue-900 dark:text-blue-200">Analyse IA</CardTitle>
-                        <CardDescription className="text-blue-700 dark:text-blue-300">Votre taux de disponibilité est bon, mais des ruptures sont détectées sur des produits à forte rotation chez E.Leclerc. Priorisez la résolution de ces alertes pour éviter une perte de chiffre d'affaires.</CardDescription>
-                    </div>
+            <Card>
+                <CardHeader className="flex-row items-center gap-2 space-y-0">
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
+                <CardContent className="space-y-4 text-sm">
+                    <div>
+                        <h4 className="font-semibold mb-1">À retenir</h4>
+                         <ul className="list-disc pl-5 text-muted-foreground">
+                            <li>Le taux de disponibilité global est excellent à <strong>{availabilityRate.toFixed(1)}%</strong>.</li>
+                            <li>Quelques ruptures sont détectées chez <strong>E.Leclerc</strong>, principalement sur les produits à forte rotation.</li>
+                            <li><strong>{notReferencedCount}</strong> produits ne sont pas référencés sur l'ensemble des enseignes.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                         <ul className="list-disc pl-5 text-muted-foreground">
+                            <li><strong>Prioriser :</strong> Concentrer les efforts sur la résolution des <strong>{oosCount} ruptures de stock</strong> pour éviter une perte de chiffre d'affaires immédiate.</li>
+                            <li><strong>Analyser :</strong> Utiliser l'onglet "Offre" pour identifier le potentiel de gain lié aux <strong>{notReferencedCount} produits non-référencés</strong>.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                         <Button variant="link" asChild className="p-0 h-auto">
+                            <Link href="/performances?tab=offer">Analyser le potentiel de référencement <MoveRight className="ml-1" /></Link>
+                        </Button>
+                    </div>
+                </CardContent>
             </Card>
         </TabsContent>
          <TabsContent value="search" className="mt-6 space-y-6">
@@ -345,16 +367,33 @@ export default function DigitalShelfPage() {
                         </TableBody>
                     </Table>
                 </Card>
-                <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
-                    <CardHeader className="flex flex-row items-start gap-3 space-y-0">
-                        <Lightbulb className="h-5 w-5 text-blue-500 mt-1" />
-                        <div>
-                            <CardTitle className="text-blue-900 dark:text-blue-200">Analyse IA</CardTitle>
-                            <CardDescription className="text-blue-700 dark:text-blue-300">
-                                Vous êtes leader sur le mot-clé "skyr", ce qui est excellent. Cependant, votre rang moyen sur "dessert végétal" est de {keywordRanking.find(k => k.keyword === 'dessert végétal')?.rank}, ce qui indique une opportunité d'optimisation (mots-clés dans le titre, campagnes de produits sponsorisés).
-                            </CardDescription>
-                        </div>
+                <Card>
+                    <CardHeader className="flex-row items-center gap-2 space-y-0">
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                        <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
+                    <CardContent className="space-y-4 text-sm">
+                        <div>
+                            <h4 className="font-semibold mb-1">À retenir</h4>
+                            <ul className="list-disc pl-5 text-muted-foreground">
+                                <li>Excellente performance sur "<strong>skyr</strong>" et "<strong>yaourt</strong>" où vous êtes leader.</li>
+                                <li>Opportunité de croissance sur "<strong>dessert végétal</strong>", où votre rang moyen est de {keywordRanking.find(k => k.keyword === 'dessert végétal')?.rank}.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                            <ul className="list-disc pl-5 text-muted-foreground">
+                                <li><strong>Optimiser :</strong> Renforcer le SEO des pages produits de la gamme "dessert végétal" (titres, descriptions).</li>
+                                <li><strong>Investir :</strong> Lancer une campagne de produits sponsorisés sur le mot-clé "dessert végétal" chez les enseignes où vous êtes bien référencé.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                            <Button variant="link" asChild className="p-0 h-auto">
+                                <Link href="/retail-media">Piloter les campagnes Retail Media <MoveRight className="ml-1" /></Link>
+                            </Button>
+                        </div>
+                    </CardContent>
                 </Card>
             </div>
         </TabsContent>
@@ -424,21 +463,41 @@ export default function DigitalShelfPage() {
                     </CardContent>
                 </Card>
             </div>
-             <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
-                <CardHeader className="flex flex-row items-start gap-3 space-y-0">
-                    <Lightbulb className="h-5 w-5 text-blue-500 mt-1" />
-                    <div>
-                        <CardTitle className="text-blue-900 dark:text-blue-200">Analyse IA</CardTitle>
-                        <CardDescription className="text-blue-700 dark:text-blue-300">
-                           Votre score de contenu est bon, principalement grâce à des titres et bullet points bien optimisés. Cependant, la qualité des images pourrait être améliorée. Les avis mentionnent souvent le mot "cher", suggérant une sensibilité au prix. Valorisez le rapport qualité-prix dans vos descriptions.
-                        </CardDescription>
-                    </div>
+             <Card>
+                <CardHeader className="flex-row items-center gap-2 space-y-0">
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
+                <CardContent className="space-y-4 text-sm">
+                    <div>
+                        <h4 className="font-semibold mb-1">À retenir</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li>Votre score de contenu est bon (<strong>{contentScore.toFixed(0)}/100</strong>), principalement grâce à des titres et bullet points bien optimisés.</li>
+                            <li>Point faible : la qualité des **images** pourrait être améliorée.</li>
+                            <li>Les avis mentionnent souvent le mot "<strong>cher</strong>", suggérant une sensibilité au prix.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li><strong>Optimiser :</strong> Mettre à jour les visuels sur les fiches produits où le score d'image est le plus faible.</li>
+                            <li><strong>Argumenter :</strong> Valoriser le rapport qualité-prix dans les descriptions pour contrer la perception de "cher".</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                         <Button variant="link" asChild className="p-0 h-auto">
+                            <Link href="/creative-studio">Générer de nouveaux visuels avec le Studio Créatif <MoveRight className="ml-1" /></Link>
+                        </Button>
+                    </div>
+                </CardContent>
             </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+    
 
     

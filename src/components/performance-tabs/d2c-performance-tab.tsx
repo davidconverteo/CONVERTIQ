@@ -4,10 +4,13 @@
 import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LineChart, Line, CartesianGrid } from 'recharts';
-import { DollarSign, ShoppingCart, Users, Percent, UserPlus, Repeat, TrendingUp, Sparkles } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, Percent, UserPlus, Repeat, TrendingUp, Sparkles, MoveRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from '@/components/ui/checkbox';
 import ExportDialog from './export-dialog';
+import { Button } from '../ui/button';
+import Link from 'next/link';
+import Image from 'next/image';
 
 type Filters = {
     country: string;
@@ -163,16 +166,37 @@ export default function D2CPerformanceTab({ filters }: D2CPerformanceTabProps) {
             </CardContent>
         </Card>
         <Card>
-            <CardHeader className="flex-row items-center gap-2">
-                <Sparkles className="h-5 w-5 text-accent" />
-                <CardTitle>Synthèse & Recommandations IA</CardTitle>
+            <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">Le taux de conversion global est de <strong>2.8%</strong>. L'optimisation principale se situe entre la vue produit et l'ajout au panier, où l'on observe une chute de <strong>68%</strong> des utilisateurs.</p>
-                <p className="text-sm text-muted-foreground mt-4"><strong>Recommandation :</strong> Améliorer les visuels et les descriptions sur les pages produits pour augmenter l'attrait et la clarté de l'offre.</p>
+            <CardContent className="space-y-4 text-sm">
+                <div>
+                    <h4 className="font-semibold mb-1">À retenir</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li>Le taux de conversion global est de <strong>{kpiData.find(k => k.title === 'Taux Conv.')?.value}</strong>.</li>
+                        <li>La principale chute dans le funnel (<strong>68%</strong>) se situe entre la vue produit et l'ajout au panier.</li>
+                        <li>Le ratio LTV/CAC est très positif (<strong>{(parseFloat(kpiData.find(k => k.title === 'LTV')?.value.replace('€','') || '0') / parseFloat(kpiData.find(k => k.title === 'CAC')?.value.replace('€','') || '1')).toFixed(1)}</strong>), indiquant une acquisition client rentable.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Optimiser :</strong> Améliorer les visuels et les descriptions sur les pages produits pour augmenter l'attrait et inciter à l'ajout au panier.</li>
+                        <li><strong>Tester :</strong> Mettre en place un test A/B sur le bouton "Ajouter au panier" (couleur, texte).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                    <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/creative-studio">Créer de nouveaux visuels produits <MoveRight className="ml-1" /></Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
       </div>
     </div>
   );
 }
+
+    

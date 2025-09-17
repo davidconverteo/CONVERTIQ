@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Filter, MapPin, DollarSign, Eye, MousePointerClick, TrendingUp, CalendarDays, ChevronRight, Presentation, Sparkles } from "lucide-react";
+import { ShoppingCart, Filter, MapPin, DollarSign, Eye, MousePointerClick, TrendingUp, CalendarDays, ChevronRight, Presentation, Sparkles, MoveRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { generateRetailMediaCampaignData, retailMediaPerformanceByRetailer } from '@/services/data-service';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import Image from 'next/image';
+import Link from 'next/link';
 
 
 const COLORS = ['#16a34a', '#0ea5e9', '#f97316', '#6366f1', '#f59e0b', '#84cc16'];
@@ -80,13 +82,30 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                 </div>
                  <Card className="bg-background">
                     <CardHeader className="flex-row items-center gap-2 space-y-0">
-                        <Sparkles className="h-5 w-5 text-accent" />
-                        <CardTitle className="text-lg">Recommandation IA</CardTitle>
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                        <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">
-                           {campaign.details.recommendation}
-                        </p>
+                    <CardContent className="space-y-4 text-sm">
+                         <div>
+                            <h4 className="font-semibold mb-1">À retenir</h4>
+                             <ul className="list-disc pl-5 text-muted-foreground">
+                                <li>Le ROAS de <strong>{campaign.roas.toFixed(1)}x</strong> est excellent pour ce type d'activation.</li>
+                                <li>Le coût par clic (CPC) est de <strong>{campaign.details.cpc || 'N/A'}</strong>.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                             <ul className="list-disc pl-5 text-muted-foreground">
+                                <li><strong>Optimiser :</strong> Tester un nouveau visuel pour cette campagne afin d'améliorer le CTR.</li>
+                                <li><strong>Investir :</strong> Augmenter le budget de 10% sur les mots-clés les plus performants.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                            <Button variant="link" asChild className="p-0 h-auto">
+                                <Link href="/digital-shelf">Analyser le positionnement sur le Digital Shelf <MoveRight className="ml-1" /></Link>
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -353,16 +372,31 @@ export default function RetailMediaPage() {
             </div>
              <Card>
                 <CardHeader className="flex-row items-center gap-2 space-y-0">
-                    <Sparkles className="h-5 w-5 text-accent" />
-                    <CardTitle className="text-lg">Synthèse et Recommandation IA</CardTitle>
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                        En {country}, les activations Retail Media génèrent un ROAS global de <strong>{globalRoi.toFixed(2)}x</strong>. 
-                        Les campagnes "Sponsored Products" sur Amazon s'avèrent les plus rentables. 
-                        Les activations chez Unlimitail montrent un fort potentiel de conversion, surtout pour la Gamme Bio.
-                        <strong> Recommandation :</strong> Intensifier les investissements sur les "Sponsored Products" chez Amazon pour les produits à forte marge et envisager d'augmenter la fréquence des campagnes "Coupons" sur Unlimitail pour accélérer le recrutement de nouveaux clients sur la Gamme Végétale.
-                    </p>
+                <CardContent className="space-y-4 text-sm">
+                    <div>
+                        <h4 className="font-semibold mb-1">À retenir</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li>Le ROAS global Retail Media en {country} est de <strong>{globalRoi.toFixed(2)}x</strong>.</li>
+                            <li>Les campagnes "<strong>Sponsored Products</strong>" sur <strong>Amazon</strong> s'avèrent les plus rentables.</li>
+                            <li>Les activations chez <strong>Unlimitail</strong> montrent un fort potentiel de conversion, surtout pour la Gamme Bio.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                        <ul className="list-disc pl-5 text-muted-foreground">
+                            <li><strong>Intensifier :</strong> Augmenter les investissements sur les "Sponsored Products" chez Amazon pour les produits à forte marge.</li>
+                            <li><strong>Accélérer :</strong> Augmenter la fréquence des campagnes "Coupons" sur Unlimitail pour recruter sur la Gamme Végétale.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                        <Button variant="link" asChild className="p-0 h-auto">
+                            <Link href="/report-canvas">Demander une analyse détaillée des performances Retail Media <MoveRight className="ml-1" /></Link>
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
         </TabsContent>
@@ -438,6 +472,8 @@ export default function RetailMediaPage() {
 }
 
     
+    
+
     
 
     
