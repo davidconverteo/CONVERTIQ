@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { brandOptions, countryOptions, retailerOptions, gammeOptions } from '@/services/filters-data';
+import Image from 'next/image';
 
 const reportSchema = z.object({
   prompt: z.string().min(10, { message: "Veuillez décrire le rapport souhaité (10 caractères min)." }),
@@ -24,9 +25,9 @@ const reportSchema = z.object({
 type ReportFormValues = z.infer<typeof reportSchema>;
 
 const suggestedAnalyses = [
-  { id: "media-bilan", label: "Bilan Média Annuel" },
-  { id: "retail-media-bilan", label: "Bilan Retail Media Annuel" },
-  { id: "growth-opps", label: "Identifier les Opportunités de Croissance" },
+  { id: "media-bilan", label: "Bilan Média sur la dernière année" },
+  { id: "retail-media-bilan", label: "Bilan Retail Media sur la dernière année" },
+  { id: "growth-opps", label: "Identifier les Opportunités de croissance" },
   { id: "customer-opps", label: "Identifier les Opportunités Client" },
   { id: "who-are-customers", label: "Analyser le Profil de mes Clients" },
   { id: "digitalshelf-opt", label: "Optimiser le Digital Shelf" },
@@ -65,7 +66,7 @@ const BarChartWidget = ({ widget }: { widget: ReportWidget & { type: 'barchart' 
 );
 
 const PieChartWidget = ({ widget }: { widget: ReportWidget & { type: 'piechart' } }) => {
-    const COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
+    const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
     return (
       <Card>
         <CardHeader>
@@ -88,14 +89,14 @@ const PieChartWidget = ({ widget }: { widget: ReportWidget & { type: 'piechart' 
 
 
 const SummaryWidget = ({ widget }: { widget: ReportWidget & { type: 'summary' } }) => (
-  <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800 md:col-span-full">
-    <CardHeader className="flex-row items-start gap-3 space-y-0">
-        <Sparkles className="h-5 w-5 text-blue-500 mt-1" />
-        <div>
-            <CardTitle className="text-blue-900 dark:text-blue-200">{widget.title}</CardTitle>
-            <CardDescription className="text-blue-700 dark:text-blue-300 whitespace-pre-wrap">{widget.text}</CardDescription>
-        </div>
+  <Card className="md:col-span-full">
+    <CardHeader className="flex-row items-center gap-2 space-y-0">
+        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+        <CardTitle className="text-lg">{widget.title}</CardTitle>
     </CardHeader>
+    <CardContent>
+        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{widget.text}</p>
+    </CardContent>
   </Card>
 );
 
@@ -269,3 +270,5 @@ export default function ReportCanvasPage() {
     </div>
   );
 }
+
+    
