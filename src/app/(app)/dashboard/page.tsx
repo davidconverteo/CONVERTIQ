@@ -252,7 +252,7 @@ export default function DashboardPage() {
                 <Card>
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-2">
-                           <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                           <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
                         </div>
                         <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
