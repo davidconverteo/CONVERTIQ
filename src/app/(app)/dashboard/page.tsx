@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
-import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown, Radio, Target } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown, Radio, Target, ChevronDown } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ import { generateCustomerPersona, GenerateCustomerPersonaOutput } from '@/ai/flo
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 
 const generateData = (filters: any) => {
@@ -253,40 +254,43 @@ export default function DashboardPage() {
                         <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
                         <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4 text-sm min-h-[220px]">
+                    <CardContent className="space-y-2 text-sm min-h-[170px]">
                         {isLoadingInsights ? (
-                            <div className="space-y-4">
+                             <div className="space-y-4 pt-2">
                                 <Skeleton className="h-4 w-3/4" />
                                 <Skeleton className="h-4 w-full" />
                                 <Skeleton className="h-4 w-5/6" />
-                                <div className="pt-4 space-y-2">
-                                <Skeleton className="h-4 w-3/4" />
-                                <Skeleton className="h-4 w-full" />
-                                </div>
                             </div>
                         ) : insights ? (
-                            <>
+                            <Collapsible>
                                 <div>
                                     <h4 className="font-semibold mb-1">À retenir</h4>
                                     <ul className="list-disc pl-5 text-muted-foreground">
                                         {insights.takeaways.map((item, index) => <li key={index}>{item}</li>)}
                                     </ul>
                                 </div>
-                                <div>
-                                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
-                                    <ul className="list-disc pl-5 text-muted-foreground">
-                                        {insights.recommendations.map((item, index) => <li key={index}>{item}</li>)}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
-                                    <Button variant="link" asChild className="p-0 h-auto">
-                                        <Link href={insights.nextStep.href}>{insights.nextStep.text} <MoveRight className="ml-1" /></Link>
+                                <CollapsibleContent className="space-y-4 pt-4">
+                                    <div>
+                                        <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                                        <ul className="list-disc pl-5 text-muted-foreground">
+                                            {insights.recommendations.map((item, index) => <li key={index}>{item}</li>)}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                                        <Button variant="link" asChild className="p-0 h-auto">
+                                            <Link href={insights.nextStep.href}>{insights.nextStep.text} <MoveRight className="ml-1" /></Link>
+                                        </Button>
+                                    </div>
+                                </CollapsibleContent>
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="link" className="p-0 h-auto text-xs mt-2">
+                                        Voir les recommandations <ChevronDown className="ml-1 h-3 w-3" />
                                     </Button>
-                                </div>
-                            </>
+                                </CollapsibleTrigger>
+                            </Collapsible>
                         ) : (
-                            <p className="text-muted-foreground">Les recommandations de l'IA n'ont pas pu être chargées.</p>
+                            <p className="text-muted-foreground pt-2">Les recommandations de l'IA n'ont pas pu être chargées.</p>
                         )}
                     </CardContent>
                 </Card>
@@ -302,50 +306,59 @@ export default function DashboardPage() {
                              <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
                     ) : persona ? (
-                         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-                            <div className="flex-shrink-0 flex flex-col items-center text-center">
-                                <Avatar className="h-32 w-32 border-4 border-primary/20 shadow-md">
-                                    <AvatarImage src={persona.imageUrl} alt={persona.name} />
-                                    <AvatarFallback>{persona.name.substring(0, 1)}</AvatarFallback>
-                                </Avatar>
-                                <h3 className="mt-4 text-xl font-bold">{persona.name}</h3>
+                         <div className="flex flex-col items-center text-center gap-4">
+                            <Avatar className="h-32 w-32 border-4 border-primary/20 shadow-md">
+                                <AvatarImage src={persona.imageUrl} alt={persona.name} />
+                                <AvatarFallback>{persona.name.substring(0, 1)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <h3 className="text-xl font-bold">{persona.name}</h3>
                                 <p className="text-muted-foreground">{`${persona.age} ans, ${persona.familyStatus}`}</p>
                                 <p className="text-sm text-muted-foreground">{persona.profession}</p>
                             </div>
-                            <div className="w-full space-y-4">
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    <div>
-                                        <h4 className="font-semibold flex items-center gap-2"><Settings /> Habitudes</h4>
-                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
-                                            {persona.habits.map((h, i) => <li key={i}>{h}</li>)}
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold flex items-center gap-2"><Heart /> Motivations</h4>
-                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
-                                            {persona.motivations.map((m, i) => <li key={i}>{m}</li>)}
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold flex items-center gap-2"><ThumbsDown /> Frustrations</h4>
-                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
-                                            {persona.painPoints.map((p, i) => <li key={i}>{p}</li>)}
-                                        </ul>
-                                    </div>
-                                     <div>
-                                        <h4 className="font-semibold flex items-center gap-2"><Radio /> Habitudes Média</h4>
-                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
-                                            {persona.mediaHabits.map((h, i) => <li key={i}>{h}</li>)}
-                                        </ul>
-                                    </div>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-left w-full pt-4">
+                                <div>
+                                    <h4 className="font-semibold flex items-center gap-2"><Heart /> Motivations</h4>
+                                    <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                        {persona.motivations.map((m, i) => <li key={i}>{m}</li>)}
+                                    </ul>
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold flex items-center gap-2"><Target /> Leviers à activer</h4>
+                                    <h4 className="font-semibold flex items-center gap-2"><ThumbsDown /> Frustrations</h4>
                                     <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
-                                        {persona.marketingLevers.map((l, i) => <li key={i}>{l}</li>)}
+                                        {persona.painPoints.map((p, i) => <li key={i}>{p}</li>)}
                                     </ul>
                                 </div>
                             </div>
+                            <Collapsible className="w-full text-left">
+                                <CollapsibleContent className="space-y-4 pt-4">
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 className="font-semibold flex items-center gap-2"><Settings /> Habitudes</h4>
+                                            <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                                {persona.habits.map((h, i) => <li key={i}>{h}</li>)}
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold flex items-center gap-2"><Radio /> Habitudes Média</h4>
+                                            <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                                {persona.mediaHabits.map((h, i) => <li key={i}>{h}</li>)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold flex items-center gap-2"><Target /> Leviers à activer</h4>
+                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                            {persona.marketingLevers.map((l, i) => <li key={i}>{l}</li>)}
+                                        </ul>
+                                    </div>
+                                </CollapsibleContent>
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="link" className="p-0 h-auto text-xs mt-2 w-full justify-center">
+                                        Voir les détails <ChevronDown className="ml-1 h-3 w-3" />
+                                    </Button>
+                                </CollapsibleTrigger>
+                            </Collapsible>
                         </div>
                     ) : (
                          <div className="text-center text-muted-foreground py-8">
@@ -359,3 +372,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
