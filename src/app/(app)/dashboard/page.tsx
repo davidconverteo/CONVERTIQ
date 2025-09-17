@@ -250,11 +250,11 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader>
-                        <div className="flex items-center gap-2">
-                            <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
-                            <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
+                    <CardHeader className="text-center">
+                        <div className="flex justify-center mb-2">
+                           <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
                         </div>
+                        <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm min-h-[170px]">
                         {isLoadingInsights ? (
