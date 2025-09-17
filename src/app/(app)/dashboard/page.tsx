@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
-import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown, Radio, Target, ChevronDown } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown, Radio, Target, ChevronDown, Sparkles } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
