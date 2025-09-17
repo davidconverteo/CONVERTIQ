@@ -15,6 +15,7 @@ import {
   Users,
   Settings,
   FlaskConical,
+  LayoutTemplate,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/brand-media', icon: Megaphone, label: 'Brand Media' },
   { href: '/retail-media', icon: ShoppingCart, label: 'Retail Media' },
   { href: '/creative-studio', icon: Sparkles, label: 'Studio Créatif' },
+  { href: '/report-canvas', icon: LayoutTemplate, label: "Canevas d'Analyse" },
   { href: '/mmm', icon: PieChart, label: 'MMM' },
   { href: '/performances', icon: BarChart2, label: 'Performances' },
   { href: '/digital-shelf', icon: Store, label: 'Digital Shelf' },

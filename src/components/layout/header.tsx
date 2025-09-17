@@ -13,6 +13,7 @@ import Link from 'next/link';
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Cockpit Marketing', subtitle: "Vue d'ensemble de votre performance." },
   '/creative-studio': { title: 'Studio Créatif IA', subtitle: "Générez et adaptez vos visuels de campagne." },
+  '/report-canvas': { title: 'Canevas d\'Analyse', subtitle: "Générez des rapports visuels à la demande." },
   '/brand-media': { title: 'Brand Media', subtitle: "Analyse de la performance de vos campagnes." },
   '/retail-media': { title: 'Retail Media', subtitle: "Performance de vos activations e-commerce." },
   '/mmm': { title: 'Marketing Mix Modeling', subtitle: "Analysez la contribution de vos leviers." },
