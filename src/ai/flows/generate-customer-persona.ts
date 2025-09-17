@@ -43,7 +43,7 @@ export async function generateCustomerPersona(input: GenerateCustomerPersonaInpu
 const personaPrompt = ai.definePrompt({
   name: 'generateCustomerPersonaPrompt',
   input: {schema: GenerateCustomerPersonaInputSchema},
-  output: {schema: Omit<GenerateCustomerPersonaOutput, 'imageUrl'>},
+  output: {schema: GenerateCustomerPersonaOutputSchema.omit({ imageUrl: true })},
   prompt: `You are an expert market researcher for a yogurt brand called "La Prairie Gourmande".
   Based on the following dashboard filters, create a realistic and detailed customer persona.
   
@@ -82,3 +82,4 @@ const generateCustomerPersonaFlow = ai.defineFlow(
     };
   }
 );
+
