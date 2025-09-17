@@ -15,17 +15,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, FileText, Sparkles, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { brandOptions, countryOptions, retailerOptions, gammeOptions } from '@/services/filters-data';
 
 const reportSchema = z.object({
   prompt: z.string().min(10, { message: "Veuillez décrire le rapport souhaité (10 caractères min)." }),
 });
 type ReportFormValues = z.infer<typeof reportSchema>;
 
-const suggestedPrompts = [
-  "Quelle est la performance de ma marque face à la MDD chez Carrefour ?",
-  "Synthèse des campagnes marketing pour la gamme Bio ce trimestre.",
-  "Identifier les opportunités de croissance pour la gamme Skyr.",
-  "Comparer le ROAS de mes campagnes Social Media et TV en France.",
+const suggestedAnalyses = [
+  { id: "media-bilan", label: "Bilan média sur la dernière année" },
+  { id: "retail-media-bilan", label: "Bilan retail media sur la dernière année" },
+  { id: "growth-opps", label: "Opportunités de croissances commerciales" },
+  { id: "customer-opps", label: "Opportunités client" },
+  { id: "who-are-customers", label: "Qui sont mes clients" },
+  { id: "digitalshelf-opt", label: "Optimisation digital shelf" },
 ];
 
 const KpiWidget = ({ widget }: { widget: ReportWidget & { type: 'kpi' } }) => (
@@ -86,7 +90,7 @@ const PieChartWidget = ({ widget }: { widget: ReportWidget & { type: 'piechart' 
 
 
 const SummaryWidget = ({ widget }: { widget: ReportWidget & { type: 'summary' } }) => (
-  <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800 md:col-span-2">
+  <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800 md:col-span-full">
     <CardHeader className="flex-row items-start gap-3 space-y-0">
         <Sparkles className="h-5 w-5 text-blue-500 mt-1" />
         <div>
@@ -97,21 +101,79 @@ const SummaryWidget = ({ widget }: { widget: ReportWidget & { type: 'summary' } 
   </Card>
 );
 
+
+const SuggestedPromptsTab = ({ onPromptSelect, onActiveTabChange }: { onPromptSelect: (prompt: string) => void, onActiveTabChange: (tab: string) => void }) => {
+    const [filters, setFilters] = useState({
+        country: '',
+        retailer: '',
+        brand: '',
+        gamme: ''
+    });
+
+    const handleFilterChange = (filterName: keyof typeof filters, value: string) => {
+        setFilters(prev => ({...prev, [filterName]: value}));
+    }
+
+    const handleAnalysisClick = (analysis: { id: string, label: string }) => {
+        let prompt = analysis.label;
+        const context = Object.entries(filters)
+            .filter(([, value]) => value && value !== 'all')
+            .map(([key, value]) => {
+                const labels: Record<string, string> = { country: 'pour le pays', retailer: 'pour l\'enseigne', brand: 'pour la marque', gamme: 'pour la gamme'};
+                const options = [...countryOptions, ...retailerOptions, ...brandOptions, ...gammeOptions];
+                const selectedLabel = options.find(o => o.value === value)?.label || value;
+                return `${labels[key]} ${selectedLabel}`;
+            }).join(', ');
+        
+        if (context) {
+            prompt += ` (${context})`;
+        }
+        
+        onPromptSelect(prompt);
+        onActiveTabChange('prompt');
+    }
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <h4 className="font-semibold text-foreground mb-2">1. Définir le contexte (optionnel)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Select onValueChange={(v) => handleFilterChange('country', v)}><SelectTrigger><SelectValue placeholder="Pays" /></SelectTrigger><SelectContent>{countryOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent></Select>
+                    <Select onValueChange={(v) => handleFilterChange('retailer', v)}><SelectTrigger><SelectValue placeholder="Enseigne" /></SelectTrigger><SelectContent>{retailerOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent></Select>
+                    <Select onValueChange={(v) => handleFilterChange('brand', v)}><SelectTrigger><SelectValue placeholder="Marque" /></SelectTrigger><SelectContent>{brandOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent></Select>
+                    <Select onValueChange={(v) => handleFilterChange('gamme', v)}><SelectTrigger><SelectValue placeholder="Gamme" /></SelectTrigger><SelectContent>{gammeOptions.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent></Select>
+                </div>
+            </div>
+             <div>
+                <h4 className="font-semibold text-foreground mb-2">2. Choisir une analyse</h4>
+                <div className="space-y-3">
+                    {suggestedAnalyses.map((analysis) => (
+                        <Button key={analysis.id} variant="outline" className="w-full h-auto text-wrap justify-start" onClick={() => handleAnalysisClick(analysis)}>
+                            {analysis.label}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 export default function ReportCanvasPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<{ title: string; widgets: ReportWidget[] } | null>(null);
+  const [activeTab, setActiveTab] = useState('prompt');
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
     defaultValues: { prompt: '' },
   });
 
-  const handlePromptClick = (prompt: string) => {
+  const handlePromptSelect = (prompt: string) => {
     form.setValue('prompt', prompt);
-    onSubmit({ prompt });
   };
-
+  
   const onSubmit: SubmitHandler<ReportFormValues> = async (data) => {
     setIsLoading(true);
     setReportData(null);
@@ -130,19 +192,20 @@ export default function ReportCanvasPage() {
   };
 
   const renderWidget = (widget: ReportWidget, index: number) => {
-    // Force summary to span full width if it's the last item
-    if (widget.type === 'summary' && index === (reportData?.widgets?.length ?? 0) - 1) {
-        return <SummaryWidget key={index} widget={widget} />;
-    }
+    const isLastWidget = index === (reportData?.widgets?.length ?? 0) - 1;
+    // Force summary to span full width if it's the last item in a grid with an odd number of non-summary items
+    const nonSummaryWidgets = reportData?.widgets.filter(w => w.type !== 'summary').length ?? 0;
+    const forceSpan = widget.type === 'summary' && isLastWidget && nonSummaryWidgets % 2 !== 0;
 
     switch (widget.type) {
       case 'kpi': return <KpiWidget key={index} widget={widget} />;
       case 'barchart': return <BarChartWidget key={index} widget={widget} />;
       case 'piechart': return <PieChartWidget key={index} widget={widget} />;
-      case 'summary': return <SummaryWidget key={index} widget={widget} />; // Fallback for other summaries
+      case 'summary': return <SummaryWidget key={index} widget={widget} />;
       default: return null;
     }
   };
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -152,10 +215,10 @@ export default function ReportCanvasPage() {
           <CardDescription>Demandez à l'IA de construire une analyse sur mesure.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="prompt" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="prompt">Prompt Personnalisé</TabsTrigger>
-              <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+              <TabsTrigger value="suggestions">Prompt Suggéré</TabsTrigger>
             </TabsList>
             <TabsContent value="prompt" className="pt-6">
               <Form {...form}>
@@ -181,13 +244,7 @@ export default function ReportCanvasPage() {
               </Form>
             </TabsContent>
             <TabsContent value="suggestions" className="pt-6">
-              <div className="space-y-3">
-                {suggestedPrompts.map((prompt, i) => (
-                  <Button key={i} variant="outline" className="w-full h-auto text-wrap justify-start" onClick={() => handlePromptClick(prompt)} disabled={isLoading}>
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
+                <SuggestedPromptsTab onPromptSelect={handlePromptSelect} onActiveTabChange={setActiveTab}/>
             </TabsContent>
           </Tabs>
         </CardContent>
