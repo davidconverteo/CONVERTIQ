@@ -10,67 +10,67 @@
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 197 92% 48%; /* ConvertIQ Blue */
-    --primary-foreground: 0 0% 100%;
+    --primary: 181 67% 51%; /* Cyan from Converteo Palette */
+    --primary-foreground: 259 60% 15%; /* Dark Blue for contrast on Cyan */
     --secondary: 220 13% 91%;
     --secondary-foreground: 224 71.4% 4.1%;
     --muted: 220 9% 90%;
     --muted-foreground: 220 9% 45%;
-    --accent: 220 20% 30%; /* Darker Blue/Gray */
+    --accent: 259 60% 30%; /* A slightly lighter version of Bleu Nuit for accents */
     --accent-foreground: 0 0% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 197 92% 48%;
-    --chart-1: 197 92% 48%;
-    --chart-2: 220 20% 40%;
-    --chart-3: 220 15% 60%;
-    --chart-4: 197 50% 70%;
-    --chart-5: 220 10% 80%;
+    --ring: 181 67% 51%;
+    --chart-1: 181 67% 51%;
+    --chart-2: 259 60% 40%;
+    --chart-3: 181 50% 70%;
+    --chart-4: 259 40% 60%;
+    --chart-5: 181 30% 80%;
     --radius: 0.75rem;
-    --sidebar-background: 220 25% 15%; /* Dark Slate Blue */
+    --sidebar-background: 259 60% 20%; /* Bleu Nuit from Converteo Palette */
     --sidebar-foreground: 220 15% 80%;
-    --sidebar-primary: 197 92% 68%; /* Lighter ConvertIQ Blue for active items */
-    --sidebar-primary-foreground: 220 25% 10%;
-    --sidebar-accent: 220 25% 25%;
+    --sidebar-primary: 181 67% 70%; /* Lighter Cyan for active items */
+    --sidebar-primary-foreground: 259 60% 10%;
+    --sidebar-accent: 259 60% 28%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 25% 22%;
-    --sidebar-ring: 197 92% 68%;
+    --sidebar-border: 259 60% 25%;
+    --sidebar-ring: 181 67% 70%;
   }
   .dark {
     --background: 220 25% 10%;
     --foreground: 0 0% 98%;
-    --card: 220 25% 12%;
+    --card: 259 60% 12%; /* Darker Bleu Nuit */
     --card-foreground: 0 0% 98%;
     --popover: 220 25% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 197 92% 58%; /* Lighter ConvertIQ Blue */
-    --primary-foreground: 220 25% 10%;
-    --secondary: 220 25% 20%;
+    --primary: 181 67% 51%; /* Cyan */
+    --primary-foreground: 259 60% 10%;
+    --secondary: 259 60% 25%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 220 25% 20%;
+    --muted: 259 60% 25%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 220 15% 50%;
+    --accent: 181 67% 40%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 25% 20%;
-    --input: 220 25% 20%;
-    --ring: 197 92% 58%;
-    --chart-1: 197 92% 58%;
-    --chart-2: 220 20% 60%;
-    --chart-3: 220 15% 40%;
-    --chart-4: 197-50-80;
-    --chart-5: 220 10% 90%;
-    --sidebar-background: 220 25% 15%;
+    --border: 259 60% 25%;
+    --input: 259 60% 25%;
+    --ring: 181 67% 51%;
+    --chart-1: 181 67% 51%;
+    --chart-2: 181 50% 70%;
+    --chart-3: 259 50% 60%;
+    --chart-4: 181-30-80;
+    --chart-5: 259 30% 70%;
+    --sidebar-background: 259 60% 20%;
     --sidebar-foreground: 220 15% 80%;
-    --sidebar-primary: 197 92% 68%;
-    --sidebar-primary-foreground: 220 25% 10%;
-    --sidebar-accent: 220 25% 25%;
+    --sidebar-primary: 181 67% 70%;
+    --sidebar-primary-foreground: 259 60% 10%;
+    --sidebar-accent: 259 60% 28%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 25% 22%;
-    --sidebar-ring: 197 92% 68%;
+    --sidebar-border: 259 60% 25%;
+    --sidebar-ring: 181 67% 70%;
   }
 }
 
