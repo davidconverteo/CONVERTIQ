@@ -294,58 +294,50 @@ export default function DashboardPage() {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><User /> Persona Client</CardTitle>
-                    <CardDescription>Profil type du client sur ce segment.</CardDescription>
+                    <CardDescription>Profil type du client correspondant à votre sélection.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {isLoadingPersona ? (
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <Skeleton className="h-24 w-24 rounded-full" />
-                                <div className="space-y-2">
-                                    <Skeleton className="h-6 w-40" />
-                                    <Skeleton className="h-4 w-32" />
-                                </div>
-                            </div>
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-5/6" />
-                            <Skeleton className="h-4 w-4/5" />
+                        <div className="flex items-center justify-center p-8">
+                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
                     ) : persona ? (
-                        <div className="space-y-4">
-                            <div className="flex flex-col items-center text-center space-y-2">
-                                <Avatar className="h-24 w-24 border-2 border-primary">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="md:col-span-1 flex flex-col items-center text-center">
+                                <Avatar className="h-32 w-32 border-4 border-primary/20 shadow-md">
                                     <AvatarImage src={persona.imageUrl} alt={persona.name} />
                                     <AvatarFallback>{persona.name.substring(0, 1)}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <h3 className="text-xl font-bold">{persona.name}</h3>
-                                    <p className="text-muted-foreground">{`${persona.age} ans, ${persona.familyStatus}`}</p>
-                                    <p className="text-sm text-muted-foreground">{persona.profession}</p>
-                                </div>
+                                <h3 className="mt-4 text-2xl font-bold">{persona.name}</h3>
+                                <p className="text-muted-foreground">{`${persona.age} ans, ${persona.familyStatus}`}</p>
+                                <p className="text-sm text-muted-foreground">{persona.profession}</p>
                             </div>
-                            <div className="space-y-3 text-sm">
+                            <div className="md:col-span-2 space-y-4 pt-4">
                                 <div>
-                                    <h4 className="font-semibold flex items-center gap-1"><Settings /> Habitudes</h4>
-                                    <ul className="list-disc pl-5 text-muted-foreground">
+                                    <h4 className="font-semibold flex items-center gap-2 text-lg"><Settings /> Habitudes d'achat</h4>
+                                    <ul className="list-disc pl-5 text-muted-foreground mt-2 space-y-1">
                                         {persona.habits.map((h, i) => <li key={i}>{h}</li>)}
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold flex items-center gap-1"><Heart /> Motivations</h4>
-                                     <ul className="list-disc pl-5 text-muted-foreground">
+                                    <h4 className="font-semibold flex items-center gap-2 text-lg"><Heart /> Motivations</h4>
+                                     <ul className="list-disc pl-5 text-muted-foreground mt-2 space-y-1">
                                         {persona.motivations.map((m, i) => <li key={i}>{m}</li>)}
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold flex items-center gap-1"><ThumbsDown /> Frustrations</h4>
-                                     <ul className="list-disc pl-5 text-muted-foreground">
+                                    <h4 className="font-semibold flex items-center gap-2 text-lg"><ThumbsDown /> Frustrations</h4>
+                                     <ul className="list-disc pl-5 text-muted-foreground mt-2 space-y-1">
                                         {persona.painPoints.map((p, i) => <li key={i}>{p}</li>)}
                                     </ul>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                         <p className="text-muted-foreground">Le persona client n'a pas pu être chargé.</p>
+                         <div className="text-center text-muted-foreground py-8">
+                            <p>Le persona client n'a pas pu être chargé.</p>
+                            <p className="text-xs">Veuillez réessayer ou vérifier votre configuration.</p>
+                         </div>
                     )}
                 </CardContent>
             </Card>
