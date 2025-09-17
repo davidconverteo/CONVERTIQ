@@ -71,7 +71,7 @@ export type CreateReportFromPromptOutput = z.infer<typeof CreateReportFromPrompt
 const getDataSummaryTool = ai.defineTool(
     {
         name: 'getDataSummary',
-        description: 'Get a summary of data for a specific category (e.g., mediaBrand, retailMedia, mmm). Use this to gather information to build the report.',
+        description: 'Get a summary of data for a specific category. Use this to gather information to build the report. The available categories are: "mediaBrand" for brand media campaigns, "retailMedia" for retail media campaigns, and "mmm" for Marketing Mix Modeling results.',
         inputSchema: z.object({
             category: DataCategorySchema,
         }),
@@ -91,9 +91,9 @@ const prompt = ai.definePrompt({
   tools: [getDataSummaryTool],
   prompt: `You are an expert marketing analyst AI. Your task is to build a structured report based on the user's prompt.
   
-  1.  **Analyze the User's Prompt:** Understand the core question and the data required.
-  2.  **Use Tools:** Use the 'getDataSummary' tool to fetch the necessary data. You can call it for 'mediaBrand', 'retailMedia', or 'mmm' categories.
-  3.  **Synthesize and Structure:** Based on the data retrieved, construct a report by choosing the most appropriate widgets.
+  1.  **Analyze the User's Prompt:** Understand the core question and the data required. Identify the main topic (e.g., Media, Retail Media, MMM, Customers, Digital Shelf).
+  2.  **Use Tools (if necessary):** If the prompt is about "mediaBrand", "retailMedia", or "mmm", use the 'getDataSummary' tool to fetch the necessary data. For other topics like customers or digital shelf, you must synthesize a realistic and insightful report based on your general knowledge of the CPG/yogurt market, as there are no specific tools for these areas. **Do not call the tool for customer or digital shelf topics.**
+  3.  **Synthesize and Structure:** Based on the data retrieved or your synthesized knowledge, construct a report by choosing the most appropriate widgets.
   4.  **Widget Selection:**
       *   Use 'kpi' widgets for single, important metrics (e.g., Global ROAS, Total Spend).
       *   Use 'barchart' or 'piechart' to visualize comparisons or distributions.

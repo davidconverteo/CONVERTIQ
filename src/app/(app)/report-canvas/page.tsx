@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, FileText, Sparkles, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { brandOptions, countryOptions, retailerOptions, gammeOptions } from '@/services/filters-data';
 
@@ -24,12 +24,12 @@ const reportSchema = z.object({
 type ReportFormValues = z.infer<typeof reportSchema>;
 
 const suggestedAnalyses = [
-  { id: "media-bilan", label: "Bilan média sur la dernière année" },
-  { id: "retail-media-bilan", label: "Bilan retail media sur la dernière année" },
-  { id: "growth-opps", label: "Opportunités de croissances commerciales" },
-  { id: "customer-opps", label: "Opportunités client" },
-  { id: "who-are-customers", label: "Qui sont mes clients" },
-  { id: "digitalshelf-opt", label: "Optimisation digital shelf" },
+  { id: "media-bilan", label: "Bilan Média Annuel" },
+  { id: "retail-media-bilan", label: "Bilan Retail Media Annuel" },
+  { id: "growth-opps", label: "Identifier les Opportunités de Croissance" },
+  { id: "customer-opps", label: "Identifier les Opportunités Client" },
+  { id: "who-are-customers", label: "Analyser le Profil de mes Clients" },
+  { id: "digitalshelf-opt", label: "Optimiser le Digital Shelf" },
 ];
 
 const KpiWidget = ({ widget }: { widget: ReportWidget & { type: 'kpi' } }) => (
@@ -44,30 +44,28 @@ const KpiWidget = ({ widget }: { widget: ReportWidget & { type: 'kpi' } }) => (
   </Card>
 );
 
-const BarChartWidget = ({ widget }: { widget: ReportWidget & { type: 'barchart' } }) => {
-    const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280'];
-    return(
-      <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle>{widget.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={widget.data}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" fill="hsl(var(--primary))" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    )
-};
+const BarChartWidget = ({ widget }: { widget: ReportWidget & { type: 'barchart' } }) => (
+  <Card className="md:col-span-2">
+    <CardHeader>
+      <CardTitle>{widget.title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={widget.data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
+          <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
+);
 
 const PieChartWidget = ({ widget }: { widget: ReportWidget & { type: 'piechart' } }) => {
-    const COLORS = ['#1e293b', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444'];
+    const COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
     return (
       <Card>
         <CardHeader>
@@ -79,7 +77,7 @@ const PieChartWidget = ({ widget }: { widget: ReportWidget & { type: 'piechart' 
                 <Pie data={widget.data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                     {(widget.data as any[]).map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value: number, name: string) => [`${value}`, name]} />
                 <Legend />
             </PieChart>
           </ResponsiveContainer>
@@ -192,11 +190,6 @@ export default function ReportCanvasPage() {
   };
 
   const renderWidget = (widget: ReportWidget, index: number) => {
-    const isLastWidget = index === (reportData?.widgets?.length ?? 0) - 1;
-    // Force summary to span full width if it's the last item in a grid with an odd number of non-summary items
-    const nonSummaryWidgets = reportData?.widgets.filter(w => w.type !== 'summary').length ?? 0;
-    const forceSpan = widget.type === 'summary' && isLastWidget && nonSummaryWidgets % 2 !== 0;
-
     switch (widget.type) {
       case 'kpi': return <KpiWidget key={index} widget={widget} />;
       case 'barchart': return <BarChartWidget key={index} widget={widget} />;
