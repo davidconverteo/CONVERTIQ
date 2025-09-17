@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, X, Loader2 } from "lucide-react";
+import { Send, X, Loader2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { askChatbot } from "@/ai/flows/chatbot-flow";
 import Image from "next/image";
@@ -25,7 +25,7 @@ function ChatWindow({ isOpen, onToggle, messages, isLoading, input, setInput, ha
           <Card className="flex h-[70vh] max-h-[600px] flex-col shadow-2xl">
             <CardHeader className="flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain" />
+                <Sparkles className="h-5 w-5 text-primary" />
                 Assistant ConvertIQ
               </CardTitle>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onToggle}>
@@ -152,7 +152,7 @@ export default function ChatbotTrigger() {
           'hover:bg-sidebar-accent/50'
         )}
       >
-        <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={20} height={20} className="object-contain brightness-0 invert" />
+        <Sparkles className="h-5 w-5" />
         <span>Assistant IA</span>
       </button>
       <ChatWindow 
@@ -168,5 +168,3 @@ export default function ChatbotTrigger() {
     </>
   );
 }
-
-    
