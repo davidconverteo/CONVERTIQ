@@ -38,13 +38,13 @@ export default function Header() {
               <Menu className="h-6 w-6 text-foreground" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[260px] bg-sidebar p-0">
+          <SheetContent side="left" className="w-[260px] p-0">
             {/* We need to re-create the sidebar here for mobile, but as a standard div not aside */}
-            <div className="flex h-full flex-col text-sidebar-foreground">
-                <div className="flex h-20 items-center gap-3 px-6">
-                  <Link href="/dashboard" className="flex items-center gap-3 rounded-md bg-white p-2">
-                     <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
-                  </Link>
+            <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+                <div className="flex h-20 items-center justify-center bg-white px-4">
+                    <Link href="/dashboard">
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
+                    </Link>
                 </div>
                 <Sidebar />
             </div>

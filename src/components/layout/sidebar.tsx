@@ -39,12 +39,12 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
 
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-64 flex-col bg-sidebar text-sidebar-foreground md:flex">
-      <div className="flex h-20 items-center justify-center px-6">
-        <Link href="/dashboard" className="rounded-md bg-white p-2">
+      <div className="flex h-20 items-center justify-center bg-white px-4">
+        <Link href="/dashboard">
           <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
         </Link>
       </div>
-      <nav className="flex-1 space-y-2 px-4">
+      <nav className="flex-1 space-y-2 px-4 py-4">
         {navItems.map((item) => (
           <Link
             key={item.href}
@@ -62,6 +62,7 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
         ))}
       </nav>
       <div className="space-y-2 p-4">
+        <ChatbotTrigger />
         <Link
           href="/settings"
           className={cn(
