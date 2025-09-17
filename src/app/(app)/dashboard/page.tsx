@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 import { DollarSign, Zap, Users, CheckCircle, Lightbulb, ExternalLink } from "lucide-react";
 import Link from "next/link";
@@ -18,12 +17,10 @@ const kpiData = [
 ];
 
 const channelData = [
-    { name: 'Offline', value: 400 },
-    { name: 'Online (Drive)', value: 300 },
-    { name: 'D2C', value: 50 },
+    { name: 'Offline', value: 5000000, fill: 'hsl(var(--chart-1))' },
+    { name: 'Online (Drive)', value: 3000000, fill: 'hsl(var(--chart-2))' },
+    { name: 'D2C', value: 330000, fill: 'hsl(var(--chart-3))' },
 ];
-
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))'];
 
 const insightPlatforms = [
     { name: 'Circana', logo: 'https://i.postimg.cc/PqYp2MSx/circana-logo.png' },
@@ -38,27 +35,28 @@ const activationPlatforms = [
 ];
 
 const PlatformCard = ({ name, logo }: { name: string, logo: string }) => (
-    <Link href="#" className="block">
+    <Link href="#" className="block group">
         <Card className="flex h-24 items-center justify-center p-4 transition-all hover:shadow-md hover:border-primary">
-            <div className="relative h-full w-full">
-                <Image src={logo} alt={`${name} logo`} fill style={{objectFit:"contain"}} />
+            <div className="relative h-12 w-full">
+                <Image src={logo} alt={`${name} logo`} fill style={{objectFit:"contain"}} className="grayscale opacity-60 transition-all group-hover:grayscale-0 group-hover:opacity-100" />
             </div>
         </Card>
+        <p className="mt-2 text-center text-sm font-semibold text-muted-foreground transition-colors group-hover:text-foreground">{name}</p>
     </Link>
 );
 
 export default function DashboardPage() {
     const [filters, setFilters] = useState({
         period: 'mat',
-        channel: 'offline',
-        brand: 'lpg'
+        channel: 'all',
     });
 
   return (
     <div className="space-y-6">
         <Card>
             <CardHeader>
-                <CardTitle>Filtres Globaux</CardTitle>
+                <CardTitle className="font-headline">Cockpit de Pilotage</CardTitle>
+                <CardDescription>Vue d'ensemble de votre performance marketing.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-4">
                  <Select defaultValue="mat" onValueChange={(v) => setFilters(f => ({...f, period: v}))}>
@@ -70,7 +68,7 @@ export default function DashboardPage() {
                         <SelectItem value="last_month">Dernier Mois</SelectItem>
                     </SelectContent>
                 </Select>
-                 <Select defaultValue="offline" onValueChange={(v) => setFilters(f => ({...f, channel: v}))}>
+                 <Select defaultValue="all" onValueChange={(v) => setFilters(f => ({...f, channel: v}))}>
                     <SelectTrigger className="w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">Tous les canaux</SelectItem>
@@ -79,24 +77,16 @@ export default function DashboardPage() {
                         <SelectItem value="d2c">D2C</SelectItem>
                     </SelectContent>
                 </Select>
-                <Select defaultValue="lpg" onValueChange={(v) => setFilters(f => ({...f, brand: v}))}>
-                    <SelectTrigger className="w-full sm:w-[240px]"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="lpg">Marque: La Prairie Gourmande</SelectItem>
-                        <SelectItem value="skyr">Marque: Gamme Skyr</SelectItem>
-                        <SelectItem value="bio">Marque: Gamme Bio</SelectItem>
-                    </SelectContent>
-                </Select>
             </CardContent>
         </Card>
         
         <Card className="border-l-4 border-primary bg-primary/5">
             <CardHeader className="flex-row items-start gap-4">
-                <Lightbulb className="h-6 w-6 text-primary mt-1" />
+                <Lightbulb className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <div>
-                    <CardTitle>Synthèse & Recommandations IA</CardTitle>
+                    <CardTitle>Analyse & Recommandations IA</CardTitle>
                     <CardDescription className="mt-2 text-base text-foreground">
-                        Analyse pour <strong>Cumul Annuel Mobile (MAT) / Offline</strong>. La performance globale est solide. Le canal <strong>Online</strong> montre un fort potentiel de croissance. Le ROAS moyen indique une bonne rentabilité des investissements. <span className="font-bold text-primary">Action prioritaire :</span> Améliorer la conversion sur le canal D2C.
+                        Analyse pour <strong>Cumul Annuel Mobile (MAT) / Tous canaux</strong>. La performance globale est solide, tirée par le canal Offline. Le canal Online montre un fort potentiel de croissance avec un ROAS élevé. <span className="font-bold text-primary">Action prioritaire :</span> Analyser les causes de la sous-performance de la gamme Skyr sur le canal Online pour débloquer ce potentiel.
                     </CardDescription>
                 </div>
             </CardHeader>
@@ -135,27 +125,38 @@ export default function DashboardPage() {
                         innerRadius={80} 
                         outerRadius={120} 
                         paddingAngle={2}
+                        label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                          const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                          const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                          const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                          return (
+                            <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="font-bold">
+                              {`${(percent * 100).toFixed(0)}%`}
+                            </text>
+                          );
+                        }}
+                        labelLine={false}
                     >
                         {channelData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
                     </Pie>
-                    <Tooltip formatter={(value, name) => [new Intl.NumberFormat('fr-FR').format(value as number), name]} />
+                    <Tooltip formatter={(value: number, name: string) => [`${value.toLocaleString('fr-FR')} €`, name]} />
                     <Legend />
                 </PieChart>
             </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div>
-            <h3 className="text-xl font-semibold mb-4">Plateformes d'Insight</h3>
+            <h3 className="text-2xl font-headline font-bold mb-4">Plateformes d'Insight</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {insightPlatforms.map(p => <PlatformCard key={p.name} {...p} />)}
             </div>
         </div>
          <div>
-            <h3 className="text-xl font-semibold mb-4">Plateformes d'Activation</h3>
+            <h3 className="text-2xl font-headline font-bold mb-4">Plateformes d'Activation</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {activationPlatforms.map(p => <PlatformCard key={p.name} {...p} />)}
             </div>
