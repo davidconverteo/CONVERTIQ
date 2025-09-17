@@ -5,12 +5,14 @@ import { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Legend, ZAxis } from 'recharts';
-import { Sparkles } from "lucide-react";
+import { Sparkles, MoveRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OfferByRetailerTab from './offer-by-retailer-tab';
 import DecisionTreeTab from './decision-tree-tab';
 import ExportDialog from './export-dialog';
 import Image from 'next/image';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 type Filters = {
     country: string;
@@ -140,7 +142,9 @@ const AssortmentAnalysisTab = ({ filters }: { filters: Filters }) => {
                     </div>
                     <div>
                         <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
-                        <p className="text-muted-foreground">Analysez l'arbre de décision pour comprendre les alternatives que les clients choisissent face au Yaourt Végétal.</p>
+                        <Button variant="link" asChild className="p-0 h-auto">
+                           <Link href="/performances?tab=offer&subtab=decision-tree">Analyser l'arbre de décision <MoveRight className="ml-1" /></Link>
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
@@ -169,5 +173,7 @@ export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProp
     </Tabs>
   );
 }
+
+    
 
     

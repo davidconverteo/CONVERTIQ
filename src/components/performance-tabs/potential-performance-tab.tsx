@@ -168,7 +168,7 @@ export default function PotentialPerformanceTab({ filters }: PotentialPerformanc
                 <div>
                     <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
                     <Button variant="link" asChild className="p-0 h-auto">
-                        <Link href="/performances?tab=offer&subtab=retailer">Analyser l'assortiment par enseigne <MoveRight className="ml-1" /></Link>
+                        <Link href="/performances?tab=offer">Analyser l'assortiment par enseigne <MoveRight className="ml-1" /></Link>
                     </Button>
                 </div>
             </CardContent>
@@ -176,5 +176,7 @@ export default function PotentialPerformanceTab({ filters }: PotentialPerformanc
     </div>
   );
 }
+
+    
 
     
