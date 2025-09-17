@@ -1,16 +1,19 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
-import { DollarSign, Package, ShoppingCart, Users, MoveRight } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2 } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { generateDashboardInsights, DashboardInsightsOutput } from '@/ai/flows/generate-dashboard-insights';
+import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const generateData = (filters: any) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -67,6 +70,7 @@ const generateData = (filters: any) => {
 
 
 export default function DashboardPage() {
+    const { toast } = useToast();
     const [filters, setFilters] = useState({
         country: 'france',
         channel: 'all',
@@ -76,6 +80,8 @@ export default function DashboardPage() {
     });
     
     const [visibleKpis, setVisibleKpis] = useState<string[]>(["Chiffre d'Affaires"]);
+    const [insights, setInsights] = useState<DashboardInsightsOutput | null>(null);
+    const [isLoadingInsights, setIsLoadingInsights] = useState(true);
 
     const handleFilterChange = (filterName: keyof typeof filters, value: string) => {
         setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -87,7 +93,27 @@ export default function DashboardPage() {
 
     const { kpiData, evolutionData } = useMemo(() => generateData(filters), [filters]);
     
-    const chartKpis = Object.keys(evolutionData[0]).filter(k => k !== 'name');
+    useEffect(() => {
+        const fetchInsights = async () => {
+            setIsLoadingInsights(true);
+            try {
+                const result = await generateDashboardInsights({ filters, kpis: kpiData });
+                setInsights(result);
+            } catch (error) {
+                console.error("Failed to fetch dashboard insights:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Erreur de l'IA",
+                    description: "Impossible de générer les recommandations. Avez-vous configuré votre clé API ?",
+                });
+                setInsights(null); // Clear previous insights on error
+            } finally {
+                setIsLoadingInsights(false);
+            }
+        };
+
+        fetchInsights();
+    }, [filters, kpiData, toast]);
 
 
   return (
@@ -179,7 +205,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <CardTitle>Évolution Hebdomadaire des KPIs (vs N-1)</CardTitle>
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                        {chartKpis.map(kpi => (
+                        {Object.keys(evolutionData[0]).filter(k => k !== 'name').map(kpi => (
                             <div key={kpi} className="flex items-center space-x-2">
                                 <Checkbox id={`cb-${kpi}`} checked={visibleKpis.includes(kpi)} onCheckedChange={() => handleKpiToggle(kpi)} />
                                 <label htmlFor={`cb-${kpi}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{kpi}</label>
@@ -213,29 +239,41 @@ export default function DashboardPage() {
                 <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
                 <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-                <div>
-                    <h4 className="font-semibold mb-1">À retenir</h4>
-                    <ul className="list-disc pl-5 text-muted-foreground">
-                        <li>La croissance du chiffre d'affaires est principalement portée par l'augmentation des volumes, ce qui est un signe de bonne santé.</li>
-                        <li>Le nombre de clients montre une tendance positive, mais les transactions par client stagnent légèrement sur les dernières semaines.</li>
-                        <li>Les filtres actuels montrent une forte performance sur le canal 'Offline', mais une faiblesse sur le 'Online'.</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
-                    <ul className="list-disc pl-5 text-muted-foreground">
-                        <li><strong>Opportunité :</strong> Il y a un potentiel de croissance significatif sur le canal Online. Envisagez de lancer une campagne de 'Sponsored Products' pour la gamme 'Skyr' afin de dynamiser les ventes en ligne.</li>
-                        <li><strong>Optimisation :</strong> Le ROAS des campagnes TV semble diminuer. Utilisez le module MMM pour simuler une réallocation de 10% du budget TV vers le 'Social Media' afin d'en mesurer l'impact.</li>
-                        <li><strong>Analyse :</strong> La pénétration des foyers stagne. Plongez dans les 'Données Consommateurs' pour identifier de nouveaux segments de clientèle à cibler.</li>
-                    </ul>
-                </div>
-                 <div>
-                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
-                     <Button variant="link" asChild className="p-0 h-auto">
-                        <Link href="/retail-media">Piloter les campagnes Retail Media <MoveRight className="ml-1" /></Link>
-                    </Button>
-                </div>
+            <CardContent className="space-y-4 text-sm min-h-[220px]">
+                {isLoadingInsights ? (
+                    <div className="space-y-4">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                        <div className="pt-4 space-y-2">
+                           <Skeleton className="h-4 w-3/4" />
+                           <Skeleton className="h-4 w-full" />
+                        </div>
+                    </div>
+                ) : insights ? (
+                    <>
+                        <div>
+                            <h4 className="font-semibold mb-1">À retenir</h4>
+                            <ul className="list-disc pl-5 text-muted-foreground">
+                                {insights.takeaways.map((item, index) => <li key={index}>{item}</li>)}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                            <ul className="list-disc pl-5 text-muted-foreground">
+                                {insights.recommendations.map((item, index) => <li key={index}>{item}</li>)}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                            <Button variant="link" asChild className="p-0 h-auto">
+                                <Link href={insights.nextStep.href}>{insights.nextStep.text} <MoveRight className="ml-1" /></Link>
+                            </Button>
+                        </div>
+                    </>
+                ) : (
+                     <p className="text-muted-foreground">Les recommandations de l'IA n'ont pas pu être chargées.</p>
+                )}
             </CardContent>
         </Card>
 
