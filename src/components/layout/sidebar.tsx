@@ -74,7 +74,7 @@ export default function Sidebar({ children }: { children?: ReactNode }) {
           <Settings className="h-5 w-5" />
           <span>Paramètres</span>
         </Link>
-        <ChatbotTrigger />
+        {children}
       </div>
     </aside>
   );
