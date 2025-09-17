@@ -86,7 +86,7 @@ const PieChartWidget = ({ widget }: { widget: ReportWidget & { type: 'piechart' 
 
 
 const SummaryWidget = ({ widget }: { widget: ReportWidget & { type: 'summary' } }) => (
-  <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
+  <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800 md:col-span-2">
     <CardHeader className="flex-row items-start gap-3 space-y-0">
         <Sparkles className="h-5 w-5 text-blue-500 mt-1" />
         <div>
@@ -108,7 +108,8 @@ export default function ReportCanvasPage() {
 
   const handlePromptClick = (prompt: string) => {
     form.setValue('prompt', prompt);
-    form.handleSubmit(onSubmit)();
+    // Automatically submit the form
+    onSubmit({ prompt });
   };
 
   const onSubmit: SubmitHandler<ReportFormValues> = async (data) => {
@@ -129,11 +130,16 @@ export default function ReportCanvasPage() {
   };
 
   const renderWidget = (widget: ReportWidget, index: number) => {
+    // Force summary to span full width if it's the last item
+    if (widget.type === 'summary' && index === (reportData?.widgets?.length ?? 0) - 1) {
+        return <SummaryWidget key={index} widget={widget} />;
+    }
+
     switch (widget.type) {
       case 'kpi': return <KpiWidget key={index} widget={widget} />;
       case 'barchart': return <BarChartWidget key={index} widget={widget} />;
       case 'piechart': return <PieChartWidget key={index} widget={widget} />;
-      case 'summary': return <SummaryWidget key={index} widget={widget} />;
+      case 'summary': return <SummaryWidget key={index} widget={widget} />; // Fallback for other summaries
       default: return null;
     }
   };
@@ -213,3 +219,5 @@ export default function ReportCanvasPage() {
     </div>
   );
 }
+
+    

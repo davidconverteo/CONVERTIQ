@@ -14,7 +14,7 @@ import { getDataSummary, DataCategorySchema } from '@/services/data-service';
 
 // --- Input and Output Schemas ---
 
-const CreateReportFromPromptInputSchema = z.object({
+export const CreateReportFromPromptInputSchema = z.object({
   prompt: z.string().describe("The user's question or request for a report."),
 });
 export type CreateReportFromPromptInput = z.infer<typeof CreateReportFromPromptInputSchema>;
@@ -60,7 +60,7 @@ const ReportWidgetSchema = z.union([
 export type ReportWidget = z.infer<typeof ReportWidgetSchema>;
 
 
-const CreateReportFromPromptOutputSchema = z.object({
+export const CreateReportFromPromptOutputSchema = z.object({
     title: z.string().describe('A clear and concise title for the generated report.'),
     widgets: z.array(ReportWidgetSchema).describe('An array of widget objects that make up the report.'),
 });
@@ -97,8 +97,8 @@ const prompt = ai.definePrompt({
   4.  **Widget Selection:**
       *   Use 'kpi' widgets for single, important metrics (e.g., Global ROAS, Total Spend).
       *   Use 'barchart' or 'piechart' to visualize comparisons or distributions.
-      *   Use a 'summary' widget to provide a concise, actionable AI-powered insight and recommendation at the end.
-  5.  **Generate Output:** Create a clear title for the report and assemble the chosen widgets into the final JSON output. Ensure the data in charts is correctly formatted as an array of objects with 'name' and 'value'.
+      *   Use a 'summary' widget to provide a concise, actionable AI-powered insight and recommendation at the end. The summary widget should be the last one in the array.
+  5.  **Generate Output:** Create a clear title for the report and assemble the chosen widgets into the final JSON output. Ensure the data in charts is correctly formatted as an array of objects with 'name' and 'value'. Ensure the summary widget is the last element in the 'widgets' array.
 
   User's Prompt: {{{prompt}}}`,
 });
@@ -124,3 +124,5 @@ const createReportFlow = ai.defineFlow(
 export async function createReportFromPrompt(input: CreateReportFromPromptInput): Promise<CreateReportFromPromptOutput> {
   return createReportFlow(input);
 }
+
+    
