@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
-import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown, Radio, Target } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
@@ -302,33 +302,47 @@ export default function DashboardPage() {
                              <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
                     ) : persona ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="md:col-span-1 flex flex-col items-center text-center">
+                         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+                            <div className="flex-shrink-0 flex flex-col items-center text-center">
                                 <Avatar className="h-32 w-32 border-4 border-primary/20 shadow-md">
                                     <AvatarImage src={persona.imageUrl} alt={persona.name} />
                                     <AvatarFallback>{persona.name.substring(0, 1)}</AvatarFallback>
                                 </Avatar>
-                                <h3 className="mt-4 text-2xl font-bold">{persona.name}</h3>
+                                <h3 className="mt-4 text-xl font-bold">{persona.name}</h3>
                                 <p className="text-muted-foreground">{`${persona.age} ans, ${persona.familyStatus}`}</p>
                                 <p className="text-sm text-muted-foreground">{persona.profession}</p>
                             </div>
-                            <div className="md:col-span-2 space-y-4 pt-4">
-                                <div>
-                                    <h4 className="font-semibold flex items-center gap-2 text-lg"><Settings /> Habitudes d'achat</h4>
-                                    <ul className="list-disc pl-5 text-muted-foreground mt-2 space-y-1">
-                                        {persona.habits.map((h, i) => <li key={i}>{h}</li>)}
-                                    </ul>
+                            <div className="w-full space-y-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div>
+                                        <h4 className="font-semibold flex items-center gap-2"><Settings /> Habitudes</h4>
+                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                            {persona.habits.map((h, i) => <li key={i}>{h}</li>)}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold flex items-center gap-2"><Heart /> Motivations</h4>
+                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                            {persona.motivations.map((m, i) => <li key={i}>{m}</li>)}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold flex items-center gap-2"><ThumbsDown /> Frustrations</h4>
+                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                            {persona.painPoints.map((p, i) => <li key={i}>{p}</li>)}
+                                        </ul>
+                                    </div>
+                                     <div>
+                                        <h4 className="font-semibold flex items-center gap-2"><Radio /> Habitudes Média</h4>
+                                        <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                            {persona.mediaHabits.map((h, i) => <li key={i}>{h}</li>)}
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold flex items-center gap-2 text-lg"><Heart /> Motivations</h4>
-                                     <ul className="list-disc pl-5 text-muted-foreground mt-2 space-y-1">
-                                        {persona.motivations.map((m, i) => <li key={i}>{m}</li>)}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold flex items-center gap-2 text-lg"><ThumbsDown /> Frustrations</h4>
-                                     <ul className="list-disc pl-5 text-muted-foreground mt-2 space-y-1">
-                                        {persona.painPoints.map((p, i) => <li key={i}>{p}</li>)}
+                                    <h4 className="font-semibold flex items-center gap-2"><Target /> Leviers à activer</h4>
+                                    <ul className="list-disc pl-5 text-muted-foreground mt-1 space-y-1 text-sm">
+                                        {persona.marketingLevers.map((l, i) => <li key={i}>{l}</li>)}
                                     </ul>
                                 </div>
                             </div>
