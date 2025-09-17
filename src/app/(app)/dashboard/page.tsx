@@ -41,7 +41,7 @@ const PlatformCard = ({ name, logo }: { name: string, logo: string }) => (
     <Link href="#" className="block">
         <Card className="flex h-24 items-center justify-center p-4 transition-all hover:shadow-md hover:border-primary">
             <div className="relative h-full w-full">
-                <Image src={logo} alt={`${name} logo`} layout="fill" objectFit="contain" />
+                <Image src={logo} alt={`${name} logo`} fill objectFit="contain" />
             </div>
         </Card>
     </Link>
