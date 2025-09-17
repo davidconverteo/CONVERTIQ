@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
@@ -155,8 +154,8 @@ const MmmCountryView = ({ country, onBack }: { country: 'France' | 'USA' | 'Japa
                         </Card>
                     </div>
                      <Card>
-                        <CardHeader className="flex-row items-center gap-2 space-y-0">
-                            <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                        <CardHeader className="flex-row items-center gap-2">
+                            <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={32} height={32} className="object-contain" />
                             <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 text-sm">

@@ -83,8 +83,8 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                     </div>
                 </div>
                  <Card className="bg-background">
-                    <CardHeader className="flex-row items-center gap-2 space-y-0">
-                        <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                    <CardHeader className="flex-row items-center gap-2">
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={32} height={32} className="object-contain" />
                         <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 text-sm">
@@ -112,7 +112,7 @@ const CampaignModal = ({ campaign }: { campaign: any }) => {
                 </Card>
             </div>
         </DialogContent>
-    )
+    );
 }
 
 const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
@@ -172,14 +172,12 @@ const MediaPlanner = ({ campaigns }: { campaigns: any[] }) => {
                                                         </DialogTrigger>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        <p className="font-bold">{campaign.lever} - {campaign.channel}</p>
-                                                        <p>{new Date(campaign.start).toLocaleDateString('fr-FR')} - {new Date(campaign.end).toLocaleDateString('fr-FR')}</p>
-                                                        <p>Budget: {campaign.spend.toLocaleString('fr-FR')}€</p>
+                                                      <p>{campaign.lever} - {campaign.channel}</p>
                                                     </TooltipContent>
                                                 </UITooltip>
                                                 <CampaignModal campaign={campaign} />
                                             </Dialog>
-                                        )
+                                        );
                                     })}
                                 </div>
                             ))}
@@ -345,8 +343,8 @@ export default function BrandMediaPage() {
                 </Card>
             </div>
              <Card>
-                <CardHeader className="flex-row items-center gap-2 space-y-0">
-                    <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardHeader className="flex-row items-center gap-2">
+                    <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={32} height={32} className="object-contain" />
                     <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">

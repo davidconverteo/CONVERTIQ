@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -35,7 +34,7 @@ const generateData = (filters: Filters) => {
         t = Math.imul(t ^ t >>> 15, t | 1);
         t ^= t + Math.imul(t ^ t >>> 7, t | 61);
         const result = ((t ^ t >>> 14) >>> 0) / 4294967296;
-        return result * (max-min) + min;
+        return result * (max - min) + min;
     };
 
     const baseData = {
@@ -146,8 +145,8 @@ export default function PotentialPerformanceTab({ filters }: PotentialPerformanc
             </CardContent>
         </Card>
         <Card>
-            <CardHeader className="flex-row items-center gap-2 space-y-0">
-                <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+            <CardHeader className="flex-row items-center gap-2">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={32} height={32} className="object-contain" />
                 <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
