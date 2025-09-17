@@ -16,6 +16,7 @@ import {
   Settings,
   FlaskConical,
   LayoutTemplate,
+  BrainCircuit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
@@ -27,7 +28,7 @@ const navItems = [
   { href: '/retail-media', icon: ShoppingCart, label: 'Retail Media' },
   { href: '/creative-studio', icon: Sparkles, label: 'Studio Créatif' },
   { href: '/report-canvas', icon: LayoutTemplate, label: "Canevas d'Analyse" },
-  { href: '/mmm', icon: PieChart, label: 'MMM' },
+  { href: '/mmm', icon: BrainCircuit, label: 'MMM' },
   { href: '/performances', icon: BarChart2, label: 'Performances' },
   { href: '/digital-shelf', icon: Store, label: 'Digital Shelf' },
   { href: '/donnees-consommateurs', icon: Users, label: 'Données Conso.' },
