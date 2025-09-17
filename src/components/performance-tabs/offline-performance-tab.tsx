@@ -294,9 +294,3 @@ export default function OfflinePerformanceTab({ filters }: OfflinePerformanceTab
     </div>
   );
 }
-
-    
-
-    
-
-    

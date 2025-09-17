@@ -177,9 +177,3 @@ export default function PricingPerformanceTab({ filters }: PricingPerformanceTab
     </div>
   );
 }
-
-    
-
-    
-
-    

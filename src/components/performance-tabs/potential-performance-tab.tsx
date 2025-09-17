@@ -176,9 +176,3 @@ export default function PotentialPerformanceTab({ filters }: PotentialPerformanc
     </div>
   );
 }
-
-    
-
-    
-
-    

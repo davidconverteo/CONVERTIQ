@@ -157,9 +157,3 @@ export default function OnlinePerformanceTab({ filters }: OnlinePerformanceTabPr
     </div>
   );
 }
-
-    
-
-    
-
-    

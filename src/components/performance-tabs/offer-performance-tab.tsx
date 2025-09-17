@@ -173,9 +173,3 @@ export default function OfferPerformanceTab({ filters }: OfferPerformanceTabProp
     </Tabs>
   );
 }
-
-    
-
-    
-
-    

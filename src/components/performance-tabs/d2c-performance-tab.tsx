@@ -198,9 +198,3 @@ export default function D2CPerformanceTab({ filters }: D2CPerformanceTabProps) {
     </div>
   );
 }
-
-    
-
-    
-
-    

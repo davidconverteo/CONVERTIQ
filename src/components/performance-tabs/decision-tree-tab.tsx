@@ -202,5 +202,3 @@ export default function DecisionTreeTab({ filters }: DecisionTreeTabProps) {
         </div>
     );
 }
-
-    
