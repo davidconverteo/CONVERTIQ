@@ -1,154 +1,168 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ArrowUp, ArrowDown, DollarSign, ShoppingCart, Users, Sparkles, MoveRight } from "lucide-react";
-import Image from "next/image";
+import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { DollarSign, Zap, Users, CheckCircle, Lightbulb, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 
 const kpiData = [
-    { title: "Chiffre d'affaires", value: "€1.2M", change: "+12.5%", changeType: "increase", icon: DollarSign },
-    { title: "Ventes en ligne", value: "8,452", change: "+8.2%", changeType: "increase", icon: ShoppingCart },
-    { title: "Nouveaux Clients", value: "1,203", change: "-2.1%", changeType: "decrease", icon: Users },
-    { title: "Coût d'acquisition", value: "€15.70", change: "+5.3%", changeType: "decrease", icon: DollarSign },
-];
-
-const salesData = [
-  { name: 'Jan', sales: 4000 },
-  { name: 'Fév', sales: 3000 },
-  { name: 'Mar', sales: 5000 },
-  { name: 'Avr', sales: 4500 },
-  { name: 'Mai', sales: 6000 },
-  { name: 'Juin', sales: 5500 },
-];
-
-const trafficData = [
-  { name: 'Lun', uv: 400, pv: 2400 },
-  { name: 'Mar', uv: 300, pv: 1398 },
-  { name: 'Mer', uv: 200, pv: 9800 },
-  { name: 'Jeu', uv: 278, pv: 3908 },
-  { name: 'Ven', uv: 189, pv: 4800 },
-  { name: 'Sam', uv: 239, pv: 3800 },
-  { name: 'Dim', uv: 349, pv: 4300 },
+    { title: "Chiffre d'Affaires Total", value: "8.33 M€", icon: DollarSign },
+    { title: "ROAS Moyen Pondéré", value: "2.5", icon: Zap },
+    { title: "Pénétration Marché", value: "12.7%", icon: Users },
+    { title: "Taux Disponibilité Online", value: "108.7%", icon: CheckCircle, note: "vs objectif 98%" },
 ];
 
 const channelData = [
-    { name: 'Organique', value: 400 },
-    { name: 'Payant', value: 300 },
-    { name: 'Direct', value: 200 },
-    { name: 'Référents', value: 100 },
+    { name: 'Offline', value: 400 },
+    { name: 'Online (Drive)', value: 300 },
+    { name: 'D2C', value: 50 },
 ];
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
-const creativeImage = PlaceHolderImages.find(img => img.id === 'creative-example');
+
+const COLORS = ['#2d3748', '#2b6cb0', '#38a169'];
+
+const insightPlatforms = [
+    { name: 'Circana', logo: 'https://i.postimg.cc/PqYp2MSx/circana-logo.png' },
+    { name: 'Kantar', logo: 'https://i.postimg.cc/Yq3C93p0/kantar-logo.png' },
+    { name: 'Data Impact', logo: 'https://i.postimg.cc/L69g9T3h/data-impact-logo.png' },
+];
+
+const activationPlatforms = [
+    { name: 'Amazon Ads', logo: 'https://i.postimg.cc/6p65p5V2/amazon-ads-logo.png' },
+    { name: 'Unlimitail', logo: 'https://i.postimg.cc/tJnF4h07/unlimitail-logo.png' },
+    { name: 'Pacvue', logo: 'https://i.postimg.cc/d1W1xJ6T/pacvue-logo.png' },
+];
+
+const PlatformCard = ({ name, logo }: { name: string, logo: string }) => (
+    <Link href="#" className="block">
+        <Card className="flex h-24 items-center justify-center p-4 transition-all hover:shadow-md hover:border-primary">
+            <div className="relative h-full w-full">
+                <Image src={logo} alt={`${name} logo`} layout="fill" objectFit="contain" />
+            </div>
+        </Card>
+    </Link>
+);
 
 export default function DashboardPage() {
+    const [filters, setFilters] = useState({
+        period: 'mat',
+        channel: 'offline',
+        brand: 'lpg'
+    });
+
   return (
     <div className="space-y-6">
+        <Card>
+            <CardHeader>
+                <CardTitle>Filtres Globaux</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-wrap items-center gap-4">
+                 <Select defaultValue="mat" onValueChange={(v) => setFilters(f => ({...f, period: v}))}>
+                    <SelectTrigger className="w-full sm:w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="mat">Cumul Annuel Mobile (MAT)</SelectItem>
+                        <SelectItem value="ytd">Year-to-Date (YTD)</SelectItem>
+                        <SelectItem value="last_quarter">Dernier Trimestre</SelectItem>
+                        <SelectItem value="last_month">Dernier Mois</SelectItem>
+                    </SelectContent>
+                </Select>
+                 <Select defaultValue="offline" onValueChange={(v) => setFilters(f => ({...f, channel: v}))}>
+                    <SelectTrigger className="w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Tous les canaux</SelectItem>
+                        <SelectItem value="offline">Offline</SelectItem>
+                        <SelectItem value="online">Online (Drive)</SelectItem>
+                        <SelectItem value="d2c">D2C</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select defaultValue="lpg" onValueChange={(v) => setFilters(f => ({...f, brand: v}))}>
+                    <SelectTrigger className="w-full sm:w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="lpg">Marque: La Prairie Gourmande</SelectItem>
+                        <SelectItem value="skyr">Marque: Gamme Skyr</SelectItem>
+                        <SelectItem value="bio">Marque: Gamme Bio</SelectItem>
+                    </SelectContent>
+                </Select>
+            </CardContent>
+        </Card>
+        
+        <Card className="border-l-4 border-primary bg-primary/5">
+            <CardHeader className="flex-row items-start gap-4">
+                <Lightbulb className="h-6 w-6 text-primary mt-1" />
+                <div>
+                    <CardTitle>Synthèse & Recommandations IA</CardTitle>
+                    <CardDescription className="mt-2 text-base text-foreground">
+                        Analyse pour <strong>Cumul Annuel Mobile (MAT) / Offline</strong>. La performance globale est solide. Le canal <strong>Online</strong> montre un fort potentiel de croissance. Le ROAS moyen indique une bonne rentabilité des investissements. <span className="font-bold text-primary">Action prioritaire :</span> Améliorer la conversion sur le canal D2C.
+                    </CardDescription>
+                </div>
+            </CardHeader>
+        </Card>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {kpiData.map((kpi, index) => (
             <Card key={index}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-                    <kpi.icon className="h-4 w-4 text-muted-foreground" />
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <kpi.icon className="h-4 w-4" />
+                        {kpi.title}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{kpi.value}</div>
-                    <p className={`text-xs ${kpi.changeType === 'increase' ? 'text-green-500' : 'text-red-500'} flex items-center`}>
-                        {kpi.changeType === 'increase' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                        {kpi.change} vs. mois dernier
-                    </p>
+                    <div className="text-4xl font-bold">{kpi.value}</div>
+                    {kpi.note && <p className="text-xs text-muted-foreground">{kpi.note}</p>}
                 </CardContent>
             </Card>
         ))}
       </div>
       
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Card>
-              <CardHeader>
-                  <CardTitle>Ventes Mensuelles</CardTitle>
-                  <CardDescription>Évolution du chiffre d'affaires sur les 6 derniers mois.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={salesData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="sales" fill="hsl(var(--primary))" />
-                    </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-          </Card>
-          <Card>
-              <CardHeader>
-                  <CardTitle>Trafic du Site Web</CardTitle>
-                  <CardDescription>Visiteurs uniques (UV) et pages vues (PV) cette semaine.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={trafficData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="pv" stroke="hsl(var(--primary))" name="Pages Vues" />
-                        <Line type="monotone" dataKey="uv" stroke="hsl(var(--accent))" name="Visiteurs Uniques" />
-                    </LineChart>
-                  </ResponsiveContainer>
-              </CardContent>
-          </Card>
-      </div>
+      <Card>
+        <CardHeader>
+            <CardTitle>Répartition du Chiffre d'Affaires par Canal</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                    <Pie 
+                        data={channelData} 
+                        dataKey="value" 
+                        nameKey="name" 
+                        cx="50%" 
+                        cy="50%" 
+                        innerRadius={80} 
+                        outerRadius={120} 
+                        paddingAngle={2}
+                    >
+                        {channelData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip formatter={(value, name) => [new Intl.NumberFormat('fr-FR').format(value as number), name]} />
+                    <Legend />
+                </PieChart>
+            </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card className="md:col-span-1">
-            <CardHeader>
-                <CardTitle>Répartition des Canaux</CardTitle>
-                <CardDescription>Origine de votre trafic.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                        <Pie data={channelData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                            {channelData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                    </PieChart>
-                </ResponsiveContainer>
-            </CardContent>
-        </Card>
-        <Card className="md:col-span-2">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Sparkles className="text-accent" /> Studio Créatif IA</CardTitle>
-                <CardDescription>Générez et adaptez vos visuels de campagne en un clic.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center gap-4 text-center sm:flex-row sm:text-left">
-                {creativeImage && (
-                    <Image 
-                        src={creativeImage.imageUrl} 
-                        alt="Exemple de création" 
-                        width={200}
-                        height={200}
-                        data-ai-hint={creativeImage.imageHint}
-                        className="rounded-lg object-cover shadow-lg"
-                    />
-                )}
-                <div className="space-y-4">
-                    <p className="text-muted-foreground">Besoin d'un nouveau visuel pour votre prochaine campagne ? Laissez notre IA vous surprendre.</p>
-                    <Button asChild>
-                        <Link href="/creative-studio">
-                            Aller au studio <MoveRight className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 gap-6">
+        <div>
+            <h3 className="text-xl font-semibold mb-4">Plateformes d'Insight</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {insightPlatforms.map(p => <PlatformCard key={p.name} {...p} />)}
+            </div>
+        </div>
+         <div>
+            <h3 className="text-xl font-semibold mb-4">Plateformes d'Activation</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {activationPlatforms.map(p => <PlatformCard key={p.name} {...p} />)}
+            </div>
+        </div>
       </div>
     </div>
   );
 }
+
+    
