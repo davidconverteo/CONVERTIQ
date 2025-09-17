@@ -23,7 +23,7 @@ const channelData = [
     { name: 'D2C', value: 50 },
 ];
 
-const COLORS = ['#2d3748', '#2b6cb0', '#38a169'];
+const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))'];
 
 const insightPlatforms = [
     { name: 'Circana', logo: 'https://i.postimg.cc/PqYp2MSx/circana-logo.png' },
@@ -41,7 +41,7 @@ const PlatformCard = ({ name, logo }: { name: string, logo: string }) => (
     <Link href="#" className="block">
         <Card className="flex h-24 items-center justify-center p-4 transition-all hover:shadow-md hover:border-primary">
             <div className="relative h-full w-full">
-                <Image src={logo} alt={`${name} logo`} fill objectFit="contain" />
+                <Image src={logo} alt={`${name} logo`} fill style={{objectFit:"contain"}} />
             </div>
         </Card>
     </Link>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
             <h3 className="text-xl font-semibold mb-4">Plateformes d'Insight</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
