@@ -5,15 +5,18 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
-import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2 } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users, MoveRight, Loader2, User, Heart, Settings, ThumbsDown } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { generateDashboardInsights, DashboardInsightsOutput } from '@/ai/flows/generate-dashboard-insights';
+import { generateCustomerPersona, GenerateCustomerPersonaOutput } from '@/ai/flows/generate-customer-persona';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+
 
 const generateData = (filters: any) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -82,6 +85,8 @@ export default function DashboardPage() {
     const [visibleKpis, setVisibleKpis] = useState<string[]>(["Chiffre d'Affaires"]);
     const [insights, setInsights] = useState<DashboardInsightsOutput | null>(null);
     const [isLoadingInsights, setIsLoadingInsights] = useState(true);
+    const [persona, setPersona] = useState<GenerateCustomerPersonaOutput | null>(null);
+    const [isLoadingPersona, setIsLoadingPersona] = useState(true);
 
     const handleFilterChange = (filterName: keyof typeof filters, value: string) => {
         setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -94,25 +99,33 @@ export default function DashboardPage() {
     const { kpiData, evolutionData } = useMemo(() => generateData(filters), [filters]);
     
     useEffect(() => {
-        const fetchInsights = async () => {
+        const fetchAiData = async () => {
             setIsLoadingInsights(true);
+            setIsLoadingPersona(true);
+            
             try {
-                const result = await generateDashboardInsights({ filters, kpis: kpiData });
-                setInsights(result);
+                const [insightsResult, personaResult] = await Promise.all([
+                    generateDashboardInsights({ filters, kpis: kpiData }),
+                    generateCustomerPersona({ filters })
+                ]);
+                setInsights(insightsResult);
+                setPersona(personaResult);
             } catch (error) {
-                console.error("Failed to fetch dashboard insights:", error);
+                console.error("Failed to fetch AI data:", error);
                 toast({
                     variant: "destructive",
                     title: "Erreur de l'IA",
-                    description: "Impossible de générer les recommandations. Avez-vous configuré votre clé API ?",
+                    description: "Impossible de générer les insights ou le persona. Avez-vous configuré votre clé API ?",
                 });
-                setInsights(null); // Clear previous insights on error
+                setInsights(null);
+                setPersona(null);
             } finally {
                 setIsLoadingInsights(false);
+                setIsLoadingPersona(false);
             }
         };
 
-        fetchInsights();
+        fetchAiData();
     }, [filters, kpiData, toast]);
 
 
@@ -200,83 +213,143 @@ export default function DashboardPage() {
             </Card>
         </div>
 
-        <Card>
-            <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <CardTitle>Évolution Hebdomadaire des KPIs (vs N-1)</CardTitle>
-                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                        {Object.keys(evolutionData[0]).filter(k => k !== 'name').map(kpi => (
-                            <div key={kpi} className="flex items-center space-x-2">
-                                <Checkbox id={`cb-${kpi}`} checked={visibleKpis.includes(kpi)} onCheckedChange={() => handleKpiToggle(kpi)} />
-                                <label htmlFor={`cb-${kpi}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{kpi}</label>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+                <Card>
+                    <CardHeader>
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <CardTitle>Évolution Hebdomadaire des KPIs (vs N-1)</CardTitle>
+                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                                {Object.keys(evolutionData[0]).filter(k => k !== 'name').map(kpi => (
+                                    <div key={kpi} className="flex items-center space-x-2">
+                                        <Checkbox id={`cb-${kpi}`} checked={visibleKpis.includes(kpi)} onCheckedChange={() => handleKpiToggle(kpi)} />
+                                        <label htmlFor={`cb-${kpi}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{kpi}</label>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                    <LineChart data={evolutionData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
-                        <YAxis yAxisId="left" stroke="hsl(var(--primary))" tickFormatter={(value) => `${value.toFixed(0)}%`} />
-                        <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" tickFormatter={(value) => `${value.toFixed(0)}%`} />
-                        <Tooltip
-                          formatter={(value: number) => [`${value.toFixed(2)}%`, `vs N-1`]}
-                        />
-                        <Legend />
-                        {visibleKpis.includes("Chiffre d'Affaires") && <Line yAxisId="left" type="monotone" dataKey="Chiffre d'Affaires" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />}
-                        {visibleKpis.includes("Volumes") && <Line yAxisId="right" type="monotone" dataKey="Volumes" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} />}
-                        {visibleKpis.includes("Transactions") && <Line yAxisId="right" type="monotone" dataKey="Transactions" stroke="hsl(var(--chart-3))" strokeWidth={2} dot={false} />}
-                        {visibleKpis.includes("Clients") && <Line yAxisId="right" type="monotone" dataKey="Clients" stroke="hsl(var(--chart-4))" strokeWidth={2} dot={false} />}
-                    </LineChart>
-                </ResponsiveContainer>
-            </CardContent>
-        </Card>
-        
-        <Card>
-            <CardHeader className="flex-row items-center gap-2 space-y-0">
-                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
-                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm min-h-[220px]">
-                {isLoadingInsights ? (
-                    <div className="space-y-4">
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                        <div className="pt-4 space-y-2">
-                           <Skeleton className="h-4 w-3/4" />
-                           <Skeleton className="h-4 w-full" />
                         </div>
-                    </div>
-                ) : insights ? (
-                    <>
-                        <div>
-                            <h4 className="font-semibold mb-1">À retenir</h4>
-                            <ul className="list-disc pl-5 text-muted-foreground">
-                                {insights.takeaways.map((item, index) => <li key={index}>{item}</li>)}
-                            </ul>
+                    </CardHeader>
+                    <CardContent>
+                        <ResponsiveContainer width="100%" height={350}>
+                            <LineChart data={evolutionData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                                <YAxis yAxisId="left" stroke="hsl(var(--primary))" tickFormatter={(value) => `${value.toFixed(0)}%`} />
+                                <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" tickFormatter={(value) => `${value.toFixed(0)}%`} />
+                                <Tooltip
+                                formatter={(value: number) => [`${value.toFixed(2)}%`, `vs N-1`]}
+                                />
+                                <Legend />
+                                {visibleKpis.includes("Chiffre d'Affaires") && <Line yAxisId="left" type="monotone" dataKey="Chiffre d'Affaires" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />}
+                                {visibleKpis.includes("Volumes") && <Line yAxisId="right" type="monotone" dataKey="Volumes" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} />}
+                                {visibleKpis.includes("Transactions") && <Line yAxisId="right" type="monotone" dataKey="Transactions" stroke="hsl(var(--chart-3))" strokeWidth={2} dot={false} />}
+                                {visibleKpis.includes("Clients") && <Line yAxisId="right" type="monotone" dataKey="Clients" stroke="hsl(var(--chart-4))" strokeWidth={2} dot={false} />}
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex-row items-center gap-2 space-y-0">
+                        <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                        <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 text-sm min-h-[220px]">
+                        {isLoadingInsights ? (
+                            <div className="space-y-4">
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-5/6" />
+                                <div className="pt-4 space-y-2">
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-4 w-full" />
+                                </div>
+                            </div>
+                        ) : insights ? (
+                            <>
+                                <div>
+                                    <h4 className="font-semibold mb-1">À retenir</h4>
+                                    <ul className="list-disc pl-5 text-muted-foreground">
+                                        {insights.takeaways.map((item, index) => <li key={index}>{item}</li>)}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                                    <ul className="list-disc pl-5 text-muted-foreground">
+                                        {insights.recommendations.map((item, index) => <li key={index}>{item}</li>)}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                                    <Button variant="link" asChild className="p-0 h-auto">
+                                        <Link href={insights.nextStep.href}>{insights.nextStep.text} <MoveRight className="ml-1" /></Link>
+                                    </Button>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="text-muted-foreground">Les recommandations de l'IA n'ont pas pu être chargées.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><User /> Persona Client</CardTitle>
+                    <CardDescription>Profil type du client sur ce segment.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingPersona ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                                <Skeleton className="h-24 w-24 rounded-full" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-6 w-40" />
+                                    <Skeleton className="h-4 w-32" />
+                                </div>
+                            </div>
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6" />
+                            <Skeleton className="h-4 w-4/5" />
                         </div>
-                        <div>
-                            <h4 className="font-semibold mb-1">Nos recommandations</h4>
-                            <ul className="list-disc pl-5 text-muted-foreground">
-                                {insights.recommendations.map((item, index) => <li key={index}>{item}</li>)}
-                            </ul>
+                    ) : persona ? (
+                        <div className="space-y-4">
+                            <div className="flex flex-col items-center text-center space-y-2">
+                                <Avatar className="h-24 w-24 border-2 border-primary">
+                                    <AvatarImage src={persona.imageUrl} alt={persona.name} />
+                                    <AvatarFallback>{persona.name.substring(0, 1)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <h3 className="text-xl font-bold">{persona.name}</h3>
+                                    <p className="text-muted-foreground">{`${persona.age} ans, ${persona.familyStatus}`}</p>
+                                    <p className="text-sm text-muted-foreground">{persona.profession}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-3 text-sm">
+                                <div>
+                                    <h4 className="font-semibold flex items-center gap-1"><Settings /> Habitudes</h4>
+                                    <ul className="list-disc pl-5 text-muted-foreground">
+                                        {persona.habits.map((h, i) => <li key={i}>{h}</li>)}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold flex items-center gap-1"><Heart /> Motivations</h4>
+                                     <ul className="list-disc pl-5 text-muted-foreground">
+                                        {persona.motivations.map((m, i) => <li key={i}>{m}</li>)}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold flex items-center gap-1"><ThumbsDown /> Frustrations</h4>
+                                     <ul className="list-disc pl-5 text-muted-foreground">
+                                        {persona.painPoints.map((p, i) => <li key={i}>{p}</li>)}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
-                            <Button variant="link" asChild className="p-0 h-auto">
-                                <Link href={insights.nextStep.href}>{insights.nextStep.text} <MoveRight className="ml-1" /></Link>
-                            </Button>
-                        </div>
-                    </>
-                ) : (
-                     <p className="text-muted-foreground">Les recommandations de l'IA n'ont pas pu être chargées.</p>
-                )}
-            </CardContent>
-        </Card>
-
+                    ) : (
+                         <p className="text-muted-foreground">Le persona client n'a pas pu être chargé.</p>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     </div>
   );
 }
