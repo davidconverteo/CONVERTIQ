@@ -30,9 +30,26 @@ const generateData = (filters: any) => {
         customers: random(250000, 350000, 'cust'),
         customersTrend: random(1, 8, 'custTrend'),
     };
+
+    let weeksToShow = 52;
+    switch (filters.period) {
+        case 'ytd':
+            weeksToShow = 32; // Assuming we are in August
+            break;
+        case 'last_quarter':
+            weeksToShow = 12;
+            break;
+        case 'last_month':
+            weeksToShow = 4;
+            break;
+        case 'mat':
+        default:
+            weeksToShow = 52;
+            break;
+    }
     
-    const evolutionData = Array.from({length: 52}, (_, i) => {
-        const week = 52-i;
+    const evolutionData = Array.from({length: weeksToShow}, (_, i) => {
+        const week = weeksToShow - i;
         return {
             name: `S-${week}`,
             "Chiffre d'Affaires": random(kpiData.caTrend - 5, kpiData.caTrend + 5, `ca_w${week}`),
