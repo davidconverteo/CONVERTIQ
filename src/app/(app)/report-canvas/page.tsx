@@ -43,7 +43,7 @@ const KpiWidget = ({ widget }: { widget: ReportWidget & { type: 'kpi' } }) => (
 const BarChartWidget = ({ widget }: { widget: ReportWidget & { type: 'barchart' } }) => {
     const COLORS = ['#4267B2', '#E1306C', '#FF0000', '#000000', '#6B7280'];
     return(
-      <Card>
+      <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle>{widget.title}</CardTitle>
         </CardHeader>
@@ -104,11 +104,11 @@ export default function ReportCanvasPage() {
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
+    defaultValues: { prompt: '' },
   });
 
   const handlePromptClick = (prompt: string) => {
     form.setValue('prompt', prompt);
-    // Automatically submit the form
     onSubmit({ prompt });
   };
 
@@ -219,5 +219,3 @@ export default function ReportCanvasPage() {
     </div>
   );
 }
-
-    
