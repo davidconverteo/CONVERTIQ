@@ -95,7 +95,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{kpiData.ca.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}</div>
-                    <p className={`text-xs ${kpiData.caTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.caTrend >= 0 ? '+' : ''}{kpiData.caTrend.toFixed(1)}% vs N-1</p>
+                    <p className={`text-xs ${kpiData.caTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.caTrend >= 0 ? '+' : ''}{kpiData.caTrend.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}% vs N-1</p>
                 </CardContent>
             </Card>
             <Card>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{kpiData.volumes.toLocaleString('fr-FR', { maximumFractionDigits: 0 })} unités</div>
-                    <p className={`text-xs ${kpiData.volumesTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.volumesTrend >= 0 ? '+' : ''}{kpiData.volumesTrend.toFixed(1)}% vs N-1</p>
+                    <p className={`text-xs ${kpiData.volumesTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.volumesTrend >= 0 ? '+' : ''}{kpiData.volumesTrend.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}% vs N-1</p>
                 </CardContent>
             </Card>
             <Card>
@@ -115,7 +115,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{kpiData.transactions.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</div>
-                    <p className={`text-xs ${kpiData.transactionsTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.transactionsTrend >= 0 ? '+' : ''}{kpiData.transactionsTrend.toFixed(1)}% vs N-1</p>
+                    <p className={`text-xs ${kpiData.transactionsTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.transactionsTrend >= 0 ? '+' : ''}{kpiData.transactionsTrend.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}% vs N-1</p>
                 </CardContent>
             </Card>
             <Card>
@@ -125,7 +125,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{kpiData.customers.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</div>
-                    <p className={`text-xs ${kpiData.customersTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.customersTrend >= 0 ? '+' : ''}{kpiData.customersTrend.toFixed(1)}% vs N-1</p>
+                    <p className={`text-xs ${kpiData.customersTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>{kpiData.customersTrend >= 0 ? '+' : ''}{kpiData.customersTrend.toLocaleString('fr-FR', { maximumFractionDigits: 1 })}% vs N-1</p>
                 </CardContent>
             </Card>
         </div>
