@@ -1,12 +1,13 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LineChart, Line, CartesianGrid } from 'recharts';
 import { DollarSign, ShoppingCart, Users, Percent, UserPlus, Repeat, TrendingUp, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from '@/components/ui/checkbox';
+import ExportDialog from './export-dialog';
 
 type Filters = {
     country: string;
@@ -18,6 +19,11 @@ type Filters = {
 interface D2CPerformanceTabProps {
     filters: Filters;
 }
+
+const exportableItems = {
+    data: ["KPIs de performance D2C"],
+    graphs: ["Évolution des KPIs D2C", "Analyse du Funnel de Conversion"],
+};
 
 const generateKpiData = (filters: Filters) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -82,6 +88,9 @@ export default function D2CPerformanceTab({ filters }: D2CPerformanceTabProps) {
 
   return (
     <div className="space-y-6">
+        <div className="flex justify-end">
+            <ExportDialog tabTitle="D2C" items={exportableItems} />
+        </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">
         {kpiData.map((kpi) => (
             <Card key={kpi.title}>

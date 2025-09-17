@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Legend, ZAxis } from 'recharts';
@@ -9,6 +9,7 @@ import { Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OfferByRetailerTab from './offer-by-retailer-tab';
 import DecisionTreeTab from './decision-tree-tab';
+import ExportDialog from './export-dialog';
 
 type Filters = {
     country: string;
@@ -20,6 +21,11 @@ type Filters = {
 interface OfferPerformanceTabProps {
     filters: Filters;
 }
+
+const exportableAssortment = {
+    data: ["Classement des Références"],
+    graphs: ["Matrice de l'Offre (BCG)"],
+};
 
 const generateRankingData = (filters: Filters) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -53,6 +59,9 @@ const AssortmentAnalysisTab = ({ filters }: { filters: Filters }) => {
 
     return (
         <div className="space-y-6">
+            <div className="flex justify-end">
+                <ExportDialog tabTitle="Analyse Assortiment" items={exportableAssortment} />
+            </div>
             <Card>
                 <CardHeader>
                     <CardTitle>Classement des Références</CardTitle>

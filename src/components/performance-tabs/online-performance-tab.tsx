@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Sparkles } from "lucide-react";
+import ExportDialog from './export-dialog';
 
 type Filters = {
     country: string;
@@ -16,6 +17,11 @@ type Filters = {
 interface OnlinePerformanceTabProps {
     filters: Filters;
 }
+
+const exportableItems = {
+    data: ["Scorecard Digital Shelf", "Tableau comparatif Drive vs. Offline"],
+    graphs: [],
+};
 
 const generateOnlineData = (filters: Filters) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -51,6 +57,9 @@ export default function OnlinePerformanceTab({ filters }: OnlinePerformanceTabPr
 
   return (
     <div className="space-y-6">
+        <div className="flex justify-end">
+            <ExportDialog tabTitle="Online (Drive)" items={exportableItems} />
+        </div>
        <Card>
         <CardHeader>
           <CardTitle>Scorecard Digital Shelf par Enseigne (Drive)</CardTitle>

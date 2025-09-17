@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import { Sparkles } from "lucide-react";
+import ExportDialog from './export-dialog';
 
 type Filters = {
     country: string;
@@ -18,6 +19,10 @@ interface PricingPerformanceTabProps {
     filters: Filters;
 }
 
+const exportableItems = {
+    data: ["Tableau de pilotage Prix & Promo"],
+    graphs: ["Pont de Croissance du CA"],
+};
 
 const generatePricingData = (filters: Filters) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -85,6 +90,9 @@ export default function PricingPerformanceTab({ filters }: PricingPerformanceTab
 
   return (
     <div className="space-y-6">
+        <div className="flex justify-end">
+            <ExportDialog tabTitle="Prix & Promotions" items={exportableItems} />
+        </div>
       <Card>
         <CardHeader>
           <CardTitle>Pont de Croissance du CA</CardTitle>

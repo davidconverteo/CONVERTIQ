@@ -7,6 +7,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Badge } from "@/components/ui/badge";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { DollarSign, Package, Home, Percent, Sparkles } from "lucide-react";
+import ExportDialog from './export-dialog';
 
 type Filters = {
     country: string;
@@ -18,6 +19,11 @@ type Filters = {
 interface OfflinePerformanceTabProps {
     filters: Filters;
 }
+
+const exportableItems = {
+    data: ["KPIs de performance (Ventes, Unités...)", "Tableau du Top 5 Produits", "Tableau de la Performance par Enseigne"],
+    graphs: ["Arbre de décomposition du CA", "Évolution des Ventes vs N-1"],
+};
 
 const generateOfflineData = (filters: Filters) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -84,6 +90,9 @@ export default function OfflinePerformanceTab({ filters }: OfflinePerformanceTab
 
   return (
     <div className="space-y-6">
+       <div className="flex justify-end">
+            <ExportDialog tabTitle="Offline" items={exportableItems} />
+        </div>
        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
