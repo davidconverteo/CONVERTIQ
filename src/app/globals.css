@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    --background: 220 20% 98%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 0 0% 98%; /* #F9F9F9 */
+    --foreground: 259 60% 20%; /* #2E1452 */
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 259 60% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 181 67% 51%; /* Cyan from Converteo Palette */
-    --primary-foreground: 259 60% 15%; /* Dark Blue for contrast on Cyan */
-    --secondary: 220 13% 91%;
-    --secondary-foreground: 224 71.4% 4.1%;
-    --muted: 220 9% 90%;
-    --muted-foreground: 220 9% 45%;
-    --accent: 259 60% 30%; /* A slightly lighter version of Bleu Nuit for accents */
-    --accent-foreground: 0 0% 98%;
+    --popover-foreground: 259 60% 20%;
+    --primary: 181 67% 51%; /* #2BD6D9 */
+    --primary-foreground: 259 60% 15%;
+    --secondary: 0 0% 94%; /* #EFEFEF */
+    --secondary-foreground: 259 60% 20%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 90%; /* #C4C4C4 */
+    --accent-foreground: 259 60% 20%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 181 67% 51%;
-    --chart-1: 181 67% 51%;
-    --chart-2: 259 60% 40%;
-    --chart-3: 181 50% 70%;
-    --chart-4: 259 40% 60%;
-    --chart-5: 181 30% 80%;
+    --chart-1: 181 67% 51%; /* Cyan */
+    --chart-2: 259 60% 40%; /* Darker Blue */
+    --chart-3: 181 50% 70%; /* Lighter Cyan */
+    --chart-4: 259 40% 60%; /* Lighter Blue */
+    --chart-5: 181 30% 80%; /* Very Light Cyan */
     --radius: 0.75rem;
-    --sidebar-background: 259 60% 20%; /* Bleu Nuit from Converteo Palette */
-    --sidebar-foreground: 220 15% 80%;
-    --sidebar-primary: 181 67% 70%; /* Lighter Cyan for active items */
+    --sidebar-background: 259 60% 20%; /* #2E1452 */
+    --sidebar-foreground: 0 0% 80%;
+    --sidebar-primary: 181 67% 70%; 
     --sidebar-primary-foreground: 259 60% 10%;
     --sidebar-accent: 259 60% 28%;
     --sidebar-accent-foreground: 0 0% 100%;
@@ -39,11 +39,11 @@
     --sidebar-ring: 181 67% 70%;
   }
   .dark {
-    --background: 220 25% 10%;
+    --background: 259 60% 10%;
     --foreground: 0 0% 98%;
-    --card: 259 60% 12%; /* Darker Bleu Nuit */
+    --card: 259 60% 15%;
     --card-foreground: 0 0% 98%;
-    --popover: 220 25% 10%;
+    --popover: 259 60% 10%;
     --popover-foreground: 0 0% 98%;
     --primary: 181 67% 51%; /* Cyan */
     --primary-foreground: 259 60% 10%;
@@ -58,13 +58,13 @@
     --border: 259 60% 25%;
     --input: 259 60% 25%;
     --ring: 181 67% 51%;
-    --chart-1: 181 67% 51%;
-    --chart-2: 181 50% 70%;
-    --chart-3: 259 50% 60%;
-    --chart-4: 181-30-80;
-    --chart-5: 259 30% 70%;
-    --sidebar-background: 259 60% 20%;
-    --sidebar-foreground: 220 15% 80%;
+    --chart-1: 181 67% 51%; /* Cyan */
+    --chart-2: 181 50% 70%; /* Lighter Cyan */
+    --chart-3: 259 50% 60%; /* Lighter Blue */
+    --chart-4: 181 30% 80%; /* Very Light Cyan */
+    --chart-5: 259 30% 70%; /* Very Light Blue */
+    --sidebar-background: 259 60% 20%; /* #2E1452 */
+    --sidebar-foreground: 0 0% 80%;
     --sidebar-primary: 181 67% 70%;
     --sidebar-primary-foreground: 259 60% 10%;
     --sidebar-accent: 259 60% 28%;
