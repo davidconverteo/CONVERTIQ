@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 import { DollarSign, Zap, Users, CheckCircle, Lightbulb, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -164,5 +164,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
