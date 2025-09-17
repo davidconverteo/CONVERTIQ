@@ -42,8 +42,8 @@ export default function Header() {
             {/* We need to re-create the sidebar here for mobile, but as a standard div not aside */}
             <div className="flex h-full flex-col text-sidebar-foreground">
                 <div className="flex h-20 items-center gap-3 px-6">
-                  <Link href="/dashboard" className="flex items-center gap-3">
-                     <Image src="https://i.postimg.cc/sX4YyC2j/Convert-IQ-logo-2.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain brightness-[10] contrast-[1.2]" />
+                  <Link href="/dashboard" className="flex items-center gap-3 rounded-md bg-white p-2">
+                     <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={140} height={32} className="h-8 w-auto object-contain" />
                   </Link>
                 </div>
                 <Sidebar />
@@ -65,5 +65,3 @@ export default function Header() {
     </header>
   );
 }
-
-    
