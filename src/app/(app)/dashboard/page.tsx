@@ -5,9 +5,12 @@ import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countryOptions, channelOptions, retailerOptions, gammeOptions, periodOptions } from '@/services/filters-data';
-import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users, MoveRight } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Checkbox } from '@/components/ui/checkbox';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const generateData = (filters: any) => {
     const hashCode = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
@@ -57,7 +60,7 @@ const generateData = (filters: any) => {
             "Transactions": random(kpiData.transactionsTrend - 3, kpiData.transactionsTrend + 3, `trans_w${week}`),
             "Clients": random(kpiData.customersTrend - 2, kpiData.customersTrend + 2, `cust_w${week}`),
         }
-    });
+    }).reverse();
 
     return { kpiData, evolutionData };
 };
@@ -202,6 +205,37 @@ export default function DashboardPage() {
                         {visibleKpis.includes("Clients") && <Line yAxisId="right" type="monotone" dataKey="Clients" stroke="hsl(var(--chart-4))" strokeWidth={2} dot={false} />}
                     </LineChart>
                 </ResponsiveContainer>
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Image src="https://i.postimg.cc/BvSXnkMw/Convert-IQ-logo.png" alt="ConvertIQ Logo" width={24} height={24} className="object-contain" />
+                <CardTitle className="text-lg">Analyse & Recommandations</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+                <div>
+                    <h4 className="font-semibold mb-1">À retenir</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li>La croissance du chiffre d'affaires est principalement portée par l'augmentation des volumes, ce qui est un signe de bonne santé.</li>
+                        <li>Le nombre de clients montre une tendance positive, mais les transactions par client stagnent légèrement sur les dernières semaines.</li>
+                        <li>Les filtres actuels montrent une forte performance sur le canal 'Offline', mais une faiblesse sur le 'Online'.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Nos recommandations</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground">
+                        <li><strong>Opportunité :</strong> Il y a un potentiel de croissance significatif sur le canal Online. Envisagez de lancer une campagne de 'Sponsored Products' pour la gamme 'Skyr' afin de dynamiser les ventes en ligne.</li>
+                        <li><strong>Optimisation :</strong> Le ROAS des campagnes TV semble diminuer. Utilisez le module MMM pour simuler une réallocation de 10% du budget TV vers le 'Social Media' afin d'en mesurer l'impact.</li>
+                        <li><strong>Analyse :</strong> La pénétration des foyers stagne. Plongez dans les 'Données Consommateurs' pour identifier de nouveaux segments de clientèle à cibler.</li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 className="font-semibold mb-1">Pour aller plus loin</h4>
+                     <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href="/retail-media">Piloter les campagnes Retail Media <MoveRight className="ml-1" /></Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
 
