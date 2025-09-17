@@ -156,7 +156,7 @@ export default function CreativeStudio() {
         toast({ title: "Génération en cours...", description: "Création de l'image de base, veuillez patienter." });
         const imageResponse = await generateMarketingImage({ prompt: finalPrompt });
         setBaseImage(imageResponse.imageUrl);
-        toast({ title: "Image de base générée !", description: "Vous pouvez maintenant l'adapter aux différents canaux." });
+        toast({ title: "Image de base générée !", description: "Vous pouvez maintenant l'éditer ou l'adapter." });
 
     } catch (error) {
         console.error("Image generation error:", error);
@@ -169,7 +169,7 @@ export default function CreativeStudio() {
   const handleEditSubmit: SubmitHandler<BriefFormValues> = async (data) => {
     const editPrompt = data.editPrompt;
     if (!baseImage || !editPrompt) {
-        toast({ variant: "destructive", title: "Éléments manquants", description: "Veuillez uploader une image et fournir une instruction de modification."});
+        toast({ variant: "destructive", title: "Éléments manquants", description: "Veuillez avoir une image de base et une instruction de modification."});
         return;
     }
 
@@ -181,6 +181,7 @@ export default function CreativeStudio() {
              editInstruction: editPrompt
          });
          setBaseImage(editResponse.editedImageUrl);
+         briefForm.setValue("editPrompt", "");
          toast({ title: "Image modifiée !", description: "La modification a été appliquée. Vous pouvez continuer à l'éditer ou la décliner." });
 
     } catch (error) {
@@ -240,7 +241,7 @@ export default function CreativeStudio() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Sparkles className="h-6 w-6 text-accent" />1. Brief Créatif</CardTitle>
-            <CardDescription>Définissez votre point de départ, vos ressources de marque et générez le visuel principal.</CardDescription>
+            <CardDescription>Définissez votre point de départ pour générer ou uploader le visuel principal.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...briefForm}>
@@ -287,21 +288,11 @@ export default function CreativeStudio() {
                             </FormItem>
                         )}
                       />
-                       <FormField
-                        control={briefForm.control}
-                        name="editPrompt"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Décrivez la modification (optionnel)</FormLabel>
-                            <FormControl><Textarea {...field} rows={3} placeholder="Ex: ajoute un fond de cuisine moderne et lumineux" /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                   </TabsContent>
                 </Tabs>
                 
                 <div className="space-y-6 pt-4">
+                  <h3 className="text-lg font-semibold text-foreground">Ressources de marque (optionnel)</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {creationMode === 'generate' && (
                          <FormField
@@ -309,7 +300,7 @@ export default function CreativeStudio() {
                           name="inspirationFile"
                           render={({ field: { onChange, ...fieldProps } }) => (
                               <FormItem>
-                                  <FormLabel>Inspiration (Optionnel)</FormLabel>
+                                  <FormLabel>Inspiration visuelle</FormLabel>
                                   <FormControl>
                                       <Input
                                           type="file"
@@ -329,7 +320,7 @@ export default function CreativeStudio() {
                       name="logoFile"
                       render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
-                          <FormLabel>Logo (Optionnel)</FormLabel>
+                          <FormLabel>Logo</FormLabel>
                           <FormControl>
                             <Input
                                 type="file"
@@ -347,7 +338,7 @@ export default function CreativeStudio() {
                       name="guidelinesFile"
                       render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
-                          <FormLabel>Charte Graphique (Optionnel)</FormLabel>
+                          <FormLabel>Charte Graphique</FormLabel>
                           <FormControl>
                             <Input
                                 type="file"
@@ -367,16 +358,11 @@ export default function CreativeStudio() {
                       {previews.guidelines && previews.guidelines.startsWith('data:image') && <Image src={previews.guidelines} alt="Charte" width={60} height={60} className="object-contain rounded-md border p-1" />}
                   </div>
                     
-                  {creationMode === 'generate' ? (
+                  {creationMode === 'generate' && (
                      <Button type="button" onClick={briefForm.handleSubmit(handleGenerationSubmit)} className="w-full" disabled={isGenerating}>
                         {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Générer l'Image de Base
+                        Générer l'Image
                       </Button>
-                  ) : (
-                    <Button type="button" onClick={briefForm.handleSubmit(handleEditSubmit)} className="w-full" disabled={isEditing || !briefForm.watch('editPrompt') || !baseImage}>
-                        {isEditing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Edit className="mr-2 h-4 w-4" />}
-                        Appliquer les Modifications
-                    </Button>
                   )}
                 </div>
               </form>
@@ -389,7 +375,7 @@ export default function CreativeStudio() {
         <Card className="sticky top-24">
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-2xl"><Palette className="h-6 w-6 text-accent" />2. Adaptation &amp; Finalisation</CardTitle>
-            <CardDescription>Générez les déclinaisons pour vos canaux de diffusion. C'est ici que vous pouvez éditer et valider vos visuels.</CardDescription>
+            <CardDescription>Modifiez l'image principale, puis générez les déclinaisons pour vos canaux de diffusion.</CardDescription>
           </CardHeader>
           <CardContent className="min-h-[400px] lg:min-h-[600px]">
             {isGenerating ? (
@@ -409,8 +395,31 @@ export default function CreativeStudio() {
                             {isEditing && <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}
                         </div>
                         
-                        <h3 className="font-semibold pt-4">Choisir les formats</h3>
-                        <Accordion type="multiple" className="w-full">
+                        <Form {...briefForm}>
+                          <form onSubmit={briefForm.handleSubmit(handleEditSubmit)} className="space-y-4">
+                            <FormField
+                              control={briefForm.control}
+                              name="editPrompt"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Instruction de modification (optionnel)</FormLabel>
+                                  <FormControl><Textarea {...field} rows={2} placeholder="Ex: ajoute un fond de cuisine moderne et lumineux" /></FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <Button type="submit" className="w-full" disabled={isEditing || !briefForm.watch('editPrompt')}>
+                                {isEditing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Edit className="mr-2 h-4 w-4" />}
+                                Appliquer la Modification
+                            </Button>
+                          </form>
+                        </Form>
+
+                        
+                    </div>
+                    <div className="space-y-4">
+                         <h3 className="font-semibold">Choisir les formats et décliner</h3>
+                         <Accordion type="multiple" className="w-full">
                           {targetChannelsByCategory.map(category => (
                             <AccordionItem value={category.category} key={category.category}>
                               <AccordionTrigger>{category.category}</AccordionTrigger>
@@ -437,10 +446,7 @@ export default function CreativeStudio() {
                         <Button onClick={handleAdaptation} className="w-full" disabled={Object.values(adaptations).some(a => a.isLoading)}>
                             <Wand2 className="mr-2 h-4 w-4" /> Générer les Déclinaisons
                         </Button>
-                    </div>
-                    <div className="space-y-4">
-                         <h3 className="font-semibold">Déclinaisons</h3>
-                         <div className="space-y-6">
+                         <div className="space-y-6 pt-4 max-h-[400px] overflow-y-auto pr-2">
                             {Object.keys(adaptations).length === 0 && <p className="text-sm text-muted-foreground">Les déclinaisons apparaîtront ici.</p>}
                             {allChannels.filter(channel => adaptations[channel.id]).map(channel => {
                                 const adaptation = adaptations[channel.id];

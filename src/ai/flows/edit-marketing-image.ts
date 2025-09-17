@@ -44,7 +44,7 @@ const editMarketingImageFlow = ai.defineFlow(
         { media: { url: input.baseImage } },
       ],
       config: {
-        responseModalities: ['TEXT', 'IMAGE'],
+        responseModalities: ['IMAGE'],
       },
     });
 
@@ -55,5 +55,3 @@ const editMarketingImageFlow = ai.defineFlow(
     return { editedImageUrl: media.url };
   }
 );
-
-    
