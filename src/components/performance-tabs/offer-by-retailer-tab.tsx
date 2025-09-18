@@ -207,7 +207,7 @@ export default function OfferByRetailerTab({ filters }: OfferByRetailerTabProps)
 const COLORS = ['#8889DD', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D'];
 
 const CustomizedTreemapContent = (props: any) => {
-    const { root, depth, x, y, width, height, index, payload, rank, name } = props;
+    const { root, depth, x, y, width, height, index, payload, rank, name = '' } = props;
   
     return (
       <g>
